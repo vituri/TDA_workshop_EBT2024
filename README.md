@@ -1,4 +1,4 @@
-# Topological Data Analysis workshop at EBT 2024
+# Topological Data Analysis workshop - 2024
 
 ![](images/ebt.png)
 
