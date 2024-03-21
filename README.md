@@ -51,7 +51,7 @@ Extensions are small helpers in VSCode with language-specific functionalities. A
 
 In this workshop I use several libraries with functions to deal with TDA, plots, graphs and so on. To easily install all of them, clone this repository and open it with VSCode.
 
-To-do: 
+# To-do: 
 
 - explain how to source a project with its dependencies;
 - create the .qmd files
