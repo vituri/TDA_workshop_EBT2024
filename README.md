@@ -1,15 +1,23 @@
 # Topological Data Analysis workshop at EBT 2024
 
-This repository will hold all materials necessary to the Topological Data Analysis workshop, which will be presented at the [Encontro Brasileiro de Topologia](https://xxiiiebt.ime.ufba.br/) in july 2024.
+![](https://xxiiiebt.ime.ufba.br/img/splash.png)
+
+This repository will hold all materials necessary to the Topological Data Analysis workshop, which will be presented at the [Encontro Brasileiro de Topologia](https://xxiiiebt.ime.ufba.br/) in July 2024.
 
 ## Goals
 
 At the end of this workshop, you (hopefully) will be able to:
 
 - Explore Julia and its ecosystem;
-- Load and explore datasets;
+- Load and analyze datasets;
 - Apply some TDA techniques side-by-side with other machine learning methods;
 - Create classifiers or clusters of the original data.
+
+My main goal with this course is to spark more interest in the *applied* part of TDA, and create more projects with students to code more and do more data analysis.
+
+Remember: 
+
+> 2 thirds of TDA is data analysis!
 
 # Instructions: how to use this repository
 
@@ -37,9 +45,15 @@ If you are brave enough, you can always code on the notepad, but I suggest some 
 
 ### Install the Julia extension (optional)
 
-Extensions are small helpers in VSCode with language-specific functionalities. Install the Julia extension [here](https://code.visualstudio.com/docs/languages/julia).
+Extensions are small helpers in VSCode with language-specific functionalities. After installing VSCode, install the Julia extension [here](https://code.visualstudio.com/docs/languages/julia).
 
 ## Installing the dependencies
 
-In this workshop I use several libraries with functions from TDA, plots, graphs and so on. To easily install all of them, clone this repository and open it with VSCode.
+In this workshop I use several libraries with functions to deal with TDA, plots, graphs and so on. To easily install all of them, clone this repository and open it with VSCode.
 
+To-do: 
+
+- explain how to source a project with its dependencies;
+- create the .qmd files
+- export the files also as plain code
+- use pluto.jl?
