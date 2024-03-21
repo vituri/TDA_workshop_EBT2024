@@ -1,6 +1,6 @@
 # Topological Data Analysis workshop at EBT 2024
 
-![](https://xxiiiebt.ime.ufba.br/img/splash.png)
+![](images/ebt.png)
 
 This repository will hold all materials necessary to the Topological Data Analysis workshop, which will be presented at the [Encontro Brasileiro de Topologia](images/ebt.png) in July 2024.
 
