@@ -6,7 +6,7 @@ This repository will hold all materials necessary to the Topological Data Analys
 
 ## Goals
 
-At the end of this workshop, you (hopefully) will be able to:
+At the end of this minicourse, you (hopefully) will be able to:
 
 - Explore Julia and its ecosystem;
 - Load and analyze datasets;
@@ -50,6 +50,18 @@ Extensions are small helpers in VSCode with language-specific functionalities. A
 ## Installing the dependencies
 
 In this workshop I use several libraries with functions to deal with TDA, plots, graphs and so on. To easily install all of them, clone this repository and open it with VSCode.
+
+# Summary
+
+In this minicourse, we will explore the practical aspects of Topological Data Analysis using the Julia programming language:
+
+- Quick intro on Julia: basic math and data manipulation, its advantages over other languages like R and Python, how to run code;
+- Dealing with data: import and explore datasets from several types of sources like CSV, meshes and images;
+- A bit of data science: how to clean data, normalize coordinates, explore and visualize it;
+- TDA techniques: create simplicial complex, calculate persistent homology, visualize and interpret the Mapper graph, try different settings;
+- TDA like a pro: Try to reproduce some results found in TDA papers.
+
+The minicourse will be more useful if the attendee be able to run code in its own computer along with the explanations (although this is not a pre-requisite). The complete instructions and code used are available at https://github.com/vituri/TDA_workshop_EBT2024. The material presented is available as a book at 
 
 # To-do: 
 
