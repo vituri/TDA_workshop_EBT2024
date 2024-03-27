@@ -58,10 +58,11 @@ In this minicourse, we will explore the practical aspects of Topological Data An
 - Quick intro on Julia: basic math and data manipulation, its advantages over other languages like R and Python, how to run code;
 - Dealing with data: import and explore datasets from several types of sources like CSV, meshes and images;
 - A bit of data science: how to clean data, normalize coordinates, explore and visualize it;
-- TDA techniques: create simplicial complex, calculate persistent homology, visualize and interpret the Mapper graph, try different settings;
+- TDA techniques: create graphs and simplicial complexes, calculate persistent homology, visualize and interpret the Mapper graph, cluster data with ToMATo;
+- Machine learning basics: why "pure TDA" is not enough?
 - TDA like a pro: Try to reproduce some results found in TDA papers.
 
-The minicourse will be more useful if the attendee be able to run code in its own computer along with the explanations (although this is not a pre-requisite). The complete instructions and code used are available at https://github.com/vituri/TDA_workshop_EBT2024. The material presented is available as a book at https://vituri.github.io/TDA_workshop_EBT2024/.
+The minicourse will be more useful if the attendee be able to run code in its own computer along with the explanations (although this is not a pre-requisite). The complete instructions and code used are available at https://github.com/vituri/TDA_workshop_EBT2024. The material presented is available as a Quarto book at https://vituri.github.io/TDA_workshop_EBT2024/.
 
 # To-do: 
 
