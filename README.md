@@ -61,7 +61,7 @@ In this minicourse, we will explore the practical aspects of Topological Data An
 - TDA techniques: create simplicial complex, calculate persistent homology, visualize and interpret the Mapper graph, try different settings;
 - TDA like a pro: Try to reproduce some results found in TDA papers.
 
-The minicourse will be more useful if the attendee be able to run code in its own computer along with the explanations (although this is not a pre-requisite). The complete instructions and code used are available at https://github.com/vituri/TDA_workshop_EBT2024. The material presented is available as a book at 
+The minicourse will be more useful if the attendee be able to run code in its own computer along with the explanations (although this is not a pre-requisite). The complete instructions and code used are available at https://github.com/vituri/TDA_workshop_EBT2024. The material presented is available as a book at https://vituri.github.io/TDA_workshop_EBT2024/.
 
 # To-do: 
 
