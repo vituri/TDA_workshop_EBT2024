@@ -1,0 +1,39 @@
+project:
+  type: book
+  output-dir: docs
+  # preview: 
+  #   port: 4200
+  #   browser: true
+
+execute:
+  freeze: auto  # re-render only when source changes
+  cache: true
+
+book:
+  title: "TDA Workshop - EBT 2024"
+  reader-mode: true
+  # subtitle: "With examples in Julia"
+  # site-url: https://juliatda.github.io/MetricSpaces.jl/
+  # repo-url: https://github.com/juliatda/MetricSpaces.jl
+  author: "G. Vituri"
+  # date: "2024-03-22"
+  # sharing: [twitter, linkedin]
+  # downloads: [pdf, epub]
+
+  chapters:
+    - index.qmd
+
+format:
+  html:
+    theme: cosmo
+    # css: style.css
+    code-link: true
+    page-layout: full
+    max-width: 90vw
+    preview-links: true
+    
+jupyter: julia-1.10  
+
+
+  # pdf:
+  #   documentclass: scrreprt
