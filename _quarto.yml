@@ -8,6 +8,7 @@ project:
 execute:
   freeze: auto  # re-render only when source changes
   cache: true
+  warning: false
 
 book:
   title: "TDA Workshop - EBT 2024"
@@ -22,6 +23,7 @@ book:
 
   chapters:
     - index.qmd
+    - 3d-shapes.qmd
 
 format:
   html:
@@ -31,6 +33,8 @@ format:
     page-layout: full
     max-width: 90vw
     preview-links: true
+
+  # gfm: default
     
 jupyter: julia-1.10  
 

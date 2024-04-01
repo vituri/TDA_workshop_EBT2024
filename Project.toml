@@ -1,0 +1,11 @@
+[deps]
+GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
+GeoIO = "f5a160d5-e41d-4189-8b61-d57781c419e3"
+Graphs = "86223c79-3864-5bf0-83f7-82e725a168b6"
+JLD2 = "033835bb-8acc-5ee8-8aae-3f567f8a3819"
+Meshes = "eacbb407-ea5a-433e-ab97-5258b1ca43fa"
+MetricSpaces = "737298cd-3e4b-40c4-a4ce-863151543a8d"
+PersistenceDiagrams = "90b4794c-894b-4756-a0f8-5efeb5ddf7ae"
+ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
+Ripserer = "aa79e827-bd0b-42a8-9f10-2b302677a641"
+SimpleWeightedGraphs = "47aef6b3-ad0c-573a-a1e2-d07658019622"

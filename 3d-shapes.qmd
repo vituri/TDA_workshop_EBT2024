@@ -1,0 +1,369 @@
+# 3d shape classification using persistent homology
+
+In this lesson, we will explore a 3d-shape classification problem using some experimental approaches.
+
+## The dataset
+
+The dataset we are using is !!!citar. It consists of !!!. The files can be downloaded at !!!. After downloading it, unzip the file and put then inside a directory called "meshes". !!! jogou fora gallopes
+
+The files are written in the ".obj" format. They are *meshes*: sets of points and triangles that forma  3d image like the ones we can see in videogames.
+
+## Loading and visualizing the shapes
+
+Let's start with a flamingo shape. We load some libraries
+
+```{julia}
+using Meshes, GeoIO
+import GLMakie as gl
+using ProgressMeter
+```
+
+and define functions
+
+```{julia}
+read_mesh(filepath) = GeoIO.load(filepath).geometry
+
+plot_mesh(ms) = viz(ms);
+```
+
+The reference pose is the following:
+
+```{julia}
+filepath = "meshes/flamingo-poses/flam-reference.obj"
+ms = read_mesh(filepath)
+
+plot_mesh(ms)
+```
+
+And we can see some variations of it:
+
+```{julia}
+ms2 = read_mesh("meshes/flamingo-poses/flam-01.obj")
+
+plot_mesh(ms2)
+```
+
+```{julia}
+ms2 = read_mesh("meshes/flamingo-poses/flam-02.obj")
+
+plot_mesh(ms2)
+```
+
+```{julia}
+ms2 = read_mesh("meshes/flamingo-poses/flam-03.obj")
+
+plot_mesh(ms2)
+```
+
+## Setting the classification problem
+
+We have 83 shapes on the following directories:
+
+```{julia}
+readdir("meshes/")
+```
+
+Each shape $s \in S$ has a class of the type camel, cat, elephant, etc. We can think of this class as a function $c: S \to C$ where $C$ is the set of classes. Let $S_{rp}$ be the set of reference poses.
+
+We will try to solve the following problem: can we correctly calculate $c(s)$ when we only know $c$ for $s \in S_{rp}$? That is: knowing only the class of each reference pose, can we deduce the class of the remaining shapes using only the mesh file?
+
+This kind of problem is common in data science, and is known as a "classification problem": we are trying to *atribute classes to objects, knowing the class of fewer other objects*.
+
+## From meshes to metric spaces
+
+As this is a minicourse on topological data analysis, we know that in somewhere we have to use persistent homology.
+
+An ingenuous attempt to solve the classification problem can be summarised as follows:
+
+- For each shape $S_i$, extract the points $X_i \subset \mathbb{R}^3$ and consider $d$ as the Euclidean distance;
+- Calculate the persistence diagram $D_i = dgm(X_i)$;
+- For each $D_i$, calculate the bottleneck distance from $D_i$ to all $D_j$ where $S_j$ is a reference pose;
+- The closest reference pose to $D_i$ will be the class of $S_i$.
+
+This approach won't work because of the two first steps.
+
+- The euclidean distance is not appropriate for this problem. Flamingos in different poses will have a big Gromov-Hausdorff distance. We need to use some kind of geodesic distance.
+
+- The amount of points in $X_i$ is too big to calculate the persistence diagram. The flamingo dataset has more than 25.000 points for each shape. This will probably explode your RAM memory when calculating the Rips complex.
+
+Fortunately, there are ways to contourn these problems!
+
+- Extract a subset of "reasonably spaced points" of $S$ that still contains its core geometric properties;
+
+- Calculate the geodesic distance between these points using the shape $S$.
+
+### From meshes to $\mathbb{R}^3$
+
+Let's extract the points of $S$ as a subspace of $\mathbb{R}^3$:
+
+```{julia}
+using MetricSpaces
+
+mesh_to_metric_space(ms) = ms.vertices .|> coordinates .|> Vector |> EuclideanSpace
+```
+
+```{julia}
+X = mesh_to_metric_space(ms)
+```
+
+We can see that $X$ is made of 26907 points of $\mathbb{R}^3$. We can plot it:
+
+```{julia}
+gl.scatter(X, markersize = 5)
+```
+
+### From meshes to graphs
+
+Now, to calculate the geodesic distance, we will create a graph from the mesh $S$.
+
+```{julia}
+using Graphs, SimpleWeightedGraphs
+
+function graph_from_mesh(ms)
+    # the set of vertices
+    V = coordinates.(ms.vertices)
+
+    # create an empty graph
+    g = SimpleWeightedGraph()
+
+    # add n vertices to it
+    n = length(V)
+    add_vertices!(g, n)
+
+    # the set of triangles of the mesh ms
+    triangles = ms.topology.connec
+
+    # for each triangle, add its edges to the graph
+    @showprogress desc = "Adding vertices to graph..." for t ∈ triangles
+        v1, v2, v3 = t.indices
+        add_edge!(g, v1, v2, dist_euclidean(V[v1], V[v2]))
+        add_edge!(g, v1, v3, dist_euclidean(V[v1], V[v3]))
+        add_edge!(g, v2, v3, dist_euclidean(V[v2], V[v3]))
+    end
+
+    g
+end;
+```
+
+Calculate the graph $g$ from the mesh
+
+```{julia}
+g = graph_from_mesh(ms)
+```
+
+<!-- We can see the sparse array of its weight as follows:
+
+```{julia}
+weights(g)
+```
+ -->
+
+
+Notice, however, that the mesh is not connected! This can be seen with
+
+```{julia}
+is_connected(g)
+```
+
+These are the connected components of $g$:
+
+```{julia}
+connected_components(g)
+```
+
+Let's extract the one with the most points and throw away the points of $X$ outside it.
+
+```{julia}
+function extract_biggest_connected_component(g)
+    cc_components = connected_components(g)
+    ids_biggest_component = cc_components[findmax(length, cc_components)[2]]
+
+    # modify the graph g on place
+    g = g[ids_biggest_component]
+
+    # return the ids of the biggest connected component
+    g, ids_biggest_component
+end
+```
+
+```{julia}
+g, ids_biggest_component = extract_biggest_connected_component(g);
+```
+
+We can see that $g$ now is connected:
+
+```{julia}
+is_connected(g)
+```
+
+Let's throw away from $X$ the points outside this component:
+
+```{julia}
+X = X[ids_biggest_component]
+```
+
+### Farthest points sampling
+
+We could just select a random sample of points from our space, but !!!
+
+The farthest points algorithm was shown to me by Facundo Mémoli on a dirty blackboard in 2018 !!!
+
+::: {.callout-important}
+<!-- ## Algorithm -->
+
+Let $(X, d)$ be a metric space. Fix an integer $n$. Let $C = \emptyset$ be a set of chosen points. Select $x_1 \in X$ and add it to $C$. Repeat the following procedure until you have $n$ points:
+
+- Calculate the point $x \in X$ that is the most distant from all elements of $C$. 
+- Add $x$ to $C$.
+- If $C$ has $n$ points, stop.
+
+The set $C$ is called a *farthest points sampling* of $X$ with size $n$.
+:::
+
+
+Let's extract 1000 points with the FPS algorithm:
+
+```{julia}
+ids_fps = farthest_points_sample(X, 1000);
+X_fps = X[ids_fps]
+```
+
+```{julia}
+gl.scatter(X_fps, markersize = 5)
+```
+
+This is a very reasonable approximation!
+
+We are now interested in calculating the geodesic distance between these 1000 points. But be careful! The geodesic distance need the entire mesh to work.
+
+### Geodesic distances
+
+Given a shape $S$, we can think of the geodesic distance between two points as "the least distance an and would need to walk from one point to another". We will approximate this "walkable" paths using the edges of the triangles of the shape $S$. Remember: a mesh is a set of points and triangles!
+
+The Dijkstra algorithm is perfect for our needs: it calculates the shortest path from one point to another in a weighted graph. So all we need is to:
+
+- Transform $S$ into a graph where the edges have weights (the euclidean distance between these points);
+- Calculate the shortest path between each two points.
+
+```{julia}
+function geodesic_distance_from_graph(g, ids)
+    n = length(ids)
+    D = zeros(n, n)
+
+    @showprogress desc = "Calculating geodesic distance..." Threads.@threads for (i, id) ∈ collect(enumerate(ids))
+        dts = dijkstra_shortest_paths(g, id)
+        D[i, :] = dts.dists[ids]
+    end
+
+    # force simmetry on X, because of small difference
+    # in the calculation of paths
+    for i ∈ 1:n
+        for j ∈ i:n
+            D[i, j] = D[j, i]
+        end
+    end
+
+    # normalize the distance
+    max_dist = maximum(D)
+    D = D ./ max_dist
+
+    return D
+end
+```
+
+```{julia}
+D = geodesic_distance_from_graph(g, ids_fps)
+```
+
+We can see that $D$ makes sense just by plotting $X_fps$ colored by the sum of the distances to each points:
+
+```{julia}
+exc = map(sum, eachcol(D))
+
+gl.scatter(X_fps, color = exc, markersize = 10)
+```
+
+Looks good! Now we have 1000 points sampled from $S$, together with the geodesic distance.
+
+## Persistent homology
+
+The above section was just about preparing our dataset! We can summarise what we did with the following function:
+
+```{julia}
+import Ripserer as Rp
+import PersistenceDiagrams as Pd
+import Plots
+```
+
+```{julia}
+pd = Rp.ripserer(D, dim_max = 1, verbose=true, sparse = true, threshold = 0.9)
+```
+
+```{julia}
+function plot_barcode(pd)
+    threshold = pd[2] .|> last |> maximum
+    Rp.barcode(pd[2], infinity = threshold)
+end
+
+plot_barcode(pd)
+```
+
+### Summarizing
+
+```{julia}
+function file_to_barcode(filepath, n_points = 1000, dim_max = 1)
+    ms = read_mesh(filepath)
+
+    X = mesh_to_metric_space(ms)
+    g = graph_from_mesh(ms)
+
+    g, ids_biggest_component = extract_biggest_connected_component(g)
+    X = X[ids_biggest_component]
+
+    ids_fps = farthest_points_sample(X, n_points);
+    X_fps = X[ids_fps]
+
+    D = geodesic_distance_from_graph(g, ids_fps)
+
+    pd = Rp.ripserer(D, dim_max = dim_max, verbose=true, sparse = true, threshold = 0.8)
+
+    return X_fps, D, pd
+end
+```
+
+### Calculating the barcode for all shapes
+
+```{julia}
+# using Chain
+# function list_files(path="", pattern="")
+#     files =
+#         @chain begin
+#             map(walkdir(path)) do (root, dirs, files)
+#                 joinpath.(root, files)
+#             end
+#             reduce(vcat, _)
+#             filter(x -> occursin(pattern, x), _)
+#         end
+
+#     files
+# end
+```
+
+
+
+
+```{julia}
+# filepaths = list_files("meshes/", "obj")
+```
+
+
+```{julia}
+# filepath = filepaths[10]
+
+# using FileIO
+# X_fps, D, pd = file_to_barcode(filepath)
+
+
+# new_filepath = replace(filepath, ".obj" => ".jld2")
+# save_object(new_filepath, pd[2:2])
+```
