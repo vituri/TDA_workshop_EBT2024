@@ -73,6 +73,18 @@ ms2 = read_mesh("meshes/flamingo-poses/flam-03.obj")
 plot_mesh(ms2)
 ```
 
+```{julia}
+ms2 = read_mesh("meshes/lion-poses/lion-reference.obj")
+
+plot_mesh(ms2)
+```
+
+```{julia}
+ms2 = read_mesh("meshes/cat-poses/cat-reference.obj")
+
+plot_mesh(ms2)
+```
+
 ## Setting the classification problem
 
 We have 83 shapes in the following directories:
@@ -319,7 +331,7 @@ Looks good! The extremities of the flamingo are in a lighter color, indicating t
 We can now calculate the persistence diagram of $X_fps$ with the geodesic distance and use it! Let's load some packages and calculate it
 
 ```{julia}
-pd = Ripserer.ripserer(D, dim_max = 2, verbose=true, sparse = true, threshold = 0.8)
+pd = Ripserer.ripserer(D, dim_max = 2, verbose=true, sparse = true, threshold = 0.4)
 ```
 
 Ploting the intervals looks as follows:
@@ -567,7 +579,7 @@ plot(DB, st = :heatmap, xticks = labels, yticks = labels)
 #| code-fold: true
 function plot_hc(hc)
     plot(
-        hc, xticks = (1:83, pds_df.File)
+        hc, xticks = (1:83, pds_df.File[hc.order])
         , xflip = true, xrotation = 270
         , xtickfont = font(5, "Roboto")
         )
@@ -580,11 +592,13 @@ The single linkage dendrogram is bad
 hclust(DB, linkage=:single, branchorder = :optimal) |> plot_hc
 ```
 
-The single linkage dendrogram is bad
+But the complete shows more hope:
 
 ```{julia}
-hclust(DB, linkage=:complete, branchorder = :optimal) |> plot_hc
+hclust(DB, linkage = :complete, branchorder = :optimal) |> plot_hc
 ```
+
+Here is also the Ward algorithm:
 
 ```{julia}
 hclust(DB, linkage = :ward, branchorder = :optimal) |> plot_hc
