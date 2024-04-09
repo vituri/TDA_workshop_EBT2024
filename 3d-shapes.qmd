@@ -13,12 +13,30 @@ The files are written in the ".obj" format. They are *meshes*: sets of points an
 Let's start with a flamingo shape. We load some libraries
 
 ```{julia}
+# read meshes and plot
 using Meshes, GeoIO
 import GLMakie as gl
+
+# see progress
 using ProgressMeter
+
+# dataframes
+using DataFramesMeta, CSV, Chain
+
+# metric spaces and graphs
+using MetricSpaces
+using Graphs, SimpleWeightedGraphs
+
+# persistent homology
+import Ripserer
+import PersistenceDiagrams as Pd
+import Plots
+
+# comparing the distance matrix
+using Clustering, StatsPlots
 ```
 
-and define functions
+and define functions to read and visualize shapes
 
 ```{julia}
 read_mesh(filepath) = GeoIO.load(filepath).geometry
@@ -35,7 +53,7 @@ ms = read_mesh(filepath)
 plot_mesh(ms)
 ```
 
-And we can see some variations of it:
+We can see some variations of it:
 
 ```{julia}
 ms2 = read_mesh("meshes/flamingo-poses/flam-01.obj")
@@ -57,17 +75,17 @@ plot_mesh(ms2)
 
 ## Setting the classification problem
 
-We have 83 shapes on the following directories:
+We have 83 shapes in the following directories:
 
 ```{julia}
-readdir("meshes/")
+filter(!isfile, readdir("meshes/", join = true))
 ```
 
-Each shape $s \in S$ has a class of the type camel, cat, elephant, etc. We can think of this class as a function $c: S \to C$ where $C$ is the set of classes. Let $S_{rp}$ be the set of reference poses.
+Each shape $s \in S$ has a class of the type camel, cat, elephant, etc. We can think of these classes as a function $c: S \to C$ where $C$ is the set of classes. Let $S_{rp}$ be the set of reference poses.
 
 We will try to solve the following problem: can we correctly calculate $c(s)$ when we only know $c$ for $s \in S_{rp}$? That is: knowing only the class of each reference pose, can we deduce the class of the remaining shapes using only the mesh file?
 
-This kind of problem is common in data science, and is known as a "classification problem": we are trying to *atribute classes to objects, knowing the class of fewer other objects*.
+This kind of problem is common in data science and is known as a "classification problem": we are trying to *atribute classes to objects, knowing the class of fewer other objects*.
 
 ## From meshes to metric spaces
 
@@ -80,7 +98,7 @@ An ingenuous attempt to solve the classification problem can be summarised as fo
 - For each $D_i$, calculate the bottleneck distance from $D_i$ to all $D_j$ where $S_j$ is a reference pose;
 - The closest reference pose to $D_i$ will be the class of $S_i$.
 
-This approach won't work because of the two first steps.
+**This approach won't work** because of the two first steps:
 
 - The euclidean distance is not appropriate for this problem. Flamingos in different poses will have a big Gromov-Hausdorff distance. We need to use some kind of geodesic distance.
 
@@ -97,9 +115,7 @@ Fortunately, there are ways to contourn these problems!
 Let's extract the points of $S$ as a subspace of $\mathbb{R}^3$:
 
 ```{julia}
-using MetricSpaces
-
-mesh_to_metric_space(ms) = ms.vertices .|> coordinates .|> Vector |> EuclideanSpace
+mesh_to_metric_space(ms) = ms.vertices .|> coordinates .|> Vector |> EuclideanSpace;
 ```
 
 ```{julia}
@@ -109,16 +125,15 @@ X = mesh_to_metric_space(ms)
 We can see that $X$ is made of 26907 points of $\mathbb{R}^3$. We can plot it:
 
 ```{julia}
-gl.scatter(X, markersize = 5)
+gl.scatter(X, markersize = 1)
 ```
 
 ### From meshes to graphs
 
-Now, to calculate the geodesic distance, we will create a graph from the mesh $S$.
+Now, to calculate the geodesic distance, we will create a graph from the mesh $S$. We load packages and define a function
 
 ```{julia}
-using Graphs, SimpleWeightedGraphs
-
+#| code-fold: true
 function graph_from_mesh(ms)
     # the set of vertices
     V = coordinates.(ms.vertices)
@@ -145,19 +160,19 @@ function graph_from_mesh(ms)
 end;
 ```
 
-Calculate the graph $g$ from the mesh
+and create the graph $g$ from the mesh
 
 ```{julia}
 g = graph_from_mesh(ms)
 ```
 
-<!-- We can see the sparse array of its weight as follows:
+This weighted graph is the 1-skeleton of the mesh, and the weights between the vertices are the euclidean distance between then (as subsets of $\mathbb{R}^3$).
+
+We can see the sparse array of its weight as follows:
 
 ```{julia}
 weights(g)
 ```
- -->
-
 
 Notice, however, that the mesh is not connected! This can be seen with
 
@@ -171,9 +186,11 @@ These are the connected components of $g$:
 connected_components(g)
 ```
 
-Let's extract the one with the most points and throw away the points of $X$ outside it.
+There is one big connected components, and several smaller ones with 1 point each. Let's extract the one with the most points and throw away the points of $X$ outside it.
 
 ```{julia}
+#| code-fold: true
+
 function extract_biggest_connected_component(g)
     cc_components = connected_components(g)
     ids_biggest_component = cc_components[findmax(length, cc_components)[2]]
@@ -181,9 +198,9 @@ function extract_biggest_connected_component(g)
     # modify the graph g on place
     g = g[ids_biggest_component]
 
-    # return the ids of the biggest connected component
+    # return g and the ids of the biggest connected component
     g, ids_biggest_component
-end
+end;
 ```
 
 ```{julia}
@@ -202,39 +219,46 @@ Let's throw away from $X$ the points outside this component:
 X = X[ids_biggest_component]
 ```
 
+We now have 26394 points, which is a small reduction.
+
 ### Farthest points sampling
 
-We could just select a random sample of points from our space, but !!!
-
-The farthest points algorithm was shown to me by Facundo Mémoli on a dirty blackboard in 2018 !!!
+We could just select a random sample of points from our space, but points in high-density areas would be selected a lot more. There is another way to select points in a "well spaced manner", called the *farthest point sampling algorithm*. This algorithm was shown to me by Facundo Mémoli on a dirty blackboard in 2018 and the simplicity of it astonished me. For the curious ones, the algorithm is detailed below.
 
 ::: {.callout-important}
 <!-- ## Algorithm -->
 
-Let $(X, d)$ be a metric space. Fix an integer $n$. Let $C = \emptyset$ be a set of chosen points. Select $x_1 \in X$ and add it to $C$. Repeat the following procedure until you have $n$ points:
+Let $(X, d)$ be a metric space. Fix an integer $n$. Let $C = \emptyset$ be the "set of chosen points". Select $x_1 \in X$ randomly and add it to $C$. Repeat the following procedure until you have $n$ points in $C$:
 
-- Calculate the point $x \in X$ that is the most distant from all elements of $C$. 
+- Calculate the point $x \in X$ that is the most distant from all elements of $C$, ie, 
+$$
+\max \{ d(x, c), c \in C \} = \max \{d(x', c), x' \in X, c \in C \}.
+$$
+
 - Add $x$ to $C$.
+
 - If $C$ has $n$ points, stop.
 
 The set $C$ is called a *farthest points sampling* of $X$ with size $n$.
+
+Notice that running the algorithm several times can lead to different sets $C$ because the first term is chosen randomly.
 :::
 
-
-Let's extract 1000 points with the FPS algorithm:
+Let's extract 400 points with the FPS algorithm and the euclidean distance:
 
 ```{julia}
-ids_fps = farthest_points_sample(X, 1000);
+ids_fps = farthest_points_sample(X, 400);
 X_fps = X[ids_fps]
 ```
 
+
 ```{julia}
-gl.scatter(X_fps, markersize = 5)
+gl.scatter(X_fps, markersize = 10)
 ```
 
-This is a very reasonable approximation!
+This is a very good approximation!
 
-We are now interested in calculating the geodesic distance between these 1000 points. But be careful! The geodesic distance need the entire mesh to work.
+We are now interested in calculating the geodesic distance between these 400 points. But be careful! The geodesic distance need the entire mesh to work.
 
 ### Geodesic distances
 
@@ -245,11 +269,16 @@ The Dijkstra algorithm is perfect for our needs: it calculates the shortest path
 - Transform $S$ into a graph where the edges have weights (the euclidean distance between these points);
 - Calculate the shortest path between each two points.
 
+We already have the first item, so let's calculate the second.
+
 ```{julia}
+#| code-fold: true
+
 function geodesic_distance_from_graph(g, ids)
     n = length(ids)
     D = zeros(n, n)
 
+    # for each point, calculate the distance from it to every other point of g
     @showprogress desc = "Calculating geodesic distance..." Threads.@threads for (i, id) ∈ collect(enumerate(ids))
         dts = dijkstra_shortest_paths(g, id)
         D[i, :] = dts.dists[ids]
@@ -263,12 +292,12 @@ function geodesic_distance_from_graph(g, ids)
         end
     end
 
-    # normalize the distance
+    # normalize the distance so the max is 1
     max_dist = maximum(D)
     D = D ./ max_dist
 
     return D
-end
+end;
 ```
 
 ```{julia}
@@ -283,35 +312,57 @@ exc = map(sum, eachcol(D))
 gl.scatter(X_fps, color = exc, markersize = 10)
 ```
 
-Looks good! Now we have 1000 points sampled from $S$, together with the geodesic distance.
+Looks good! The extremities of the flamingo are in a lighter color, indicating that the sum of the distances there is bigger. Now we have 1000 points sampled from $S$, together with the geodesic distance.
 
 ## Persistent homology
 
-The above section was just about preparing our dataset! We can summarise what we did with the following function:
+We can now calculate the persistence diagram of $X_fps$ with the geodesic distance and use it! Let's load some packages and calculate it
 
 ```{julia}
-import Ripserer as Rp
-import PersistenceDiagrams as Pd
-import Plots
+pd = Ripserer.ripserer(D, dim_max = 2, verbose=true, sparse = true, threshold = 0.8)
 ```
 
-```{julia}
-pd = Rp.ripserer(D, dim_max = 1, verbose=true, sparse = true, threshold = 0.9)
-```
+Ploting the intervals looks as follows:
 
 ```{julia}
+#| code-fold: true
+
 function plot_barcode(pd)
-    threshold = pd[2] .|> last |> maximum
-    Rp.barcode(pd[2], infinity = threshold)
-end
+    # get the size of the longest interval
+    threshold = 
+        @chain begin
+            vcat(pd...)
+            last.(_)
+            filter(isfinite, _)
+            maximum
+        end
 
+    # plot the barcode using this interval as the maximum value of the x-axis
+    Ripserer.barcode(pd, infinity = threshold)
+end;
+```
+
+```{julia}
 plot_barcode(pd)
 ```
 
-### Summarizing
+or just the 1- and 2-dimensional barcode:
 
 ```{julia}
-function file_to_barcode(filepath, n_points = 1000, dim_max = 1)
+plot_barcode(pd[2:3])
+```
+
+## Summarizing
+
+All the hard work on the previous sections was just to prepare our dataset from file to barcode. That's why they say that data science is 80% preparing the data and 20% analyzing it!
+
+We can summarise what we did with the following function:
+
+
+```{julia}
+#| code-fold: true
+
+function file_to_barcode(filepath; n_points = 1000, dim_max = 1)
     ms = read_mesh(filepath)
 
     X = mesh_to_metric_space(ms)
@@ -325,45 +376,291 @@ function file_to_barcode(filepath, n_points = 1000, dim_max = 1)
 
     D = geodesic_distance_from_graph(g, ids_fps)
 
-    pd = Rp.ripserer(D, dim_max = dim_max, verbose=true, sparse = true, threshold = 0.8)
+    pd = Ripserer.ripserer(D, dim_max = dim_max, verbose=true, sparse = true, threshold = 0.8)
 
     return X_fps, D, pd
+end;
+```
+
+We also define some functions to save the barcodes and metric spaces to disk, so we don't have to calculate all of them in a single session. Calculating the 2-dimensional barcode can take some time depending on your hardware!
+
+```{julia}
+#| code-fold: true
+function pd_to_dataframe(pd)
+    df = @chain begin
+        map(pd) do p
+            DataFrame(
+                birth=p .|> first, death=p .|> last, dim=p.dim
+            )
+        end
+        vcat(_...)
+    end
+
+    df
+end
+
+function dataframe_to_pd(df)
+    df.threshold .= 1
+
+    @chain df begin
+        groupby(:dim)
+        collect
+        map(Pd.PersistenceDiagram, _)
+    end
+end
+
+function metric_space_to_df(X) 
+    @chain X_fps begin
+        stack
+        transpose
+        DataFrame(_, :auto)
+    end
+end
+
+function list_files(path="", pattern="")
+    files =
+        @chain begin
+            map(walkdir(path)) do (root, dirs, files)
+                joinpath.(root, files)
+            end
+            reduce(vcat, _)
+            filter(x -> occursin(pattern, x), _)
+        end
+
+    files
+end;
+```
+
+Now we loop over all meshes, calculate its persistence diagram and save it to disk, together with the $X_fps$ metric space as above.
+
+**Important**: This can take some time! If you cloned my github repository, these files are already there, so you can skip the following piece of code:
+
+```{julia}
+#| eval: false
+overwrite_old_files = true
+
+@showprogress "Calculating barcode..." for file ∈ list_files("meshes/", ".obj") 
+    println("Calculating barcode from file $file ...")
+
+    file_pd = replace(file, ".obj" => "-pd.csv")
+    # skip if there is a file already
+    if isfile(file_pd) & !overwrite_old_files continue end
+
+    X_fps, D, pd = file_to_barcode(file, n_points = 350, dim_max = 2)
+    df = pd_to_dataframe(pd)
+
+    CSV.write(file_pd, df)
+
+    file_X = replace(file, ".obj" => "-points.csv")
+    CSV.write(file_X, metric_space_to_df(X_fps))
 end
 ```
 
-### Calculating the barcode for all shapes
+We read the persistence diagrams saved on disk and pass them to table (a DataFrame object), but first we throw away small intervals.
 
 ```{julia}
-# using Chain
-# function list_files(path="", pattern="")
-#     files =
-#         @chain begin
-#             map(walkdir(path)) do (root, dirs, files)
-#                 joinpath.(root, files)
-#             end
-#             reduce(vcat, _)
-#             filter(x -> occursin(pattern, x), _)
-#         end
+#| code-fold: true
 
-#     files
-# end
+function throw_away_small_intervals(pd, min_pers = 0.01)
+    map(pd) do p
+        filter(x -> Pd.persistence(x) > min_pers, p)
+    end
+end;
+```
+
+```{julia}
+#| code-fold: true
+function read_pds_from_files(directory, min_interval_size = 0.05)
+  pds_df = DataFrame()
+
+#   file = list_files("meshes/", "-pd.csv")[1]
+  for file ∈ list_files(directory, "-pd.csv")
+
+      pd = @chain begin
+          CSV.read(file, DataFrame)
+          dataframe_to_pd(_)
+          throw_away_small_intervals(min_interval_size)
+      end
+
+      name = replace(file, "-pd.csv" => "")
+      push!(pds_df, (Path = name, Persistence_diagram = pd))
+  end
+
+  pds_df
+
+  sort!(pds_df, :Path)
+
+  pds_df.File = [split(s, "/")[3] for s ∈ pds_df.Path]
+  pds_df.Class = [split(s, "-")[1] for s ∈ pds_df.File]
+
+  pds_df
+end;
+```
+
+```{julia}
+pds_df = read_pds_from_files("meshes/", 0.01)
+```
+
+The dataframe looks ok! You can plot the barcodes as follows:
+
+```{julia}
+pd2 = pds_df.Persistence_diagram[1]
+plot_barcode(pd2[2:3])
+```
+
+Now we calculate the bootleneck distance between each pair of persistence diagrams. This can take some time! If you cloned the repository, you don't need to run this piece of code.
+
+```{julia}
+#| eval: false
+pds = pds_df.Persistence_diagram
+
+DB = zeros(83, 83)
+
+@showprogress for i ∈ 1:83
+    for j ∈ i:83
+        if i == j
+            DB[i, j] = 0 
+            continue 
+        end
+
+        DB[i, j] = 
+            Pd.Bottleneck()(pds[i][2], pds[j][2]) + 
+            Pd.Bottleneck()(pds[i][3], pds[j][3])
+
+        DB[j, i] = DB[i, j]
+    end
+end
+
+CSV.write("meshes/bottleneck_distance.csv", DataFrame(DB, :auto))
+```
+
+Notice that we defined the distance $DB_{i, j}$ between two shapes $X_i$ and $X_j$ as 
+
+$$
+DB_{i, j} = d_b(dgm_1(X_i), dgm_1(X_j)) + d_b(dgm_2(X_i), dgm_2(X_j))
+$$
+
+where $d_b$ is the bottleneck distance, and $dgm_i$ is the $i$-dimensional persistence diagram.
+
+We read $DB$ from disk, in case you did not calculate it previously
+
+```{julia}
+DB = CSV.read("meshes/bottleneck_distance.csv", DataFrame) |> Matrix
+DB
 ```
 
 
+```{julia}
+labels = pds_df.Class |> copy
+for i ∈ 2:length(pds_df.Class)
+    if labels[i] == pds_df.Class[i-1]
+        labels[i] = ""
+    end
+end
 
+labels = (1:83, labels)
+
+plot(DB, st = :heatmap, xticks = labels, yticks = labels)
+```
 
 ```{julia}
-# filepaths = list_files("meshes/", "obj")
+#| code-fold: true
+function plot_hc(hc)
+    plot(
+        hc, xticks = (1:83, pds_df.File)
+        , xflip = true, xrotation = 270
+        , xtickfont = font(5, "Roboto")
+        )
+end;
+```
+
+The single linkage dendrogram is bad
+
+```{julia}
+hclust(DB, linkage=:single, branchorder = :optimal) |> plot_hc
+```
+
+The single linkage dendrogram is bad
+
+```{julia}
+hclust(DB, linkage=:complete, branchorder = :optimal) |> plot_hc
+```
+
+```{julia}
+hclust(DB, linkage = :ward, branchorder = :optimal) |> plot_hc
+```
+
+```{julia}
+score = @select(pds_df, :Path, :File, :Class)
+
+score.Nearest_class .= ""
+
+ids_reference = findall(x -> occursin("-reference", x), score.Path)
+names_reference = score.File[ids_reference]
+
+for i ∈ 1:83
+    id = sortperm(DB[i, ids_reference])[1]
+    score.Nearest_class[i] = names_reference[id]
+end
+
+score
 ```
 
 
 ```{julia}
-# filepath = filepaths[10]
-
-# using FileIO
-# X_fps, D, pd = file_to_barcode(filepath)
-
-
-# new_filepath = replace(filepath, ".obj" => ".jld2")
-# save_object(new_filepath, pd[2:2])
+score.Right_class =
+    split.(score.Class, "-") .|> first .== 
+    split.(score.Nearest_class, "-") .|> first
 ```
+
+Our accuracy was
+
+```{julia}
+score.Right_class |> mean
+```
+
+Can we do better?
+
+<!-- 
+
+
+```{julia}
+function metric_space_from_file(pds_df, file)
+    path = pds_df[occursin.(file, pds_df.Path), :Path][1] * "-points.csv"    
+    X = CSV.read(path, DataFrame) |> Matrix |> transpose |> Matrix |> EuclideanSpace
+end
+
+pds_erros = @rsubset pds_df :Acertou == false
+
+erro = pds_erros[1, :]
+
+X = metric_space_from_file(pds_df, erro.File)
+Y = metric_space_from_file(pds_df, erro.Nearest_class)
+
+gl.scatter(X)
+gl.scatter(Y)
+
+function acha_obj(file) 
+    class = split(file, "-")[1]
+    "meshes/" * class * "-poses/" * file * ".obj"
+end
+
+ms = read_mesh(acha_obj(erro.File))
+plot_mesh(ms)
+
+ms = read_mesh(acha_obj(erro.Nearest_class))
+plot_mesh(ms)
+
+
+pts = map(filter(x -> occursin("cat", x), pds_df.File)) do x
+    ms = read_mesh(acha_obj(x))
+    plot_mesh(ms)
+end
+
+pts[1:2]
+
+f = gl.Figure();
+f[1, 1] = pts[1]
+f[1, 2] = pts[2]
+
+``` -->

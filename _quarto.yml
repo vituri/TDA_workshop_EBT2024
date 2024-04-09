@@ -6,7 +6,7 @@ project:
   #   browser: true
 
 execute:
-  freeze: auto  # re-render only when source changes
+  freeze: true  # re-render only when source changes
   cache: true
   warning: false
 
@@ -33,6 +33,8 @@ format:
     page-layout: full
     max-width: 90vw
     preview-links: true
+    # code-fold: true
+    code-tools: true
 
   # gfm: default
     
