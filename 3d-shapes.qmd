@@ -1,14 +1,19 @@
+---
+execute:
+  freeze: true  # re-render only when source changes
+  cache: true
+  warning: false
+---
+
 # 3d shape classification using persistent homology
 
 In this lesson, we will explore a 3d-shape classification problem using some experimental approaches.
 
 ## The dataset
 
-The dataset we are using is !!!citar. It consists of !!!. The files can be downloaded at !!!. After downloading it, unzip the file and put then inside a directory called "meshes". !!! jogou fora gallopes
+The dataset we are using can be found at [http://people.csail.mit.edu/sumner/research/deftransfer/data.html](http://people.csail.mit.edu/sumner/research/deftransfer/data.html). It consists of some reference pose of animals and human faces. The files used in this lesson can be found [in this Google drive](https://drive.google.com/drive/folders/1YCx80qTvyDvunPJ8f6Ae8w6tdRz0QLy2?usp=sharing). After downloading it, unzip the file and put then inside a directory called "meshes".
 
-The files are written in the ".obj" format. They are *meshes*: sets of points and triangles that forma  3d image like the ones we can see in videogames.
-
-## Loading and visualizing the shapes
+The files are written in the ".obj" format. They are *meshes*: sets of points and triangles that form a 3d image like the ones we can see in videogames.
 
 Let's start with a flamingo shape. We load some libraries
 
@@ -34,14 +39,38 @@ import Plots
 
 # comparing the distance matrix
 using Clustering, StatsPlots
+import StatisticalMeasures.ConfusionMatrices as CM
+using MultivariateStats
 ```
 
 and define functions to read and visualize shapes
 
 ```{julia}
-read_mesh(filepath) = GeoIO.load(filepath).geometry
+#| code-fold: true
+function list_files(path="", pattern="")
+    files =
+        @chain begin
+            map(walkdir(path)) do (root, dirs, files)
+                joinpath.(root, files)
+            end
+            reduce(vcat, _)
+            filter(x -> occursin(pattern, x), _)
+        end
 
-plot_mesh(ms) = viz(ms);
+    files
+end;
+
+function get_class_files(class)
+    @chain begin list_files("meshes/", class)
+        filter(x -> occursin(".obj", x), _)
+    end
+end;
+
+get_class_from_file(x) = split(x, "-")[1]
+
+read_mesh(filepath) = GeoIO.load(filepath).geometry;
+
+plot_mesh(ms) = viz(ms, showfacets = true, alpha = 0.5);
 ```
 
 The reference pose is the following:
@@ -49,11 +78,28 @@ The reference pose is the following:
 ```{julia}
 filepath = "meshes/flamingo-poses/flam-reference.obj"
 ms = read_mesh(filepath)
-
 plot_mesh(ms)
 ```
 
-We can see some variations of it:
+We can also visualize it as a gif
+
+```{julia}
+#| eval: false
+
+# fig, ax, plt = plot_mesh(ms);
+
+# gl.record(fig, "images/3d-shapes/flamingo-ref.gif", 0:31) do i
+#     gl.rotate!(fig.scene, Vec3f(0, 0, 1), i * pi/16)
+# end;
+```
+
+![](images/3d-shapes/flamingo-ref.gif)
+
+and see its details:
+
+![](images/3d-shapes/flamingo-details.png)
+
+We can see some variations of the initial pose:
 
 ```{julia}
 ms2 = read_mesh("meshes/flamingo-poses/flam-01.obj")
@@ -73,6 +119,8 @@ ms2 = read_mesh("meshes/flamingo-poses/flam-03.obj")
 plot_mesh(ms2)
 ```
 
+And also some other animals:
+
 ```{julia}
 ms2 = read_mesh("meshes/lion-poses/lion-reference.obj")
 
@@ -85,9 +133,80 @@ ms2 = read_mesh("meshes/cat-poses/cat-reference.obj")
 plot_mesh(ms2)
 ```
 
+## Plotting {#sec-3d-plotting}
+
+Here we will see all poses together, for each class. The last pose is the reference pose.
+
+```{julia}
+#| code-fold: true
+function plot_entire_class(class) 
+    files = get_class_files(class)
+    fig = gl.Figure(size = (800, 1200));
+
+    for (i, file) ∈ enumerate(files)
+        p, q = divrem(i - 1, 3) .+ 1    
+        ms = read_mesh(file)
+        viz(fig[p, q], ms, title = "a")    
+    end
+
+    fig
+end;
+
+function create_gif_entire_class(class)
+    fig = plot_entire_class(class)
+
+    gl.record(fig, "images/3d-shapes/" * class * ".gif", 0:31) do i
+        gl.rotate!(fig.scene, Vec3f(0, 0, 1), i * pi/16)
+    end
+end;
+```
+
+```{julia}
+#| code-fold: true
+
+# all_classes = [
+#     "camel", "cat", "elephant", "face"
+#     , "flamingo", "head", "horse", "lion"
+#     ]
+
+# @showprogress map(create_gif_entire_class, all_classes)
+```
+
+### Camel
+
+![Camel poses](images/3d-shapes/camel.gif)
+
+### Cat
+
+![Cat poses](images/3d-shapes/cat.gif)
+
+### Elephant
+
+![Elephant poses](images/3d-shapes/elephant.gif)
+
+### Face
+
+![Face poses](images/3d-shapes/face.gif)
+
+### Flamingo
+
+![Flamingo poses](images/3d-shapes/flamingo.gif)
+
+### Head
+
+![Head poses](images/3d-shapes/head.gif)
+
+### Horse
+
+![Horse poses](images/3d-shapes/horse.gif)
+
+### Lion
+
+![Lion poses](images/3d-shapes/lion.gif)
+
 ## Setting the classification problem
 
-We have 83 shapes in the following directories:
+We have 84 shapes in the following directories:
 
 ```{julia}
 filter(!isfile, readdir("meshes/", join = true))
@@ -95,7 +214,7 @@ filter(!isfile, readdir("meshes/", join = true))
 
 Each shape $s \in S$ has a class of the type camel, cat, elephant, etc. We can think of these classes as a function $c: S \to C$ where $C$ is the set of classes. Let $S_{rp}$ be the set of reference poses.
 
-We will try to solve the following problem: can we correctly calculate $c(s)$ when we only know $c$ for $s \in S_{rp}$? That is: knowing only the class of each reference pose, can we deduce the class of the remaining shapes using only the mesh file?
+We will try to solve the following problem: can we correctly calculate $c(s)$ when we only know $c$ for $s \in S_{rp}$? That is: **knowing only the class of each reference pose, can we deduce the class of the remaining shapes using only the mesh file**?
 
 This kind of problem is common in data science and is known as a "classification problem": we are trying to *atribute classes to objects, knowing the class of fewer other objects*.
 
@@ -114,7 +233,7 @@ An ingenuous attempt to solve the classification problem can be summarised as fo
 
 - The euclidean distance is not appropriate for this problem. Flamingos in different poses will have a big Gromov-Hausdorff distance. We need to use some kind of geodesic distance.
 
-- The amount of points in $X_i$ is too big to calculate the persistence diagram. The flamingo dataset has more than 25.000 points for each shape. This will probably explode your RAM memory when calculating the Rips complex.
+- The amount of points in $X_i$ is too big to calculate the persistence diagram. The elephant class has more than 75.000 points for each shape. This will probably explode your RAM memory when calculating the Rips complex.
 
 Fortunately, there are ways to contourn these problems!
 
@@ -124,7 +243,7 @@ Fortunately, there are ways to contourn these problems!
 
 ### From meshes to $\mathbb{R}^3$
 
-Let's extract the points of $S$ as a subspace of $\mathbb{R}^3$:
+Let's extract the points of some $S$ as a subspace of $\mathbb{R}^3$:
 
 ```{julia}
 mesh_to_metric_space(ms) = ms.vertices .|> coordinates .|> Vector |> EuclideanSpace;
@@ -142,7 +261,7 @@ gl.scatter(X, markersize = 1)
 
 ### From meshes to graphs
 
-Now, to calculate the geodesic distance, we will create a graph from the mesh $S$. We load packages and define a function
+Now, to calculate the geodesic distance, we will create a graph from the mesh $S$. We define a function
 
 ```{julia}
 #| code-fold: true
@@ -409,7 +528,7 @@ function pd_to_dataframe(pd)
     end
 
     df
-end
+end;
 
 function dataframe_to_pd(df)
     df.threshold .= 1
@@ -419,7 +538,7 @@ function dataframe_to_pd(df)
         collect
         map(Pd.PersistenceDiagram, _)
     end
-end
+end;
 
 function metric_space_to_df(X) 
     @chain X_fps begin
@@ -427,23 +546,10 @@ function metric_space_to_df(X)
         transpose
         DataFrame(_, :auto)
     end
-end
-
-function list_files(path="", pattern="")
-    files =
-        @chain begin
-            map(walkdir(path)) do (root, dirs, files)
-                joinpath.(root, files)
-            end
-            reduce(vcat, _)
-            filter(x -> occursin(pattern, x), _)
-        end
-
-    files
 end;
 ```
 
-Now we loop over all meshes, calculate its persistence diagram and save it to disk, together with the $X_fps$ metric space as above.
+Now we loop over all meshes, calculate its persistence diagram and save it to disk, together with the $X_{fps}$ metric space as above.
 
 **Important**: This can take some time! If you cloned my github repository, these files are already there, so you can skip the following piece of code:
 
@@ -478,10 +584,7 @@ function throw_away_small_intervals(pd, min_pers = 0.01)
         filter(x -> Pd.persistence(x) > min_pers, p)
     end
 end;
-```
 
-```{julia}
-#| code-fold: true
 function read_pds_from_files(directory, min_interval_size = 0.05)
   pds_df = DataFrame()
 
@@ -509,8 +612,14 @@ function read_pds_from_files(directory, min_interval_size = 0.05)
 end;
 ```
 
+## A metric problem
+
+Now we proceed to create a dataframe that contains all we need to classify our shapes.
+
 ```{julia}
-pds_df = read_pds_from_files("meshes/", 0.01)
+pds_df = read_pds_from_files("meshes/", 0.01);
+
+first(pds_df, 20)
 ```
 
 The dataframe looks ok! You can plot the barcodes as follows:
@@ -526,10 +635,11 @@ Now we calculate the bootleneck distance between each pair of persistence diagra
 #| eval: false
 pds = pds_df.Persistence_diagram
 
-DB = zeros(83, 83)
+n = nrow(pds_df)
+DB = zeros(n, n)
 
-@showprogress for i ∈ 1:83
-    for j ∈ i:83
+@showprogress for i ∈ 1:n
+    for j ∈ i:n
         if i == j
             DB[i, j] = 0 
             continue 
@@ -549,10 +659,12 @@ CSV.write("meshes/bottleneck_distance.csv", DataFrame(DB, :auto))
 Notice that we defined the distance $DB_{i, j}$ between two shapes $X_i$ and $X_j$ as 
 
 $$
-DB_{i, j} = d_b(dgm_1(X_i), dgm_1(X_j)) + d_b(dgm_2(X_i), dgm_2(X_j))
+DB_{i, j} = d_b(\text{dgm}_1(X_i), \text{dgm}_1(X_j)) + d_b(\text{dgm}_2(X_i), \text{dgm}_2(X_j))
 $$
 
 where $d_b$ is the bottleneck distance, and $dgm_i$ is the $i$-dimensional persistence diagram.
+
+## Facing the truth
 
 We read $DB$ from disk, in case you did not calculate it previously
 
@@ -561,6 +673,11 @@ DB = CSV.read("meshes/bottleneck_distance.csv", DataFrame) |> Matrix
 DB
 ```
 
+How can we visualize $DB$?
+
+### Heatmap
+
+Heatmaps are matrices (2d arrays) where each element is colored by some value. In the ideal world, our matrix $DB$ will have a square of low values for each comparison between the same class, and a higher value when comparing elements of different classes.
 
 ```{julia}
 labels = pds_df.Class |> copy
@@ -570,29 +687,35 @@ for i ∈ 2:length(pds_df.Class)
     end
 end
 
-labels = (1:83, labels)
+labels = (1:nrow(pds_df), labels)
 
 plot(DB, st = :heatmap, xticks = labels, yticks = labels)
 ```
+
+We can see that the diagonals (intra-class comparisons) are good enough: they are dark-coloured squares, indicating small distances. But there are also black squares outside the diagonal, which means that some different classes are close to each other. 
+
+### Dendrograms
+
+Dendrograms are a nice way to visualize a distance matrix. They represent the evolution of the connected components as some parameter (usually the radius of circles centered on each point) grows.
 
 ```{julia}
 #| code-fold: true
 function plot_hc(hc)
     plot(
-        hc, xticks = (1:83, pds_df.File[hc.order])
+        hc, xticks = (1:nrow(pds_df), pds_df.File[hc.order])
         , xflip = true, xrotation = 270
         , xtickfont = font(5, "Roboto")
         )
 end;
 ```
 
-The single linkage dendrogram is bad
+The [single linkage dendrogram](https://en.wikipedia.org/wiki/Single-linkage_clustering) is a mess:
 
 ```{julia}
 hclust(DB, linkage=:single, branchorder = :optimal) |> plot_hc
 ```
 
-But the complete shows more hope:
+But the [complete linkage dendrogram](https://en.wikipedia.org/wiki/Complete-linkage_clustering) shows more hope:
 
 ```{julia}
 hclust(DB, linkage = :complete, branchorder = :optimal) |> plot_hc
@@ -604,27 +727,36 @@ Here is also the Ward algorithm:
 hclust(DB, linkage = :ward, branchorder = :optimal) |> plot_hc
 ```
 
+### Accuracy
+
+Now let's calculate for each shape which reference class is closer to it:
+
 ```{julia}
-score = @select(pds_df, :Path, :File, :Class)
+#| code-fold: true
 
-score.Nearest_class .= ""
+function get_score_dataframe(pds_df, DB) 
+  score = @select(pds_df, :Path, :File, :Class)
 
-ids_reference = findall(x -> occursin("-reference", x), score.Path)
-names_reference = score.File[ids_reference]
+  score.Nearest_class .= ""
 
-for i ∈ 1:83
-    id = sortperm(DB[i, ids_reference])[1]
-    score.Nearest_class[i] = names_reference[id]
-end
+  ids_reference = findall(x -> occursin("-reference", x), score.Path)
+  names_reference = score.File[ids_reference]
 
-score
+  for i ∈ 1:nrow(pds_df)
+      id = sortperm(DB[i, ids_reference])[1]
+      score.Nearest_class[i] = names_reference[id]
+  end
+
+  score.Right_class =
+      get_class_from_file.(score.Class) .== 
+      get_class_from_file.(score.Nearest_class)
+
+  score
+end;
 ```
 
-
 ```{julia}
-score.Right_class =
-    split.(score.Class, "-") .|> first .== 
-    split.(score.Nearest_class, "-") .|> first
+score = get_score_dataframe(pds_df, DB)
 ```
 
 Our accuracy was
@@ -633,48 +765,139 @@ Our accuracy was
 score.Right_class |> mean
 ```
 
-Can we do better?
+that is: 82%. Not bad, but not excellent either!
 
-<!-- 
-
+Here is the [confusion matrix](https://en.wikipedia.org/wiki/Confusion_matrix):
 
 ```{julia}
-function metric_space_from_file(pds_df, file)
-    path = pds_df[occursin.(file, pds_df.Path), :Path][1] * "-points.csv"    
-    X = CSV.read(path, DataFrame) |> Matrix |> transpose |> Matrix |> EuclideanSpace
+score_new = @rsubset score !occursin("ref", :File)
+x = CM.confmat(get_class_from_file.(score_new.Nearest_class), score_new.Class)
+```
+
+![Confusion matrix for DB.](images/3d-shapes/confusion%20matrix.png)
+
+Some conclusions we can take from the above analysis:
+
+- Camels, elephants and faces are all correct;
+- There is one head mistaken as a face;
+- There are two mistaken horses;
+- Cats are confused with lions.
+
+Why did this happen? Look back at the rotating plots in section [@sec-3d-plotting]: a cat and a lion are almost isometric in the geodesic sense! Thus, no tool that uses only the metric will be able to split these classes.
+
+### MDS plot
+
+Another last visualization technique is the [multidimensional scaling](https://en.wikipedia.org/wiki/Multidimensional_scaling) plot. This method takes a distance matrix and tries to project it down to $\mathbb{R}^2) (or $\mathbb{R}^3) while distorting the distances as little as possible.
+
+```{julia}
+#| code-fold: true
+
+function mds_plot(D, score)
+    M = fit(MDS, D; distances = true, maxoutdim = 2)
+    Y = predict(M)
+
+    score.Row = 1:length(score.Class)
+
+    dfs = @chain score begin
+        groupby(:Class)
+        collect
+    end
+
+    fig = gl.Figure();
+    ax = gl.Axis(fig[1,1])
+
+    colors = cgrad(:tableau_10, 8, categorical = true)
+
+    for (i, df) ∈ enumerate(dfs)    
+        gl.scatter!(
+            ax, Y[:, df.Row]
+            , label = df.Class[1], markersize = 15
+            , color = colors[i]
+            )
+    end
+
+    gl.axislegend();
+    fig
+
+    fig
+end
+```
+
+```{julia}
+mds_plot(DB, score)
+```
+
+Can we do better?
+
+With only the distance matrix $DB$, as we could see above, the answer is **NO**. We need to find more tools to compare these shapes.
+
+## Volumes
+
+Each mesh has a notion of volume that can be calculated with the function `measure`.
+
+We can see below the mean volume for each class:
+
+```{julia}
+volumes = @showprogress map(score.Path) do f
+    ms = read_mesh(f * ".obj")
+    measure(ms)
 end
 
-pds_erros = @rsubset pds_df :Acertou == false
+df_volumes = DataFrame(
+    Path = score.Path, Class = score.Class, Volume = volumes
+    )
 
-erro = pds_erros[1, :]
+@chain df_volumes begin
+    @groupby :Class
+    @combine :Mean_volume = mean(:Volume)
+end
+```
 
-X = metric_space_from_file(pds_df, erro.File)
-Y = metric_space_from_file(pds_df, erro.Nearest_class)
+The volume is enough to separate all the classes except lions and flamingos (which have volumes close to 0.54).
 
-gl.scatter(X)
-gl.scatter(Y)
+So let's add this difference in volume to our original matrix $DB$, and call it $DB2$:
 
-function acha_obj(file) 
-    class = split(file, "-")[1]
-    "meshes/" * class * "-poses/" * file * ".obj"
+```{julia}
+n = nrow(pds_df)
+volume_difs = zeros(n, n)
+
+for i ∈ 1:n
+    for j ∈ i:n
+        volume_difs[i, j] = abs(df_volumes.Volume[i] - df_volumes.Volume[j])
+        volume_difs[j, i] = volume_difs[i, j]
+    end
 end
 
-ms = read_mesh(acha_obj(erro.File))
-plot_mesh(ms)
+# ignore differences in volume greater than maximum(DB)
+replace!(x -> x > maximum(DB) ? maximum(DB) : x, volume_difs)
 
-ms = read_mesh(acha_obj(erro.Nearest_class))
-plot_mesh(ms)
+DB2 = DB .+ volume_difs
+```
 
+Its dendrogram is the following:
 
-pts = map(filter(x -> occursin("cat", x), pds_df.File)) do x
-    ms = read_mesh(acha_obj(x))
-    plot_mesh(ms)
-end
+```{julia}
+hclust(DB2, linkage = :complete, branchorder = :optimal) |> plot_hc
+```
 
-pts[1:2]
+which is much better than before!
 
-f = gl.Figure();
-f[1, 1] = pts[1]
-f[1, 2] = pts[2]
+If again we calculate the closest reference pose to each given shape, we now get
 
-``` -->
+```{julia}
+score2 = get_score_dataframe(pds_df, DB2)
+```
+
+```{julia}
+score2.Right_class |> mean
+```
+
+nearly 100%!
+
+The only misclassification can be seen with
+
+```{julia}
+@rsubset score2 !:Right_class 
+```
+
+where a head was mistaken for a face.

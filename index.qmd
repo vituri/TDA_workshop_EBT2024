@@ -1,3 +1,7 @@
-# Intro
+# Introduction
 
-To be done!
+## Why Julia?
+
+## Why TDA?
+
+## Why this minicourse?
