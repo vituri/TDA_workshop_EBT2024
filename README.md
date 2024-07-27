@@ -21,35 +21,31 @@ Remember:
 
 # Instructions: how to use this repository
 
-## Installing Julia
+## Installing Julia and running code
 
-The easiest way to install the Julia language on your system is by [juliaup](https://github.com/JuliaLang/juliaup). I write below the install instructions, as they are now.
+The best way to install Julia, VSCode and getting started is following the excellent [Modern Julia Workflows](https://modernjuliaworkflows.org/).
 
-### Mac and Linux
-Juliaup can be installed on Linux or Mac by executing
+In short:
 
-```
-curl -fsSL https://install.julialang.org | sh
-```
+- Install Julia;
+- Install VSCode;
+- Install the Julia VSCode extension;
+- Write some code on VSCode;
+- Run it with `Shift + Enter`.
 
-### Windows
-On Windows Julia and Juliaup can be installed directly from the Windows store [here](https://www.microsoft.com/store/apps/9NJNWW8PVKMN). One can also install exactly the same version by executing
+That's it!
 
-```
-winget install julia -s msstore
-```
-
-## Installing VSCode (optional)
-
-If you are brave enough, you can always code on the notepad, but I suggest some programming interface. VSCode is a nice code editor with several tools to help coding. Check the instructions [here](https://code.visualstudio.com/).
-
-### Install the Julia extension (optional)
-
-Extensions are small helpers in VSCode with language-specific functionalities. After installing VSCode, install the Julia extension [here](https://code.visualstudio.com/docs/languages/julia).
-
-## Installing the dependencies
+## Installing the dependencies of this project
 
 In this workshop I use several libraries with functions to deal with TDA, plots, graphs and so on. To easily install all of them, clone this repository and open it with VSCode.
+
+Then run any Julia code so you start the Julia REPL at the below panel. Then, type
+
+```
+] activate .
+```
+
+This will install all dependencies.
 
 # Summary
 
@@ -69,4 +65,3 @@ The minicourse will be more useful if the attendee is able to run code in its ow
 - explain how to source a project with its dependencies;
 - create the .qmd files
 - export the files also as plain code
-- use pluto.jl?
