@@ -43,8 +43,9 @@ format:
 
 bibliography: references.bib
 
-engine: julia
-# jupyter: julia-1.10
+# engine: julia
+
+jupyter: julia-1.10
 
   # pdf:
   #   documentclass: scrreprt

@@ -1,10 +1,10 @@
 ---
-engine: julia 
-
 execute:
   freeze: true  # re-render only when source changes
   cache: true
   warning: false
+
+jupyter: julia-1.10
 ---
 
 # Introduction

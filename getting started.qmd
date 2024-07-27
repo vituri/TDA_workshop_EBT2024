@@ -1,5 +1,5 @@
 ---
-engine: julia 
+jupyter: julia-1.10
 
 execute:
   freeze: true  # re-render only when source changes
@@ -19,7 +19,9 @@ Given a finite metric space $M$, for each $\epsilon > 0$ we create a simplicial 
 
 ### Creating simplicial complexes
 
-There are several ways to create this simplicial complex. One famous construction is the Vietoris-Rips complex:
+As you can guess, there are several ways to "undiscretize" a finite metric space into a simplicial complex.
+
+One famous construction is the Vietoris-Rips complex:
 
 $$
 VR_\epsilon(M) = \{ [x_1, \cdots, x_n] \subset M \; \text{s.t.} \; d(x_i, x_j) < \epsilon, \; \forall i, j \}
@@ -32,6 +34,11 @@ $$
 $$
 
 ![The Vietoris-Rips filtration of a metric space (on the left of each panel). As $\epsilon$ increases, so do the amount of simplexes we have. Source: @vr.](images/getting-started/vr.png)
+
+Other very useful construction is a sublevel filtration:
+
+!! colocar aqui cubical complex
+
 
 ### Creating sequences of vector spaces
 
@@ -91,6 +98,12 @@ where $M, N$ are finite metric spaces, $d_b$ is the bottleneck distance and $d_{
 
 Suppose we have several metric spaces $X_1, \ldots, X_n$ (let's say photos or 3d-objects) and we want to group these spaces by similarity (cats in one group, dogs in another). Calculating the Gromov-Hausdorff distance is a _very expensive calculation_!^[see [this excellent article by Matt Piekenbrock](https://peekxc.github.io/Mapper/articles/ShapeRecognition.html#gromov-hausdorff-distance) to get an idea of the complexity involved.]. Instead, we can use the bottleneck distance of each barcode $\mathbb{V}(X_i)$ as a approximation to the geometry of $X_i$.
 
+So, if our barcode retains enough information about $X_i$, we can use 
+
+$$
+d_b(\mathbb{V}(X_i), \mathbb{V}(X_j)) \quad \text{as a good approximation to} \quad d_{GH}(X_i, X_j).
+$$
+
 :::
 
 The following beautiful gifs can be found at the [Ripserer.jl](https://mtsch.github.io/Ripserer.jl/dev/generated/stability/) documentation, a Julia package that implements an efficient algorithm to calculate the barcode using the Vietoris-Rips filtration.
@@ -116,7 +129,7 @@ Barcodes are nice and
 Let's start exploring some common objects in topology.
 
 ```{julia}
-#| eval: false
+#| eval: true
 using MetricSpaces;
 import CairoMakie as gl;
 
@@ -135,14 +148,14 @@ end;
 ### Torus
 
 ```{julia}
-#| eval: false
+#| eval: true
 X = torus(1500)
 gl.scatter(X)
 ```
 
 
 ```{julia}
-#| eval: false
+#| eval: true
 bc = Ripserer.ripserer(X, dim_max = 1, verbose = true, threshold = 4)
 plot_barcode(bc)
 ```
@@ -150,14 +163,14 @@ plot_barcode(bc)
 ### Circle
 
 ```{julia}
-#| eval: false
+#| eval: true
 X = sphere(200, dim = 2)
 gl.scatter(X)
 ```
 
 
 ```{julia}
-#| eval: false
+#| eval: true
 bv = Ripserer.ripserer(X, dim_max = 1, verbose = true)
 plot_barcode(bc)
 ```
@@ -165,14 +178,14 @@ plot_barcode(bc)
 ### Sphere
 
 ```{julia}
-#| eval: false
+#| eval: true
 X = sphere(1500, dim = 3)
 gl.scatter(X)
 ```
 
 
 ```{julia}
-#| eval: false
+#| eval: true
 bc = Ripserer.ripserer(X, dim_max = 1, verbose = true)
 plot_barcode(bc)
 ```
@@ -181,7 +194,7 @@ plot_barcode(bc)
 
 
 ```{julia}
-#| eval: false
+#| eval: true
 X = rand(gl.Point2, 1500)
 filter!(x -> (x[1]-0.5)^2 + (x[2]-0.5)^2 > 0.03, X)
 gl.scatter(X)
@@ -189,7 +202,7 @@ gl.scatter(X)
 
 
 ```{julia}
-#| eval: false
+#| eval: true
 bc = Ripserer.ripserer(X, dim_max = 1, verbose = true)
 plot_barcode(bc)
 ```
@@ -198,7 +211,7 @@ plot_barcode(bc)
 
 
 ```{julia}
-#| eval: false
+#| eval: true
 X = vcat(
     sphere(150, dim = 2)
     ,sphere(150, dim = 2) .|> x -> (x .+ (1, 1))
@@ -209,7 +222,7 @@ gl.scatter(X)
 
 
 ```{julia}
-#| eval: false
+#| eval: true
 bc = Ripserer.ripserer(X, dim_max = 1, verbose = true)
 plot_barcode(bc)
 ```
