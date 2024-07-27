@@ -13,7 +13,9 @@ jupyter: julia-1.10
 
 In a world ruled by Python (and, in some areas, R), why use an exquisite and new language like Julia in this workshop? You can find some good reasons in the book [Julia Data Science](https://juliadatascience.io/programmers), but I will give some in the context of topology:
 
-::: {.callout-tip title="Reason 1"}
+### Speed
+
+::: {.callout-tip title="" appearance="simple"}
 
 Julia is fast. You won't need to use another language to make some expensive computation.
 
@@ -25,7 +27,9 @@ Let's say you read about a new algorithm to calculate the Vietoris-Rips. If you 
 
 ![The deep learning package [`Flux.jl`](https://github.com/FluxML/Flux.jl) is 100% written in Julia.](images/intro/flux.png)
 
-::: {.callout-tip title="Reason 2"}
+### Use other languages
+
+::: {.callout-tip title="" appearance="simple"}
 
 It is easy to use another language inside Julia.
 
@@ -33,13 +37,17 @@ It is easy to use another language inside Julia.
 
 Even though Julia is fast and has a robust ecosystem, Python and R have many more packages already good-to-go. You can use them easily with tools like [PythonCall](https://github.com/JuliaPy/PythonCall.jl) or [RCall](https://github.com/JuliaInterop/RCall.jl).
 
-::: {.callout-tip title="Reason 3"}
+### Mathematical syntax
+
+::: {.callout-tip title="" appearance="simple"}
 
 Julia looks like mathematics and has an elegant syntax.
 
 :::
 
-1) Being able to mix LaTeX symbols with code can make the code way more readable.
+#### LaTeX symbols
+
+Being able to mix LaTeX symbols with code can make the code way more readable.
 
 You can find many nice examples on [BeautifulAlgorithms.jl](https://github.com/mossr/BeautifulAlgorithms.jl). Below are some common Julia code:
 
@@ -72,7 +80,9 @@ d(x, y) = abs(x - y)
 [d(xᵢ, xⱼ) for xᵢ ∈ X, xⱼ ∈ X]
 ```
 
-2) Easily apply a function to all elements of a vector/set:
+#### Broadcasting
+
+Easily apply a function to all elements of a vector/set:
 
 ```{julia}
 x = [1, 2, 3, 4]
@@ -91,21 +101,23 @@ map(sin, x)
 [sin(x_i) for x_i ∈ x]
 ```
 
-3) You can compose functions in the reading order 
+#### Piping
 
-Instead of writing
+You can compose functions in the reading order. Instead of writing:
 
 ```{julia}
 sin(cos(1))
 ```
 
-you can "pipe" the functions as in
+you can "pipe" the functions as in:
 
 ```{julia}
 1 |> cos |> sin
 ```
 
-4) Julia is a functional programming language with type hierarchy, which means that we have "categories" (types) and "functors" (functions) mapping between the types; moreover, its polimorphism means that the functions depend on the type of its arguments.
+#### Functional programming
+
+Julia is a [functional programming language](https://en.wikipedia.org/wiki/Functional_programming) with type hierarchy, which means that we have "categories" (ie. types) and "functors" (ie. functions) mapping between the types; moreover, its polimorphism means that the functions depend on the type of its arguments.
 
 For example, suppose you want to define the norm of a vector:
 
@@ -120,16 +132,25 @@ norm(x)
 You can also define the norm of a function $f$ as the approximate integral of $|f|$ on the interval $[0, 1]$:
 
 ```{julia}
-step_size = 0.0001
-norm(f::Function) = [abs(f(x) * step_size) for x ∈ 0:step_size:1] |> sum
-norm(sin)
+# norm on [0, 1]
+norm(f::Function; step_size = 0.0001) = 
+  [f(x) * step_size for x ∈ 0:step_size:1] .|> 
+  abs |> sum
+
+square = x -> x^2
+  
+norm(square)
 ```
 
-which is very close to
+which is very close to the real definite integral.
+
+PS: plotting is also as easy as:
 
 ```{julia}
-abs(cos(1) - cos(0))
+using Plots;
+plot(square, 0:0.1:1)
 ```
+
 
 Why not define the norm of a text as the amount of characters?
 
@@ -137,6 +158,7 @@ Why not define the norm of a text as the amount of characters?
 norm(s::AbstractString) = length(s)
 norm("Hello!")
 ```
+
 
 ## Why TDA?
 

@@ -36,6 +36,9 @@ format:
     max-width: 90vw
     preview-links: true
     # code-fold: true
+    toc-depth: 4
+    number-depth: 3
+    toc-expand: true
     code-tools: true
     grid:
       sidebar-width: 300px
