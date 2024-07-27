@@ -25,9 +25,13 @@ Remember:
 
 The best way to install Julia, VSCode and getting started is following the excellent [Modern Julia Workflows](https://modernjuliaworkflows.org/).
 
+In short:
+
 - Install Julia;
 - Install VSCode;
-- Install the Julia VSCode extension.
+- Install the Julia VSCode extension;
+- Write some code on VSCode;
+- Run it with `Shift + Enter`.
 
 That's it!
 
