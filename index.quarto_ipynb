@@ -1,0 +1,74 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "# Introduction\n",
+        "\n",
+        "## Why Julia for topological data analysis?\n",
+        "\n",
+        "In a world ruled by Python (and, in some areas, R), why use an exquisite and new language like Julia in this workshop? You can find some good reasons in the book [Julia Data Science](https://juliadatascience.io/programmers), but I will give some out of my mind too:\n",
+        "\n",
+        "::: {.callout-tip title=\"Reason 1\"}\n",
+        "\n",
+        "Julia is fast. You won't need to use another language to make some expensive computation.\n",
+        "\n",
+        ":::\n",
+        "\n",
+        "Let's say you read about a new algorithm to calculate the Vietoris-Rips. If you are a R/Python user, *your algorithm won't be written in R/Python* simply because R/Python is slow. Fast code in R/Python is written in C, C++, Fortran or Rust; this is called the [two language problem](https://juliadatascience.io/julia_accomplish#sec:two_language). Julia solves this because with enought knowledge about the compiler and the language, you will get performance nearly as good as if it was written in C. Optimize Julia code is not a trivial task, but is way easier than learning another language just to get good performance in some functions.\n",
+        "\n",
+        "![The famous `torch` Python library is written mostly in C++. Python is just a \"glue\" interface.](images/intro/torch.png)\n",
+        "\n",
+        "![The deep learning package Flux.jl is 100% written in Julia.](images/intro/flux.png)\n",
+        "\n",
+        "::: {.callout-tip title=\"Reason 2\"}\n",
+        "\n",
+        "It is easy to use another language inside Julia.\n",
+        "\n",
+        ":::\n",
+        "\n",
+        "Even though Julia is fast and has a robust ecosystem, Python and R have many more packages already good-to-go. You can use them easily with tools like [PyCall](https://github.com/JuliaPy/PyCall.jl) or [RCall](https://github.com/JuliaInterop/RCall.jl).\n",
+        "\n",
+        "::: {.callout-tip title=\"Reason 3\"}\n",
+        "\n",
+        "Julia looks like mathematics!\n",
+        "\n",
+        ":::\n"
+      ],
+      "id": "eef97d02"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "X = [1:10;]\n",
+        "d(x, y) = (x - y)^2\n",
+        "[d(xᵢ, xⱼ) for xᵢ ∈ X, xⱼ ∈ X]"
+      ],
+      "id": "0397aa7d",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Why TDA?\n",
+        "\n",
+        "## Why this minicourse?"
+      ],
+      "id": "6a722c49"
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "julia-nodeps-1.9",
+      "language": "julia",
+      "display_name": "Julia nodeps 1.9.3",
+      "path": "/home/vituri/.local/share/jupyter/kernels/julia-nodeps-1.9"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}

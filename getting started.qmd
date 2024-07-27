@@ -1,0 +1,215 @@
+---
+engine: julia 
+
+execute:
+  freeze: true  # re-render only when source changes
+  cache: true
+  warning: false
+---
+
+# Getting started
+
+Now you are convinced that Julia is really nice and fast, and that Topological data analysis is a very unique tool. It is time to start applying!
+
+## Persistent homology
+
+Let's quickly review what is persistent homology and why it is useful.
+
+Given a finite metric space $M$, for each $\epsilon > 0$ we create a simplicial complex $K_\epsilon$ in such a way that $\epsilon_1 < \epsilon_2$ implies $K_{\epsilon} \subset K_{\epsilon'}$.
+
+### Creating simplicial complexes
+
+There are several ways to create this simplicial complex. One famous construction is the Vietoris-Rips complex:
+
+$$
+VR_\epsilon(M) = \{ [x_1, \cdots, x_n] \subset M \; \text{s.t.} \; d(x_i, x_j) < \epsilon, \; \forall i, j \}
+$$
+
+that is: if we put a ball $B_i$ of radius $2 \epsilon$ around each point $x_i$, then 
+
+$$
+[x_1, \cdots, x_n] \in VR_\epsilon(M) \Leftrightarrow \cap B_i \neq \emptyset.
+$$
+
+![The Vietoris-Rips filtration of a metric space (on the left of each panel). As $\epsilon$ increases, so do the amount of simplexes we have. Source: @vr.](images/getting-started/vr.png)
+
+### Creating sequences of vector spaces
+
+Applying the homology functor with field coefficients
+
+$$
+V_\epsilon = H_n(K_\epsilon)
+$$
+
+on each of the simplicial complexes 
+
+$$
+\{ K_\epsilon \subseteq K_{\epsilon'} \; \text{s.t.} \; \epsilon \leq \epsilon' \}
+$$
+
+we obtain a sequence of vector spaces together with linear transformations
+
+$$
+\mathbb{V}(M) = \{ V_\epsilon \to V_{\epsilon'} \; \epsilon \leq \epsilon' \}
+$$
+
+called a _persistent vector space_.
+
+### Simplifying 
+
+Some very nice theorems^[citar aqui!!] prove that a persistent vector space can be decomposed as a sum of _interval modules_, which are the fundamental blocks of persistent vector spaces. Each one of these blocks represent the birth and death of a generator. Thus, $\mathbb{V}(M)$ can summarised in two equivalent ways:
+
+- as a _barcode_: a (multi)set of real intervals $\{ [a_i, b_i) \subset \mathbb{R}, \; i \in I \}$.
+
+- as a _persistence diagram_: a subset of real plane above the diagonal of the form $\{ (a_i, b_i) \in \mathbb{R}^2, \; i \in I \}$.
+
+Each pair $(a_i, b_i)$ can be interpreted as follows: $a_i$ is the value of $\epsilon$ at which a feature (i.e. a generator of $H_n(K_\epsilon)$) was "born", and this generator persisted until it reached $b_i$. See the following image for the representation of a barcode.
+
+We will use both these representations many times.
+
+![A Vietoris-Rips filtration and its respective barcode. Vertical lines represent "slices" at some values of $\epsilon$. Source: @ghrist2008barcodes.](images/getting-started/ph.png)
+
+### Distances on persistence diagrams and stability
+
+The _bottleneck distance_ can be defined on the set of persitence diagrams. Intuitively, it measures the "effort" to move the points of one diagram to the points of the other OR collapsing these points to the diagonal.
+
+It is important to note that points very close to the diagonal (or, equivalently, intervals very short on a barcode) can be seen as "noise" or "non relevant features": they represent features that were born and lived for just a small time.
+
+![The bottleneck distance between two persistence diagrams (in blue and red). Source: [https://gudhi.inria.fr/doc/latest/group__bottleneck__distance.html](https://gudhi.inria.fr/doc/latest/group__bottleneck__distance.html)](images/getting-started/bottleneck.png)
+
+### Stability of the bottleneck distance
+
+This distance is much more useful because of the _stability theorem_: metric spaces close to each other yield barcodes close to each other:
+
+$$
+d_b(\mathbb{V}(M), \mathbb{V}(N)) \leq d_{GH}(M, N)
+$$
+
+where $M, N$ are finite metric spaces, $d_b$ is the bottleneck distance and $d_{GH}$ is the Gromov-Hausdorff distance on the set of metric spaces.
+
+::: {.callout-note title="Why is stability useful?"}
+
+Suppose we have several metric spaces $X_1, \ldots, X_n$ (let's say photos or 3d-objects) and we want to group these spaces by similarity (cats in one group, dogs in another). Calculating the Gromov-Hausdorff distance is a _very expensive calculation_!^[see [this excellent article by Matt Piekenbrock](https://peekxc.github.io/Mapper/articles/ShapeRecognition.html#gromov-hausdorff-distance) to get an idea of the complexity involved.]. Instead, we can use the bottleneck distance of each barcode $\mathbb{V}(X_i)$ as a approximation to the geometry of $X_i$.
+
+:::
+
+The following beautiful gifs can be found at the [Ripserer.jl](https://mtsch.github.io/Ripserer.jl/dev/generated/stability/) documentation, a Julia package that implements an efficient algorithm to calculate the barcode using the Vietoris-Rips filtration.
+
+![Taking random samples of the circle result in pretty similar persistent diagrams.](images/getting-started/rips1.gif)
+
+![Addin some noise to the circle does not modify so much the persistent diagram.](images/getting-started/rips2.gif)
+
+![The persistent diagram slowly deformates itself as we add more noise to the circle.](images/getting-started/rips3.gif)
+
+![Collapsing the circle also make the 1-dimensional persistence diagram get close to the diagonal.](images/getting-started/rips4.gif)
+
+## A better way to represent barcodes
+
+Barcodes are nice and 
+! bottleneck is also a bit expensive
+! a representation in fixed form (vector, matrix, etc?)
+! important to use in machine learning algorithms!
+
+
+## Classic topology
+
+Let's start exploring some common objects in topology.
+
+```{julia}
+#| eval: false
+using MetricSpaces;
+import CairoMakie as gl;
+
+import Ripserer;
+# import PersistenceDiagrams as Pd
+import Plots;
+
+function plot_barcode(bc)
+Plots.plot(
+    Plots.plot(bc)
+    ,Ripserer.barcode(bc)
+)
+end;
+```
+
+### Torus
+
+```{julia}
+#| eval: false
+X = torus(1500)
+gl.scatter(X)
+```
+
+
+```{julia}
+#| eval: false
+bc = Ripserer.ripserer(X, dim_max = 1, verbose = true, threshold = 4)
+plot_barcode(bc)
+```
+
+### Circle
+
+```{julia}
+#| eval: false
+X = sphere(200, dim = 2)
+gl.scatter(X)
+```
+
+
+```{julia}
+#| eval: false
+bv = Ripserer.ripserer(X, dim_max = 1, verbose = true)
+plot_barcode(bc)
+```
+
+### Sphere
+
+```{julia}
+#| eval: false
+X = sphere(1500, dim = 3)
+gl.scatter(X)
+```
+
+
+```{julia}
+#| eval: false
+bc = Ripserer.ripserer(X, dim_max = 1, verbose = true)
+plot_barcode(bc)
+```
+
+### A square with a hole
+
+
+```{julia}
+#| eval: false
+X = rand(gl.Point2, 1500)
+filter!(x -> (x[1]-0.5)^2 + (x[2]-0.5)^2 > 0.03, X)
+gl.scatter(X)
+```
+
+
+```{julia}
+#| eval: false
+bc = Ripserer.ripserer(X, dim_max = 1, verbose = true)
+plot_barcode(bc)
+```
+
+### Two circles
+
+
+```{julia}
+#| eval: false
+X = vcat(
+    sphere(150, dim = 2)
+    ,sphere(150, dim = 2) .|> x -> (x .+ (1, 1))
+)
+
+gl.scatter(X)
+```
+
+
+```{julia}
+#| eval: false
+bc = Ripserer.ripserer(X, dim_max = 1, verbose = true)
+plot_barcode(bc)
+```

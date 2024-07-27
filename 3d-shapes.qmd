@@ -1,4 +1,6 @@
 ---
+engine: julia 
+
 execute:
   freeze: true  # re-render only when source changes
   cache: true
@@ -485,7 +487,7 @@ plot_barcode(pd[2:3])
 
 ## Summarizing
 
-All the hard work on the previous sections was just to prepare our dataset from file to barcode. That's why they say that data science is 80% preparing the data and 20% analyzing it!
+All the hard work on the previous sections was just to prepare our dataset from file to barcode. That's why they say that **data science is 80% preparing the data and 20% analyzing it!**
 
 We can summarise what we did with the following function:
 
@@ -662,7 +664,7 @@ $$
 DB_{i, j} = d_b(\text{dgm}_1(X_i), \text{dgm}_1(X_j)) + d_b(\text{dgm}_2(X_i), \text{dgm}_2(X_j))
 $$
 
-where $d_b$ is the bottleneck distance, and $dgm_i$ is the $i$-dimensional persistence diagram.
+where $d_b$ is the bottleneck distance, and $dgm_i$ is the $i$-dimensional persistence diagram. Notice that **we did not use the 0-dimensional persistent homology, because all shapes are connected**.
 
 ## Facing the truth
 
@@ -783,7 +785,7 @@ Some conclusions we can take from the above analysis:
 - There are two mistaken horses;
 - Cats are confused with lions.
 
-Why did this happen? Look back at the rotating plots in section [@sec-3d-plotting]: a cat and a lion are almost isometric in the geodesic sense! Thus, no tool that uses only the metric will be able to split these classes.
+Why did this happen? Look back at the rotating plots in section [@sec-3d-plotting]: a cat and a lion are almost isometric in the geodesic sense! Thus, **no tool that uses only the metric will be able to split these classes**.
 
 ### MDS plot
 

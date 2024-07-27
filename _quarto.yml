@@ -23,23 +23,28 @@ book:
 
   chapters:
     - index.qmd
+    - "getting started.qmd"
     - 3d-shapes.qmd
 
 format:
   html:
-    theme: cosmo
-    # css: style.css
+    # theme: flatly
+    theme: flatly
+    # css: style.css    
     code-link: true
     page-layout: full
     max-width: 90vw
     preview-links: true
     # code-fold: true
     code-tools: true
+    grid:
+      sidebar-width: 300px
+      body-width: 1200px
 
-  # gfm: default
-    
-jupyter: julia-1.10  
+bibliography: references.bib
 
+engine: julia
+# jupyter: julia-1.10
 
   # pdf:
   #   documentclass: scrreprt

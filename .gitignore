@@ -1,3 +1,4 @@
 /.quarto/
 *.obj
 /files
+.Rproj.user

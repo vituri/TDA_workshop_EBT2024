@@ -1,7 +1,161 @@
+---
+engine: julia 
+
+execute:
+  freeze: true  # re-render only when source changes
+  cache: true
+  warning: false
+---
+
 # Introduction
 
-## Why Julia?
+## Why Julia for topological data analysis?
+
+In a world ruled by Python (and, in some areas, R), why use an exquisite and new language like Julia in this workshop? You can find some good reasons in the book [Julia Data Science](https://juliadatascience.io/programmers), but I will give some in the context of topology:
+
+::: {.callout-tip title="Reason 1"}
+
+Julia is fast. You won't need to use another language to make some expensive computation.
+
+:::
+
+Let's say you read about a new algorithm to calculate the Vietoris-Rips. If you are a R/Python user, *your algorithm won't be written in R/Python* simply because R/Python is slow. Fast code in R/Python is written in C, C++, Fortran or Rust; this is called the [two language problem](https://juliadatascience.io/julia_accomplish#sec:two_language). Julia solves this because with enought knowledge about the compiler and the language, you will get performance nearly as good as if it was written in C. Optimize Julia code is not a trivial task, but is way easier than learning another language just to get good performance in some functions.
+
+![The famous deep learning package [`torch`](https://github.com/pytorch/pytorch) in Python has its core written mostly in C++. Python is just a "glue" interface.](images/intro/torch.png)
+
+![The deep learning package [`Flux.jl`](https://github.com/FluxML/Flux.jl) is 100% written in Julia.](images/intro/flux.png)
+
+::: {.callout-tip title="Reason 2"}
+
+It is easy to use another language inside Julia.
+
+:::
+
+Even though Julia is fast and has a robust ecosystem, Python and R have many more packages already good-to-go. You can use them easily with tools like [PythonCall](https://github.com/JuliaPy/PythonCall.jl) or [RCall](https://github.com/JuliaInterop/RCall.jl).
+
+::: {.callout-tip title="Reason 3"}
+
+Julia looks like mathematics and has an elegant syntax.
+
+:::
+
+1) Being able to mix LaTeX symbols with code can make the code way more readable.
+
+You can find many nice examples on [BeautifulAlgorithms.jl](https://github.com/mossr/BeautifulAlgorithms.jl). Below are some common Julia code:
+
+```{julia}
+# calculate the intersection of two vectors/sets
+[1, 2] ∩ [2, 3, 4]
+```
+
+```{julia}
+# check if a value is in a vector/set
+1 ∉ [2, 3]
+```
+
+```{julia}
+# define a function in one line
+f(r) = π*r^2
+
+f(3)
+```
+
+```{julia}
+# Euler's identity
+ℯ^(im * π) + 1 |> round
+```
+
+```{julia}
+# calculating the pairwise-distance between points in a set
+X = [1, 2, 3, 4]
+d(x, y) = abs(x - y)
+[d(xᵢ, xⱼ) for xᵢ ∈ X, xⱼ ∈ X]
+```
+
+2) Easily apply a function to all elements of a vector/set:
+
+```{julia}
+x = [1, 2, 3, 4]
+
+# broadcast
+sin.(x)
+```
+
+```{julia}
+# mapping
+map(sin, x)
+```
+
+```{julia}
+# list comprehension
+[sin(x_i) for x_i ∈ x]
+```
+
+3) You can compose functions in the reading order 
+
+Instead of writing
+
+```{julia}
+sin(cos(1))
+```
+
+you can "pipe" the functions as in
+
+```{julia}
+1 |> cos |> sin
+```
+
+4) Julia is a functional programming language with type hierarchy, which means that we have "categories" (types) and "functors" (functions) mapping between the types; moreover, its polimorphism means that the functions depend on the type of its arguments.
+
+For example, suppose you want to define the norm of a vector:
+
+```{julia}
+x = [1, 2, 3]
+
+# define the norm of a Vector of Numbers
+norm(x::Vector{<:Number}) = x.^2 |> sum |> sqrt
+norm(x)
+```
+
+You can also define the norm of a function $f$ as the approximate integral of $|f|$ on the interval $[0, 1]$:
+
+```{julia}
+step_size = 0.0001
+norm(f::Function) = [abs(f(x) * step_size) for x ∈ 0:step_size:1] |> sum
+norm(sin)
+```
+
+which is very close to
+
+```{julia}
+abs(cos(1) - cos(0))
+```
+
+Why not define the norm of a text as the amount of characters?
+
+```{julia}
+norm(s::AbstractString) = length(s)
+norm("Hello!")
+```
 
 ## Why TDA?
 
+Topological Data Analysis is a very curious field of mathematics that apply tools from topology and algebraic topology in the study of datasets. By "datasets", we almost always mean "finite metric space".
+
+These tools can be divided in some broad categories:
+
+### Homological methods
+
+Persistence homology calculates the "shape" (homology groups) of a object on different scales, and compact this information into objects called "barcodes". This barcode can be vectorized and then inserted into machine learning models.
+
+### Graph reduction methods
+
+The Mapper algorithm is the discrete version of the [Reeb graph](https://en.wikipedia.org/wiki/Reeb_graph). It captures the geometry of a dataset with respect to a given function (called "filter") and produce a graph of its pre-images clustered. There is also the Ball Mapper variant, which does not need a filter function and resembles the Vietoris-Rips filtration. These methods are useful to get a glimpse of the geometry (flares, holes) and areas of interest. For example: if your metric space is a dataset of measurements of patients with diabets, the Mapper graph can represent the patients and the shape of this graph can give insights about the type of diabetes one has.
+
+### Clustering methods
+
+Algorithms like ToMATo are clustering algorithms: we have a metric space as input, and return a partition of this dataset. Clustering is useful whenever we need to "group a set of objects in such a way that objects in the same group (called a cluster) are more similar to each other than to those in other groups (clusters)"^[https://en.wikipedia.org/wiki/Cluster_analysis].
+
 ## Why this minicourse?
+
+This minicourse is a good opportunity for pure topologists to see how we can use TDA *in practice*. It will be even better for the applied mathematicians who can promptly recognize the tools and algorithms I am using.
