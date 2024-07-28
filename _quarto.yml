@@ -23,6 +23,7 @@ book:
 
   chapters:
     - index.qmd
+    - introduction.qmd
     - "getting started.qmd"
     - 3d-shapes.qmd
 

@@ -116,15 +116,7 @@ The following beautiful gifs can be found at the [Ripserer.jl](https://mtsch.git
 
 ![Collapsing the circle also make the 1-dimensional persistence diagram get close to the diagonal.](images/getting-started/rips4.gif)
 
-## A better way to represent barcodes
-
-Barcodes are nice and 
-! bottleneck is also a bit expensive
-! a representation in fixed form (vector, matrix, etc?)
-! important to use in machine learning algorithms!
-
-
-## Classic topology
+## Some classic examples in topology
 
 Let's start exploring some common objects in topology.
 
@@ -138,10 +130,10 @@ import Ripserer;
 import Plots;
 
 function plot_barcode(bc)
-Plots.plot(
-    Plots.plot(bc)
-    ,Ripserer.barcode(bc)
-)
+  Plots.plot(
+      Plots.plot(bc)
+      ,Ripserer.barcode(bc)
+  )
 end;
 ```
 
@@ -179,14 +171,14 @@ plot_barcode(bc)
 
 ```{julia}
 #| eval: true
-X = sphere(1500, dim = 3)
+X = sphere(500, dim = 3)
 gl.scatter(X)
 ```
 
 
 ```{julia}
 #| eval: true
-bc = Ripserer.ripserer(X, dim_max = 1, verbose = true)
+bc = Ripserer.ripserer(X, dim_max = 2, verbose = true)
 plot_barcode(bc)
 ```
 
@@ -226,3 +218,12 @@ gl.scatter(X)
 bc = Ripserer.ripserer(X, dim_max = 1, verbose = true)
 plot_barcode(bc)
 ```
+
+## A better way to represent barcodes
+
+Even though the bottleneck distance is easier to calculate than the Gromov-Hausdorff distance, it is still a bit expensive for large barcodes.
+
+Barcodes are nice but wild objects. They have variable length. To be able to use these tools in machine learning algorithms, we need to represent them in a vector or matrix with fixed size.
+
+!!! falar sobre persistence landscape
+
