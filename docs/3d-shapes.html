@@ -286,7 +286,7 @@ window.Quarto = {
   <li><a href="#accuracy" id="toc-accuracy" class="nav-link" data-scroll-target="#accuracy"><span class="header-section-number">3.8.3</span> Accuracy</a></li>
   <li><a href="#mds-plot" id="toc-mds-plot" class="nav-link" data-scroll-target="#mds-plot"><span class="header-section-number">3.8.4</span> MDS plot</a></li>
   </ul></li>
-  <li><a href="#volumes" id="toc-volumes" class="nav-link" data-scroll-target="#volumes"><span class="header-section-number">3.9</span> Volumes</a></li>
+  <li><a href="#using-volumes" id="toc-using-volumes" class="nav-link" data-scroll-target="#using-volumes"><span class="header-section-number">3.9</span> Using volumes</a></li>
   </ul>
 </nav>
     </div>
@@ -810,6 +810,12 @@ An ingenuous attempt
 <section id="farthest-points-sampling" class="level3" data-number="3.4.3">
 <h3 data-number="3.4.3" class="anchored" data-anchor-id="farthest-points-sampling"><span class="header-section-number">3.4.3</span> Farthest points sampling</h3>
 <p>We could just select a random sample of points from our space, but points in high-density areas would be selected a lot more. There is another way to select points in a “well spaced manner”, called the <em>farthest point sampling algorithm</em>. This algorithm was shown to me by Facundo Mémoli on a dirty blackboard in 2018 and the simplicity of it astonished me. For the curious ones, the algorithm is detailed below.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/3d-shapes/farthest points.gif" class="img-fluid figure-img"></p>
+<figcaption>An example of farthest point sample. The blue dots are the space <span class="math inline">\(X\)</span>; the red dots are chosen each time far away from all the other red dots.</figcaption>
+</figure>
+</div>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -823,9 +829,7 @@ Important
 <!-- ## Algorithm -->
 <p>Let <span class="math inline">\((X, d)\)</span> be a metric space. Fix an integer <span class="math inline">\(n\)</span>. Let <span class="math inline">\(C = \emptyset\)</span> be the “set of chosen points”. Select <span class="math inline">\(x_1 \in X\)</span> randomly and add it to <span class="math inline">\(C\)</span>. Repeat the following procedure until you have <span class="math inline">\(n\)</span> points in <span class="math inline">\(C\)</span>:</p>
 <ul>
-<li><p>Calculate the point <span class="math inline">\(x \in X\)</span> that is the most distant from all elements of <span class="math inline">\(C\)</span>, ie, <span class="math display">\[
-\max \{ d(x, c), c \in C \} = \max \{d(x', c), x' \in X, c \in C \}.
-\]</span></p></li>
+<li><p>Calculate the point <span class="math inline">\(x \in X\)</span> that is the most distant from all elements of <span class="math inline">\(C\)</span>.</p></li>
 <li><p>Add <span class="math inline">\(x\)</span> to <span class="math inline">\(C\)</span>.</p></li>
 <li><p>If <span class="math inline">\(C\)</span> has <span class="math inline">\(n\)</span> points, stop.</p></li>
 </ul>
@@ -882,8 +886,8 @@ Important
 </section>
 <section id="geodesic-distances" class="level3" data-number="3.4.4">
 <h3 data-number="3.4.4" class="anchored" data-anchor-id="geodesic-distances"><span class="header-section-number">3.4.4</span> Geodesic distances</h3>
-<p>Given a shape <span class="math inline">\(S\)</span>, we can think of the geodesic distance between two points as “the least distance an and would need to walk from one point to another”. We will approximate this “walkable” paths using the edges of the triangles of the shape <span class="math inline">\(S\)</span>. Remember: a mesh is a set of points and triangles!</p>
-<p>The Dijkstra algorithm is perfect for our needs: it calculates the shortest path from one point to another in a weighted graph. So all we need is to:</p>
+<p>Given a shape <span class="math inline">\(S\)</span>, we can think of the geodesic distance between two points as “the least distance an ant would need to walk from one point to another”. We will approximate this “walkable” paths using the edges of the triangles of the shape <span class="math inline">\(S\)</span>. Remember: a mesh is a set of points and triangles!</p>
+<p>The <a href="https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm">Dijkstra algorithm</a> is perfect for our needs: it calculates the shortest path from one point to another in a weighted graph. So all we need is to:</p>
 <ul>
 <li>Transform <span class="math inline">\(S\)</span> into a graph where the edges have weights (the euclidean distance between these points);</li>
 <li>Calculate the shortest path between each two points.</li>
@@ -968,7 +972,7 @@ Important
 </section>
 <section id="persistent-homology" class="level2" data-number="3.5">
 <h2 data-number="3.5" class="anchored" data-anchor-id="persistent-homology"><span class="header-section-number">3.5</span> Persistent homology</h2>
-<p>We can now calculate the persistence diagram of <span class="math inline">\(X_fps\)</span> with the geodesic distance and use it! Let’s load some packages and calculate it</p>
+<p>We can now calculate the persistence diagram of <span class="math inline">\(X_{fps}\)</span> with the geodesic distance and use it! Let’s load some packages and calculate it</p>
 <div id="11deb3d2" class="cell" data-execution_count="27">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>pd <span class="op">=</span> Ripserer.<span class="fu">ripserer</span>(D, dim_max <span class="op">=</span> <span class="fl">2</span>, verbose<span class="op">=</span><span class="cn">true</span>, sparse <span class="op">=</span> <span class="cn">true</span>, threshold <span class="op">=</span> <span class="fl">0.4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="26">
@@ -5404,7 +5408,7 @@ GBAxIGJAxMA8TnHWLDEgYkDEgIgBEQP/A1GL8MOovEKYAAAAAElFTkSuQmCC
 </section>
 <section id="mds-plot" class="level3" data-number="3.8.4">
 <h3 data-number="3.8.4" class="anchored" data-anchor-id="mds-plot"><span class="header-section-number">3.8.4</span> MDS plot</h3>
-<p>Another last visualization technique is the <a href="https://en.wikipedia.org/wiki/Multidimensional_scaling">multidimensional scaling</a> plot. This method takes a distance matrix and tries to project it down to $^2) (or $^3) while distorting the distances as little as possible.</p>
+<p>Another last visualization technique is the <a href="https://en.wikipedia.org/wiki/Multidimensional_scaling">multidimensional scaling</a> plot. This method takes a distance matrix and tries to project it down to <span class="math inline">\(\mathbb{R}^2\)</span>) (or <span class="math inline">\(\mathbb{R}^3\)</span>) while distorting the distances as little as possible.</p>
 <div id="bc5915b2" class="cell" data-execution_count="48">
 <details class="code-fold">
 <summary>Code</summary>
@@ -5456,8 +5460,21 @@ GBAxIGJAxMA8TnHWLDEgYkDEgIgBEQP/A1GL8MOovEKYAAAAAElFTkSuQmCC
 <p>With only the distance matrix <span class="math inline">\(DB\)</span>, as we could see above, the answer is <strong>NO</strong>. We need to find more tools to compare these shapes.</p>
 </section>
 </section>
-<section id="volumes" class="level2" data-number="3.9">
-<h2 data-number="3.9" class="anchored" data-anchor-id="volumes"><span class="header-section-number">3.9</span> Volumes</h2>
+<section id="using-volumes" class="level2" data-number="3.9">
+<h2 data-number="3.9" class="anchored" data-anchor-id="using-volumes"><span class="header-section-number">3.9</span> Using volumes</h2>
+<div class="callout callout-style-default callout-caution callout-titled" title="Warning">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Don’t try the following scenes at home! Read the text and explain why this approach is wrong.</p>
+</div>
+</div>
 <p>Each mesh has a notion of volume that can be calculated with the function <code>measure</code>.</p>
 <p>We can see below the mean volume for each class:</p>
 <div id="3fc5f734" class="cell" data-execution_count="50">
@@ -7178,551 +7195,557 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb71-399"><a href="#cb71-399" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb71-400"><a href="#cb71-400" aria-hidden="true" tabindex="-1"></a>We could just select a random sample of points from our space, but points in high-density areas would be selected a lot more. There is another way to select points in a "well spaced manner", called the *farthest point sampling algorithm*. This algorithm was shown to me by Facundo Mémoli on a dirty blackboard in 2018 and the simplicity of it astonished me. For the curious ones, the algorithm is detailed below.</span>
 <span id="cb71-401"><a href="#cb71-401" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-402"><a href="#cb71-402" aria-hidden="true" tabindex="-1"></a>::: {.callout-important}</span>
-<span id="cb71-403"><a href="#cb71-403" aria-hidden="true" tabindex="-1"></a><span class="co">&lt;!-- ## Algorithm --&gt;</span></span>
-<span id="cb71-404"><a href="#cb71-404" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-405"><a href="#cb71-405" aria-hidden="true" tabindex="-1"></a>Let $(X, d)$ be a metric space. Fix an integer $n$. Let $C = \emptyset$ be the "set of chosen points". Select $x_1 \in X$ randomly and add it to $C$. Repeat the following procedure until you have $n$ points in $C$:</span>
+<span id="cb71-402"><a href="#cb71-402" aria-hidden="true" tabindex="-1"></a><span class="al">![An example of farthest point sample. The blue dots are the space $X$; the red dots are chosen each time far away from all the other red dots.](images/3d-shapes/farthest%20points.gif)</span></span>
+<span id="cb71-403"><a href="#cb71-403" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-404"><a href="#cb71-404" aria-hidden="true" tabindex="-1"></a>::: {.callout-important}</span>
+<span id="cb71-405"><a href="#cb71-405" aria-hidden="true" tabindex="-1"></a><span class="co">&lt;!-- ## Algorithm --&gt;</span></span>
 <span id="cb71-406"><a href="#cb71-406" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-407"><a href="#cb71-407" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Calculate the point $x \in X$ that is the most distant from all elements of $C$, ie, </span>
-<span id="cb71-408"><a href="#cb71-408" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb71-409"><a href="#cb71-409" aria-hidden="true" tabindex="-1"></a>\max <span class="sc">\{</span> d(x, c), c \in C <span class="sc">\}</span> = \max <span class="sc">\{</span>d(x', c), x' \in X, c \in C <span class="sc">\}</span>.</span>
-<span id="cb71-410"><a href="#cb71-410" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb71-411"><a href="#cb71-411" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-412"><a href="#cb71-412" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Add $x$ to $C$.</span>
-<span id="cb71-413"><a href="#cb71-413" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-414"><a href="#cb71-414" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>If $C$ has $n$ points, stop.</span>
-<span id="cb71-415"><a href="#cb71-415" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-416"><a href="#cb71-416" aria-hidden="true" tabindex="-1"></a>The set $C$ is called a *farthest points sampling* of $X$ with size $n$.</span>
-<span id="cb71-417"><a href="#cb71-417" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-418"><a href="#cb71-418" aria-hidden="true" tabindex="-1"></a>Notice that running the algorithm several times can lead to different sets $C$ because the first term is chosen randomly.</span>
-<span id="cb71-419"><a href="#cb71-419" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb71-420"><a href="#cb71-420" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-421"><a href="#cb71-421" aria-hidden="true" tabindex="-1"></a>Let's extract 400 points with the FPS algorithm and the euclidean distance:</span>
-<span id="cb71-422"><a href="#cb71-422" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-425"><a href="#cb71-425" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-426"><a href="#cb71-426" aria-hidden="true" tabindex="-1"></a><span class="in">ids_fps = farthest_points_sample(X, 400);</span></span>
-<span id="cb71-427"><a href="#cb71-427" aria-hidden="true" tabindex="-1"></a><span class="in">X_fps = X[ids_fps]</span></span>
-<span id="cb71-428"><a href="#cb71-428" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-407"><a href="#cb71-407" aria-hidden="true" tabindex="-1"></a>Let $(X, d)$ be a metric space. Fix an integer $n$. Let $C = \emptyset$ be the "set of chosen points". Select $x_1 \in X$ randomly and add it to $C$. Repeat the following procedure until you have $n$ points in $C$:</span>
+<span id="cb71-408"><a href="#cb71-408" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-409"><a href="#cb71-409" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Calculate the point $x \in X$ that is the most distant from all elements of $C$.</span>
+<span id="cb71-410"><a href="#cb71-410" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-411"><a href="#cb71-411" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Add $x$ to $C$.</span>
+<span id="cb71-412"><a href="#cb71-412" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-413"><a href="#cb71-413" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>If $C$ has $n$ points, stop.</span>
+<span id="cb71-414"><a href="#cb71-414" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-415"><a href="#cb71-415" aria-hidden="true" tabindex="-1"></a>The set $C$ is called a *farthest points sampling* of $X$ with size $n$.</span>
+<span id="cb71-416"><a href="#cb71-416" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-417"><a href="#cb71-417" aria-hidden="true" tabindex="-1"></a>Notice that running the algorithm several times can lead to different sets $C$ because the first term is chosen randomly.</span>
+<span id="cb71-418"><a href="#cb71-418" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb71-419"><a href="#cb71-419" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-420"><a href="#cb71-420" aria-hidden="true" tabindex="-1"></a>Let's extract 400 points with the FPS algorithm and the euclidean distance:</span>
+<span id="cb71-421"><a href="#cb71-421" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-424"><a href="#cb71-424" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb71-425"><a href="#cb71-425" aria-hidden="true" tabindex="-1"></a><span class="in">ids_fps = farthest_points_sample(X, 400);</span></span>
+<span id="cb71-426"><a href="#cb71-426" aria-hidden="true" tabindex="-1"></a><span class="in">X_fps = X[ids_fps]</span></span>
+<span id="cb71-427"><a href="#cb71-427" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-428"><a href="#cb71-428" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb71-429"><a href="#cb71-429" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-430"><a href="#cb71-430" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-433"><a href="#cb71-433" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-434"><a href="#cb71-434" aria-hidden="true" tabindex="-1"></a><span class="in">gl.scatter(X_fps, markersize = 10)</span></span>
-<span id="cb71-435"><a href="#cb71-435" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb71-436"><a href="#cb71-436" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-437"><a href="#cb71-437" aria-hidden="true" tabindex="-1"></a>This is a very good approximation!</span>
-<span id="cb71-438"><a href="#cb71-438" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-439"><a href="#cb71-439" aria-hidden="true" tabindex="-1"></a>We are now interested in calculating the geodesic distance between these 400 points. But be careful! The geodesic distance need the entire mesh to work.</span>
-<span id="cb71-440"><a href="#cb71-440" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-441"><a href="#cb71-441" aria-hidden="true" tabindex="-1"></a><span class="fu">### Geodesic distances</span></span>
-<span id="cb71-442"><a href="#cb71-442" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-443"><a href="#cb71-443" aria-hidden="true" tabindex="-1"></a>Given a shape $S$, we can think of the geodesic distance between two points as "the least distance an and would need to walk from one point to another". We will approximate this "walkable" paths using the edges of the triangles of the shape $S$. Remember: a mesh is a set of points and triangles!</span>
-<span id="cb71-444"><a href="#cb71-444" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-445"><a href="#cb71-445" aria-hidden="true" tabindex="-1"></a>The Dijkstra algorithm is perfect for our needs: it calculates the shortest path from one point to another in a weighted graph. So all we need is to:</span>
-<span id="cb71-446"><a href="#cb71-446" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-447"><a href="#cb71-447" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Transform $S$ into a graph where the edges have weights (the euclidean distance between these points);</span>
-<span id="cb71-448"><a href="#cb71-448" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Calculate the shortest path between each two points.</span>
-<span id="cb71-449"><a href="#cb71-449" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-450"><a href="#cb71-450" aria-hidden="true" tabindex="-1"></a>We already have the first item, so let's calculate the second.</span>
-<span id="cb71-451"><a href="#cb71-451" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-454"><a href="#cb71-454" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-455"><a href="#cb71-455" aria-hidden="true" tabindex="-1"></a><span class="in">#| code-fold: true</span></span>
-<span id="cb71-456"><a href="#cb71-456" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-457"><a href="#cb71-457" aria-hidden="true" tabindex="-1"></a><span class="in">function geodesic_distance_from_graph(g, ids)</span></span>
-<span id="cb71-458"><a href="#cb71-458" aria-hidden="true" tabindex="-1"></a><span class="in">    n = length(ids)</span></span>
-<span id="cb71-459"><a href="#cb71-459" aria-hidden="true" tabindex="-1"></a><span class="in">    D = zeros(n, n)</span></span>
-<span id="cb71-460"><a href="#cb71-460" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-461"><a href="#cb71-461" aria-hidden="true" tabindex="-1"></a><span class="in">    # for each point, calculate the distance from it to every other point of g</span></span>
-<span id="cb71-462"><a href="#cb71-462" aria-hidden="true" tabindex="-1"></a><span class="in">    @showprogress desc = "Calculating geodesic distance..." Threads.@threads for (i, id) ∈ collect(enumerate(ids))</span></span>
-<span id="cb71-463"><a href="#cb71-463" aria-hidden="true" tabindex="-1"></a><span class="in">        dts = dijkstra_shortest_paths(g, id)</span></span>
-<span id="cb71-464"><a href="#cb71-464" aria-hidden="true" tabindex="-1"></a><span class="in">        D[i, :] = dts.dists[ids]</span></span>
-<span id="cb71-465"><a href="#cb71-465" aria-hidden="true" tabindex="-1"></a><span class="in">    end</span></span>
-<span id="cb71-466"><a href="#cb71-466" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-467"><a href="#cb71-467" aria-hidden="true" tabindex="-1"></a><span class="in">    # force simmetry on X, because of small difference</span></span>
-<span id="cb71-468"><a href="#cb71-468" aria-hidden="true" tabindex="-1"></a><span class="in">    # in the calculation of paths</span></span>
-<span id="cb71-469"><a href="#cb71-469" aria-hidden="true" tabindex="-1"></a><span class="in">    for i ∈ 1:n</span></span>
-<span id="cb71-470"><a href="#cb71-470" aria-hidden="true" tabindex="-1"></a><span class="in">        for j ∈ i:n</span></span>
-<span id="cb71-471"><a href="#cb71-471" aria-hidden="true" tabindex="-1"></a><span class="in">            D[i, j] = D[j, i]</span></span>
-<span id="cb71-472"><a href="#cb71-472" aria-hidden="true" tabindex="-1"></a><span class="in">        end</span></span>
-<span id="cb71-473"><a href="#cb71-473" aria-hidden="true" tabindex="-1"></a><span class="in">    end</span></span>
-<span id="cb71-474"><a href="#cb71-474" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-475"><a href="#cb71-475" aria-hidden="true" tabindex="-1"></a><span class="in">    # normalize the distance so the max is 1</span></span>
-<span id="cb71-476"><a href="#cb71-476" aria-hidden="true" tabindex="-1"></a><span class="in">    max_dist = maximum(D)</span></span>
-<span id="cb71-477"><a href="#cb71-477" aria-hidden="true" tabindex="-1"></a><span class="in">    D = D ./ max_dist</span></span>
-<span id="cb71-478"><a href="#cb71-478" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-479"><a href="#cb71-479" aria-hidden="true" tabindex="-1"></a><span class="in">    return D</span></span>
-<span id="cb71-480"><a href="#cb71-480" aria-hidden="true" tabindex="-1"></a><span class="in">end;</span></span>
-<span id="cb71-481"><a href="#cb71-481" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb71-482"><a href="#cb71-482" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-485"><a href="#cb71-485" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-486"><a href="#cb71-486" aria-hidden="true" tabindex="-1"></a><span class="in">D = geodesic_distance_from_graph(g, ids_fps)</span></span>
-<span id="cb71-487"><a href="#cb71-487" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb71-488"><a href="#cb71-488" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-489"><a href="#cb71-489" aria-hidden="true" tabindex="-1"></a>We can see that $D$ makes sense just by plotting $X_fps$ colored by the sum of the distances to each points:</span>
-<span id="cb71-490"><a href="#cb71-490" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-493"><a href="#cb71-493" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-494"><a href="#cb71-494" aria-hidden="true" tabindex="-1"></a><span class="in">exc = map(sum, eachcol(D))</span></span>
-<span id="cb71-495"><a href="#cb71-495" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-496"><a href="#cb71-496" aria-hidden="true" tabindex="-1"></a><span class="in">gl.scatter(X_fps, color = exc, markersize = 10)</span></span>
-<span id="cb71-497"><a href="#cb71-497" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb71-498"><a href="#cb71-498" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-499"><a href="#cb71-499" aria-hidden="true" tabindex="-1"></a>Looks good! The extremities of the flamingo are in a lighter color, indicating that the sum of the distances there is bigger. Now we have 1000 points sampled from $S$, together with the geodesic distance.</span>
-<span id="cb71-500"><a href="#cb71-500" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-501"><a href="#cb71-501" aria-hidden="true" tabindex="-1"></a><span class="fu">## Persistent homology</span></span>
-<span id="cb71-502"><a href="#cb71-502" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-503"><a href="#cb71-503" aria-hidden="true" tabindex="-1"></a>We can now calculate the persistence diagram of $X_fps$ with the geodesic distance and use it! Let's load some packages and calculate it</span>
-<span id="cb71-504"><a href="#cb71-504" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-507"><a href="#cb71-507" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-508"><a href="#cb71-508" aria-hidden="true" tabindex="-1"></a><span class="in">pd = Ripserer.ripserer(D, dim_max = 2, verbose=true, sparse = true, threshold = 0.4)</span></span>
-<span id="cb71-509"><a href="#cb71-509" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb71-510"><a href="#cb71-510" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-511"><a href="#cb71-511" aria-hidden="true" tabindex="-1"></a>Ploting the intervals looks as follows:</span>
-<span id="cb71-512"><a href="#cb71-512" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-515"><a href="#cb71-515" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-516"><a href="#cb71-516" aria-hidden="true" tabindex="-1"></a><span class="in">#| code-fold: true</span></span>
-<span id="cb71-517"><a href="#cb71-517" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-518"><a href="#cb71-518" aria-hidden="true" tabindex="-1"></a><span class="in">function plot_barcode(pd)</span></span>
-<span id="cb71-519"><a href="#cb71-519" aria-hidden="true" tabindex="-1"></a><span class="in">    # get the size of the longest interval</span></span>
-<span id="cb71-520"><a href="#cb71-520" aria-hidden="true" tabindex="-1"></a><span class="in">    threshold = </span></span>
-<span id="cb71-521"><a href="#cb71-521" aria-hidden="true" tabindex="-1"></a><span class="in">        @chain begin</span></span>
-<span id="cb71-522"><a href="#cb71-522" aria-hidden="true" tabindex="-1"></a><span class="in">            vcat(pd...)</span></span>
-<span id="cb71-523"><a href="#cb71-523" aria-hidden="true" tabindex="-1"></a><span class="in">            last.(_)</span></span>
-<span id="cb71-524"><a href="#cb71-524" aria-hidden="true" tabindex="-1"></a><span class="in">            filter(isfinite, _)</span></span>
-<span id="cb71-525"><a href="#cb71-525" aria-hidden="true" tabindex="-1"></a><span class="in">            maximum</span></span>
-<span id="cb71-526"><a href="#cb71-526" aria-hidden="true" tabindex="-1"></a><span class="in">        end</span></span>
-<span id="cb71-527"><a href="#cb71-527" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-528"><a href="#cb71-528" aria-hidden="true" tabindex="-1"></a><span class="in">    # plot the barcode using this interval as the maximum value of the x-axis</span></span>
-<span id="cb71-529"><a href="#cb71-529" aria-hidden="true" tabindex="-1"></a><span class="in">    Ripserer.barcode(pd, infinity = threshold)</span></span>
-<span id="cb71-530"><a href="#cb71-530" aria-hidden="true" tabindex="-1"></a><span class="in">end;</span></span>
-<span id="cb71-531"><a href="#cb71-531" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb71-532"><a href="#cb71-532" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-535"><a href="#cb71-535" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-536"><a href="#cb71-536" aria-hidden="true" tabindex="-1"></a><span class="in">plot_barcode(pd)</span></span>
-<span id="cb71-537"><a href="#cb71-537" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb71-538"><a href="#cb71-538" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-539"><a href="#cb71-539" aria-hidden="true" tabindex="-1"></a>or just the 1- and 2-dimensional barcode:</span>
-<span id="cb71-540"><a href="#cb71-540" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-543"><a href="#cb71-543" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-544"><a href="#cb71-544" aria-hidden="true" tabindex="-1"></a><span class="in">plot_barcode(pd[2:3])</span></span>
-<span id="cb71-545"><a href="#cb71-545" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb71-546"><a href="#cb71-546" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-547"><a href="#cb71-547" aria-hidden="true" tabindex="-1"></a><span class="fu">## Summarizing</span></span>
-<span id="cb71-548"><a href="#cb71-548" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-549"><a href="#cb71-549" aria-hidden="true" tabindex="-1"></a>All the hard work on the previous sections was just to prepare our dataset from file to barcode. That's why they say that **data science is 80% preparing the data and 20% analyzing it!**</span>
-<span id="cb71-550"><a href="#cb71-550" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-551"><a href="#cb71-551" aria-hidden="true" tabindex="-1"></a>We can summarise what we did with the following function:</span>
+<span id="cb71-432"><a href="#cb71-432" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb71-433"><a href="#cb71-433" aria-hidden="true" tabindex="-1"></a><span class="in">gl.scatter(X_fps, markersize = 10)</span></span>
+<span id="cb71-434"><a href="#cb71-434" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-435"><a href="#cb71-435" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-436"><a href="#cb71-436" aria-hidden="true" tabindex="-1"></a>This is a very good approximation!</span>
+<span id="cb71-437"><a href="#cb71-437" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-438"><a href="#cb71-438" aria-hidden="true" tabindex="-1"></a>We are now interested in calculating the geodesic distance between these 400 points. But be careful! The geodesic distance need the entire mesh to work.</span>
+<span id="cb71-439"><a href="#cb71-439" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-440"><a href="#cb71-440" aria-hidden="true" tabindex="-1"></a><span class="fu">### Geodesic distances</span></span>
+<span id="cb71-441"><a href="#cb71-441" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-442"><a href="#cb71-442" aria-hidden="true" tabindex="-1"></a>Given a shape $S$, we can think of the geodesic distance between two points as "the least distance an ant would need to walk from one point to another". We will approximate this "walkable" paths using the edges of the triangles of the shape $S$. Remember: a mesh is a set of points and triangles!</span>
+<span id="cb71-443"><a href="#cb71-443" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-444"><a href="#cb71-444" aria-hidden="true" tabindex="-1"></a>The <span class="co">[</span><span class="ot">Dijkstra algorithm</span><span class="co">](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm)</span> is perfect for our needs: it calculates the shortest path from one point to another in a weighted graph. So all we need is to:</span>
+<span id="cb71-445"><a href="#cb71-445" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-446"><a href="#cb71-446" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Transform $S$ into a graph where the edges have weights (the euclidean distance between these points);</span>
+<span id="cb71-447"><a href="#cb71-447" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Calculate the shortest path between each two points.</span>
+<span id="cb71-448"><a href="#cb71-448" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-449"><a href="#cb71-449" aria-hidden="true" tabindex="-1"></a>We already have the first item, so let's calculate the second.</span>
+<span id="cb71-450"><a href="#cb71-450" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-453"><a href="#cb71-453" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb71-454"><a href="#cb71-454" aria-hidden="true" tabindex="-1"></a><span class="in">#| code-fold: true</span></span>
+<span id="cb71-455"><a href="#cb71-455" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-456"><a href="#cb71-456" aria-hidden="true" tabindex="-1"></a><span class="in">function geodesic_distance_from_graph(g, ids)</span></span>
+<span id="cb71-457"><a href="#cb71-457" aria-hidden="true" tabindex="-1"></a><span class="in">    n = length(ids)</span></span>
+<span id="cb71-458"><a href="#cb71-458" aria-hidden="true" tabindex="-1"></a><span class="in">    D = zeros(n, n)</span></span>
+<span id="cb71-459"><a href="#cb71-459" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-460"><a href="#cb71-460" aria-hidden="true" tabindex="-1"></a><span class="in">    # for each point, calculate the distance from it to every other point of g</span></span>
+<span id="cb71-461"><a href="#cb71-461" aria-hidden="true" tabindex="-1"></a><span class="in">    @showprogress desc = "Calculating geodesic distance..." Threads.@threads for (i, id) ∈ collect(enumerate(ids))</span></span>
+<span id="cb71-462"><a href="#cb71-462" aria-hidden="true" tabindex="-1"></a><span class="in">        dts = dijkstra_shortest_paths(g, id)</span></span>
+<span id="cb71-463"><a href="#cb71-463" aria-hidden="true" tabindex="-1"></a><span class="in">        D[i, :] = dts.dists[ids]</span></span>
+<span id="cb71-464"><a href="#cb71-464" aria-hidden="true" tabindex="-1"></a><span class="in">    end</span></span>
+<span id="cb71-465"><a href="#cb71-465" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-466"><a href="#cb71-466" aria-hidden="true" tabindex="-1"></a><span class="in">    # force simmetry on X, because of small difference</span></span>
+<span id="cb71-467"><a href="#cb71-467" aria-hidden="true" tabindex="-1"></a><span class="in">    # in the calculation of paths</span></span>
+<span id="cb71-468"><a href="#cb71-468" aria-hidden="true" tabindex="-1"></a><span class="in">    for i ∈ 1:n</span></span>
+<span id="cb71-469"><a href="#cb71-469" aria-hidden="true" tabindex="-1"></a><span class="in">        for j ∈ i:n</span></span>
+<span id="cb71-470"><a href="#cb71-470" aria-hidden="true" tabindex="-1"></a><span class="in">            D[i, j] = D[j, i]</span></span>
+<span id="cb71-471"><a href="#cb71-471" aria-hidden="true" tabindex="-1"></a><span class="in">        end</span></span>
+<span id="cb71-472"><a href="#cb71-472" aria-hidden="true" tabindex="-1"></a><span class="in">    end</span></span>
+<span id="cb71-473"><a href="#cb71-473" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-474"><a href="#cb71-474" aria-hidden="true" tabindex="-1"></a><span class="in">    # normalize the distance so the max is 1</span></span>
+<span id="cb71-475"><a href="#cb71-475" aria-hidden="true" tabindex="-1"></a><span class="in">    max_dist = maximum(D)</span></span>
+<span id="cb71-476"><a href="#cb71-476" aria-hidden="true" tabindex="-1"></a><span class="in">    D = D ./ max_dist</span></span>
+<span id="cb71-477"><a href="#cb71-477" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-478"><a href="#cb71-478" aria-hidden="true" tabindex="-1"></a><span class="in">    return D</span></span>
+<span id="cb71-479"><a href="#cb71-479" aria-hidden="true" tabindex="-1"></a><span class="in">end;</span></span>
+<span id="cb71-480"><a href="#cb71-480" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-481"><a href="#cb71-481" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-484"><a href="#cb71-484" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb71-485"><a href="#cb71-485" aria-hidden="true" tabindex="-1"></a><span class="in">D = geodesic_distance_from_graph(g, ids_fps)</span></span>
+<span id="cb71-486"><a href="#cb71-486" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-487"><a href="#cb71-487" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-488"><a href="#cb71-488" aria-hidden="true" tabindex="-1"></a>We can see that $D$ makes sense just by plotting $X_fps$ colored by the sum of the distances to each points:</span>
+<span id="cb71-489"><a href="#cb71-489" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-492"><a href="#cb71-492" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb71-493"><a href="#cb71-493" aria-hidden="true" tabindex="-1"></a><span class="in">exc = map(sum, eachcol(D))</span></span>
+<span id="cb71-494"><a href="#cb71-494" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-495"><a href="#cb71-495" aria-hidden="true" tabindex="-1"></a><span class="in">gl.scatter(X_fps, color = exc, markersize = 10)</span></span>
+<span id="cb71-496"><a href="#cb71-496" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-497"><a href="#cb71-497" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-498"><a href="#cb71-498" aria-hidden="true" tabindex="-1"></a>Looks good! The extremities of the flamingo are in a lighter color, indicating that the sum of the distances there is bigger. Now we have 1000 points sampled from $S$, together with the geodesic distance.</span>
+<span id="cb71-499"><a href="#cb71-499" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-500"><a href="#cb71-500" aria-hidden="true" tabindex="-1"></a><span class="fu">## Persistent homology</span></span>
+<span id="cb71-501"><a href="#cb71-501" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-502"><a href="#cb71-502" aria-hidden="true" tabindex="-1"></a>We can now calculate the persistence diagram of $X_{fps}$ with the geodesic distance and use it! Let's load some packages and calculate it</span>
+<span id="cb71-503"><a href="#cb71-503" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-506"><a href="#cb71-506" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb71-507"><a href="#cb71-507" aria-hidden="true" tabindex="-1"></a><span class="in">pd = Ripserer.ripserer(D, dim_max = 2, verbose=true, sparse = true, threshold = 0.4)</span></span>
+<span id="cb71-508"><a href="#cb71-508" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-509"><a href="#cb71-509" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-510"><a href="#cb71-510" aria-hidden="true" tabindex="-1"></a>Ploting the intervals looks as follows:</span>
+<span id="cb71-511"><a href="#cb71-511" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-514"><a href="#cb71-514" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb71-515"><a href="#cb71-515" aria-hidden="true" tabindex="-1"></a><span class="in">#| code-fold: true</span></span>
+<span id="cb71-516"><a href="#cb71-516" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-517"><a href="#cb71-517" aria-hidden="true" tabindex="-1"></a><span class="in">function plot_barcode(pd)</span></span>
+<span id="cb71-518"><a href="#cb71-518" aria-hidden="true" tabindex="-1"></a><span class="in">    # get the size of the longest interval</span></span>
+<span id="cb71-519"><a href="#cb71-519" aria-hidden="true" tabindex="-1"></a><span class="in">    threshold = </span></span>
+<span id="cb71-520"><a href="#cb71-520" aria-hidden="true" tabindex="-1"></a><span class="in">        @chain begin</span></span>
+<span id="cb71-521"><a href="#cb71-521" aria-hidden="true" tabindex="-1"></a><span class="in">            vcat(pd...)</span></span>
+<span id="cb71-522"><a href="#cb71-522" aria-hidden="true" tabindex="-1"></a><span class="in">            last.(_)</span></span>
+<span id="cb71-523"><a href="#cb71-523" aria-hidden="true" tabindex="-1"></a><span class="in">            filter(isfinite, _)</span></span>
+<span id="cb71-524"><a href="#cb71-524" aria-hidden="true" tabindex="-1"></a><span class="in">            maximum</span></span>
+<span id="cb71-525"><a href="#cb71-525" aria-hidden="true" tabindex="-1"></a><span class="in">        end</span></span>
+<span id="cb71-526"><a href="#cb71-526" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-527"><a href="#cb71-527" aria-hidden="true" tabindex="-1"></a><span class="in">    # plot the barcode using this interval as the maximum value of the x-axis</span></span>
+<span id="cb71-528"><a href="#cb71-528" aria-hidden="true" tabindex="-1"></a><span class="in">    Ripserer.barcode(pd, infinity = threshold)</span></span>
+<span id="cb71-529"><a href="#cb71-529" aria-hidden="true" tabindex="-1"></a><span class="in">end;</span></span>
+<span id="cb71-530"><a href="#cb71-530" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-531"><a href="#cb71-531" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-534"><a href="#cb71-534" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb71-535"><a href="#cb71-535" aria-hidden="true" tabindex="-1"></a><span class="in">plot_barcode(pd)</span></span>
+<span id="cb71-536"><a href="#cb71-536" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-537"><a href="#cb71-537" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-538"><a href="#cb71-538" aria-hidden="true" tabindex="-1"></a>or just the 1- and 2-dimensional barcode:</span>
+<span id="cb71-539"><a href="#cb71-539" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-542"><a href="#cb71-542" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb71-543"><a href="#cb71-543" aria-hidden="true" tabindex="-1"></a><span class="in">plot_barcode(pd[2:3])</span></span>
+<span id="cb71-544"><a href="#cb71-544" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-545"><a href="#cb71-545" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-546"><a href="#cb71-546" aria-hidden="true" tabindex="-1"></a><span class="fu">## Summarizing</span></span>
+<span id="cb71-547"><a href="#cb71-547" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-548"><a href="#cb71-548" aria-hidden="true" tabindex="-1"></a>All the hard work on the previous sections was just to prepare our dataset from file to barcode. That's why they say that **data science is 80% preparing the data and 20% analyzing it!**</span>
+<span id="cb71-549"><a href="#cb71-549" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-550"><a href="#cb71-550" aria-hidden="true" tabindex="-1"></a>We can summarise what we did with the following function:</span>
+<span id="cb71-551"><a href="#cb71-551" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb71-552"><a href="#cb71-552" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-553"><a href="#cb71-553" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-556"><a href="#cb71-556" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-557"><a href="#cb71-557" aria-hidden="true" tabindex="-1"></a><span class="in">#| code-fold: true</span></span>
-<span id="cb71-558"><a href="#cb71-558" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-559"><a href="#cb71-559" aria-hidden="true" tabindex="-1"></a><span class="in">function file_to_barcode(filepath; n_points = 1000, dim_max = 1)</span></span>
-<span id="cb71-560"><a href="#cb71-560" aria-hidden="true" tabindex="-1"></a><span class="in">    ms = read_mesh(filepath)</span></span>
-<span id="cb71-561"><a href="#cb71-561" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-562"><a href="#cb71-562" aria-hidden="true" tabindex="-1"></a><span class="in">    X = mesh_to_metric_space(ms)</span></span>
-<span id="cb71-563"><a href="#cb71-563" aria-hidden="true" tabindex="-1"></a><span class="in">    g = graph_from_mesh(ms)</span></span>
-<span id="cb71-564"><a href="#cb71-564" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-565"><a href="#cb71-565" aria-hidden="true" tabindex="-1"></a><span class="in">    g, ids_biggest_component = extract_biggest_connected_component(g)</span></span>
-<span id="cb71-566"><a href="#cb71-566" aria-hidden="true" tabindex="-1"></a><span class="in">    X = X[ids_biggest_component]</span></span>
-<span id="cb71-567"><a href="#cb71-567" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-568"><a href="#cb71-568" aria-hidden="true" tabindex="-1"></a><span class="in">    ids_fps = farthest_points_sample(X, n_points);</span></span>
-<span id="cb71-569"><a href="#cb71-569" aria-hidden="true" tabindex="-1"></a><span class="in">    X_fps = X[ids_fps]</span></span>
-<span id="cb71-570"><a href="#cb71-570" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-571"><a href="#cb71-571" aria-hidden="true" tabindex="-1"></a><span class="in">    D = geodesic_distance_from_graph(g, ids_fps)</span></span>
-<span id="cb71-572"><a href="#cb71-572" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-573"><a href="#cb71-573" aria-hidden="true" tabindex="-1"></a><span class="in">    pd = Ripserer.ripserer(D, dim_max = dim_max, verbose=true, sparse = true, threshold = 0.8)</span></span>
-<span id="cb71-574"><a href="#cb71-574" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-575"><a href="#cb71-575" aria-hidden="true" tabindex="-1"></a><span class="in">    return X_fps, D, pd</span></span>
-<span id="cb71-576"><a href="#cb71-576" aria-hidden="true" tabindex="-1"></a><span class="in">end;</span></span>
-<span id="cb71-577"><a href="#cb71-577" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb71-578"><a href="#cb71-578" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-579"><a href="#cb71-579" aria-hidden="true" tabindex="-1"></a>We also define some functions to save the barcodes and metric spaces to disk, so we don't have to calculate all of them in a single session. Calculating the 2-dimensional barcode can take some time depending on your hardware!</span>
-<span id="cb71-580"><a href="#cb71-580" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-583"><a href="#cb71-583" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-584"><a href="#cb71-584" aria-hidden="true" tabindex="-1"></a><span class="in">#| code-fold: true</span></span>
-<span id="cb71-585"><a href="#cb71-585" aria-hidden="true" tabindex="-1"></a><span class="in">function pd_to_dataframe(pd)</span></span>
-<span id="cb71-586"><a href="#cb71-586" aria-hidden="true" tabindex="-1"></a><span class="in">    df = @chain begin</span></span>
-<span id="cb71-587"><a href="#cb71-587" aria-hidden="true" tabindex="-1"></a><span class="in">        map(pd) do p</span></span>
-<span id="cb71-588"><a href="#cb71-588" aria-hidden="true" tabindex="-1"></a><span class="in">            DataFrame(</span></span>
-<span id="cb71-589"><a href="#cb71-589" aria-hidden="true" tabindex="-1"></a><span class="in">                birth=p .|&gt; first, death=p .|&gt; last, dim=p.dim</span></span>
-<span id="cb71-590"><a href="#cb71-590" aria-hidden="true" tabindex="-1"></a><span class="in">            )</span></span>
-<span id="cb71-591"><a href="#cb71-591" aria-hidden="true" tabindex="-1"></a><span class="in">        end</span></span>
-<span id="cb71-592"><a href="#cb71-592" aria-hidden="true" tabindex="-1"></a><span class="in">        vcat(_...)</span></span>
-<span id="cb71-593"><a href="#cb71-593" aria-hidden="true" tabindex="-1"></a><span class="in">    end</span></span>
-<span id="cb71-594"><a href="#cb71-594" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-595"><a href="#cb71-595" aria-hidden="true" tabindex="-1"></a><span class="in">    df</span></span>
-<span id="cb71-596"><a href="#cb71-596" aria-hidden="true" tabindex="-1"></a><span class="in">end;</span></span>
-<span id="cb71-597"><a href="#cb71-597" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-598"><a href="#cb71-598" aria-hidden="true" tabindex="-1"></a><span class="in">function dataframe_to_pd(df)</span></span>
-<span id="cb71-599"><a href="#cb71-599" aria-hidden="true" tabindex="-1"></a><span class="in">    df.threshold .= 1</span></span>
-<span id="cb71-600"><a href="#cb71-600" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-601"><a href="#cb71-601" aria-hidden="true" tabindex="-1"></a><span class="in">    @chain df begin</span></span>
-<span id="cb71-602"><a href="#cb71-602" aria-hidden="true" tabindex="-1"></a><span class="in">        groupby(:dim)</span></span>
-<span id="cb71-603"><a href="#cb71-603" aria-hidden="true" tabindex="-1"></a><span class="in">        collect</span></span>
-<span id="cb71-604"><a href="#cb71-604" aria-hidden="true" tabindex="-1"></a><span class="in">        map(Pd.PersistenceDiagram, _)</span></span>
-<span id="cb71-605"><a href="#cb71-605" aria-hidden="true" tabindex="-1"></a><span class="in">    end</span></span>
-<span id="cb71-606"><a href="#cb71-606" aria-hidden="true" tabindex="-1"></a><span class="in">end;</span></span>
-<span id="cb71-607"><a href="#cb71-607" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-608"><a href="#cb71-608" aria-hidden="true" tabindex="-1"></a><span class="in">function metric_space_to_df(X) </span></span>
-<span id="cb71-609"><a href="#cb71-609" aria-hidden="true" tabindex="-1"></a><span class="in">    @chain X_fps begin</span></span>
-<span id="cb71-610"><a href="#cb71-610" aria-hidden="true" tabindex="-1"></a><span class="in">        stack</span></span>
-<span id="cb71-611"><a href="#cb71-611" aria-hidden="true" tabindex="-1"></a><span class="in">        transpose</span></span>
-<span id="cb71-612"><a href="#cb71-612" aria-hidden="true" tabindex="-1"></a><span class="in">        DataFrame(_, :auto)</span></span>
-<span id="cb71-613"><a href="#cb71-613" aria-hidden="true" tabindex="-1"></a><span class="in">    end</span></span>
-<span id="cb71-614"><a href="#cb71-614" aria-hidden="true" tabindex="-1"></a><span class="in">end;</span></span>
-<span id="cb71-615"><a href="#cb71-615" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb71-616"><a href="#cb71-616" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-617"><a href="#cb71-617" aria-hidden="true" tabindex="-1"></a>Now we loop over all meshes, calculate its persistence diagram and save it to disk, together with the $X_{fps}$ metric space as above.</span>
-<span id="cb71-618"><a href="#cb71-618" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-619"><a href="#cb71-619" aria-hidden="true" tabindex="-1"></a>**Important**: This can take some time! If you cloned my github repository, these files are already there, so you can skip the following piece of code:</span>
-<span id="cb71-620"><a href="#cb71-620" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-623"><a href="#cb71-623" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-624"><a href="#cb71-624" aria-hidden="true" tabindex="-1"></a><span class="in">#| eval: false</span></span>
-<span id="cb71-625"><a href="#cb71-625" aria-hidden="true" tabindex="-1"></a><span class="in">overwrite_old_files = true</span></span>
-<span id="cb71-626"><a href="#cb71-626" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-627"><a href="#cb71-627" aria-hidden="true" tabindex="-1"></a><span class="in">@showprogress "Calculating barcode..." for file ∈ list_files("meshes/", ".obj") </span></span>
-<span id="cb71-628"><a href="#cb71-628" aria-hidden="true" tabindex="-1"></a><span class="in">    println("Calculating barcode from file $file ...")</span></span>
-<span id="cb71-629"><a href="#cb71-629" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-630"><a href="#cb71-630" aria-hidden="true" tabindex="-1"></a><span class="in">    file_pd = replace(file, ".obj" =&gt; "-pd.csv")</span></span>
-<span id="cb71-631"><a href="#cb71-631" aria-hidden="true" tabindex="-1"></a><span class="in">    # skip if there is a file already</span></span>
-<span id="cb71-632"><a href="#cb71-632" aria-hidden="true" tabindex="-1"></a><span class="in">    if isfile(file_pd) &amp; !overwrite_old_files continue end</span></span>
-<span id="cb71-633"><a href="#cb71-633" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-634"><a href="#cb71-634" aria-hidden="true" tabindex="-1"></a><span class="in">    X_fps, D, pd = file_to_barcode(file, n_points = 350, dim_max = 2)</span></span>
-<span id="cb71-635"><a href="#cb71-635" aria-hidden="true" tabindex="-1"></a><span class="in">    df = pd_to_dataframe(pd)</span></span>
-<span id="cb71-636"><a href="#cb71-636" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-637"><a href="#cb71-637" aria-hidden="true" tabindex="-1"></a><span class="in">    CSV.write(file_pd, df)</span></span>
-<span id="cb71-638"><a href="#cb71-638" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-639"><a href="#cb71-639" aria-hidden="true" tabindex="-1"></a><span class="in">    file_X = replace(file, ".obj" =&gt; "-points.csv")</span></span>
-<span id="cb71-640"><a href="#cb71-640" aria-hidden="true" tabindex="-1"></a><span class="in">    CSV.write(file_X, metric_space_to_df(X_fps))</span></span>
-<span id="cb71-641"><a href="#cb71-641" aria-hidden="true" tabindex="-1"></a><span class="in">end</span></span>
-<span id="cb71-642"><a href="#cb71-642" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb71-643"><a href="#cb71-643" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-644"><a href="#cb71-644" aria-hidden="true" tabindex="-1"></a>We read the persistence diagrams saved on disk and pass them to table (a DataFrame object), but first we throw away small intervals.</span>
-<span id="cb71-645"><a href="#cb71-645" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-648"><a href="#cb71-648" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-649"><a href="#cb71-649" aria-hidden="true" tabindex="-1"></a><span class="in">#| code-fold: true</span></span>
-<span id="cb71-650"><a href="#cb71-650" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-651"><a href="#cb71-651" aria-hidden="true" tabindex="-1"></a><span class="in">function throw_away_small_intervals(pd, min_pers = 0.01)</span></span>
-<span id="cb71-652"><a href="#cb71-652" aria-hidden="true" tabindex="-1"></a><span class="in">    map(pd) do p</span></span>
-<span id="cb71-653"><a href="#cb71-653" aria-hidden="true" tabindex="-1"></a><span class="in">        filter(x -&gt; Pd.persistence(x) &gt; min_pers, p)</span></span>
-<span id="cb71-654"><a href="#cb71-654" aria-hidden="true" tabindex="-1"></a><span class="in">    end</span></span>
-<span id="cb71-655"><a href="#cb71-655" aria-hidden="true" tabindex="-1"></a><span class="in">end;</span></span>
-<span id="cb71-656"><a href="#cb71-656" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-657"><a href="#cb71-657" aria-hidden="true" tabindex="-1"></a><span class="in">function read_pds_from_files(directory, min_interval_size = 0.05)</span></span>
-<span id="cb71-658"><a href="#cb71-658" aria-hidden="true" tabindex="-1"></a><span class="in">  pds_df = DataFrame()</span></span>
-<span id="cb71-659"><a href="#cb71-659" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-660"><a href="#cb71-660" aria-hidden="true" tabindex="-1"></a><span class="in">#   file = list_files("meshes/", "-pd.csv")[1]</span></span>
-<span id="cb71-661"><a href="#cb71-661" aria-hidden="true" tabindex="-1"></a><span class="in">  for file ∈ list_files(directory, "-pd.csv")</span></span>
-<span id="cb71-662"><a href="#cb71-662" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-663"><a href="#cb71-663" aria-hidden="true" tabindex="-1"></a><span class="in">      pd = @chain begin</span></span>
-<span id="cb71-664"><a href="#cb71-664" aria-hidden="true" tabindex="-1"></a><span class="in">          CSV.read(file, DataFrame)</span></span>
-<span id="cb71-665"><a href="#cb71-665" aria-hidden="true" tabindex="-1"></a><span class="in">          dataframe_to_pd(_)</span></span>
-<span id="cb71-666"><a href="#cb71-666" aria-hidden="true" tabindex="-1"></a><span class="in">          throw_away_small_intervals(min_interval_size)</span></span>
-<span id="cb71-667"><a href="#cb71-667" aria-hidden="true" tabindex="-1"></a><span class="in">      end</span></span>
-<span id="cb71-668"><a href="#cb71-668" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-669"><a href="#cb71-669" aria-hidden="true" tabindex="-1"></a><span class="in">      name = replace(file, "-pd.csv" =&gt; "")</span></span>
-<span id="cb71-670"><a href="#cb71-670" aria-hidden="true" tabindex="-1"></a><span class="in">      push!(pds_df, (Path = name, Persistence_diagram = pd))</span></span>
-<span id="cb71-671"><a href="#cb71-671" aria-hidden="true" tabindex="-1"></a><span class="in">  end</span></span>
-<span id="cb71-672"><a href="#cb71-672" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-673"><a href="#cb71-673" aria-hidden="true" tabindex="-1"></a><span class="in">  pds_df</span></span>
-<span id="cb71-674"><a href="#cb71-674" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-675"><a href="#cb71-675" aria-hidden="true" tabindex="-1"></a><span class="in">  sort!(pds_df, :Path)</span></span>
-<span id="cb71-676"><a href="#cb71-676" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-677"><a href="#cb71-677" aria-hidden="true" tabindex="-1"></a><span class="in">  pds_df.File = [split(s, "/")[3] for s ∈ pds_df.Path]</span></span>
-<span id="cb71-678"><a href="#cb71-678" aria-hidden="true" tabindex="-1"></a><span class="in">  pds_df.Class = [split(s, "-")[1] for s ∈ pds_df.File]</span></span>
-<span id="cb71-679"><a href="#cb71-679" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-680"><a href="#cb71-680" aria-hidden="true" tabindex="-1"></a><span class="in">  pds_df</span></span>
-<span id="cb71-681"><a href="#cb71-681" aria-hidden="true" tabindex="-1"></a><span class="in">end;</span></span>
-<span id="cb71-682"><a href="#cb71-682" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb71-683"><a href="#cb71-683" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-684"><a href="#cb71-684" aria-hidden="true" tabindex="-1"></a><span class="fu">## A metric problem</span></span>
-<span id="cb71-685"><a href="#cb71-685" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-686"><a href="#cb71-686" aria-hidden="true" tabindex="-1"></a>Now we proceed to create a dataframe that contains all we need to classify our shapes.</span>
-<span id="cb71-687"><a href="#cb71-687" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-690"><a href="#cb71-690" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-691"><a href="#cb71-691" aria-hidden="true" tabindex="-1"></a><span class="in">pds_df = read_pds_from_files("meshes/", 0.01);</span></span>
-<span id="cb71-692"><a href="#cb71-692" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-693"><a href="#cb71-693" aria-hidden="true" tabindex="-1"></a><span class="in">first(pds_df, 20)</span></span>
-<span id="cb71-694"><a href="#cb71-694" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb71-695"><a href="#cb71-695" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-696"><a href="#cb71-696" aria-hidden="true" tabindex="-1"></a>The dataframe looks ok! You can plot the barcodes as follows:</span>
-<span id="cb71-697"><a href="#cb71-697" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-700"><a href="#cb71-700" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-701"><a href="#cb71-701" aria-hidden="true" tabindex="-1"></a><span class="in">pd2 = pds_df.Persistence_diagram[1]</span></span>
-<span id="cb71-702"><a href="#cb71-702" aria-hidden="true" tabindex="-1"></a><span class="in">plot_barcode(pd2[2:3])</span></span>
-<span id="cb71-703"><a href="#cb71-703" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb71-704"><a href="#cb71-704" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-705"><a href="#cb71-705" aria-hidden="true" tabindex="-1"></a>Now we calculate the bootleneck distance between each pair of persistence diagrams. This can take some time! If you cloned the repository, you don't need to run this piece of code.</span>
-<span id="cb71-706"><a href="#cb71-706" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-709"><a href="#cb71-709" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-710"><a href="#cb71-710" aria-hidden="true" tabindex="-1"></a><span class="in">#| eval: false</span></span>
-<span id="cb71-711"><a href="#cb71-711" aria-hidden="true" tabindex="-1"></a><span class="in">pds = pds_df.Persistence_diagram</span></span>
-<span id="cb71-712"><a href="#cb71-712" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-713"><a href="#cb71-713" aria-hidden="true" tabindex="-1"></a><span class="in">n = nrow(pds_df)</span></span>
-<span id="cb71-714"><a href="#cb71-714" aria-hidden="true" tabindex="-1"></a><span class="in">DB = zeros(n, n)</span></span>
-<span id="cb71-715"><a href="#cb71-715" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-716"><a href="#cb71-716" aria-hidden="true" tabindex="-1"></a><span class="in">@showprogress for i ∈ 1:n</span></span>
-<span id="cb71-717"><a href="#cb71-717" aria-hidden="true" tabindex="-1"></a><span class="in">    for j ∈ i:n</span></span>
-<span id="cb71-718"><a href="#cb71-718" aria-hidden="true" tabindex="-1"></a><span class="in">        if i == j</span></span>
-<span id="cb71-719"><a href="#cb71-719" aria-hidden="true" tabindex="-1"></a><span class="in">            DB[i, j] = 0 </span></span>
-<span id="cb71-720"><a href="#cb71-720" aria-hidden="true" tabindex="-1"></a><span class="in">            continue </span></span>
-<span id="cb71-721"><a href="#cb71-721" aria-hidden="true" tabindex="-1"></a><span class="in">        end</span></span>
-<span id="cb71-722"><a href="#cb71-722" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-723"><a href="#cb71-723" aria-hidden="true" tabindex="-1"></a><span class="in">        DB[i, j] = </span></span>
-<span id="cb71-724"><a href="#cb71-724" aria-hidden="true" tabindex="-1"></a><span class="in">            Pd.Bottleneck()(pds[i][2], pds[j][2]) + </span></span>
-<span id="cb71-725"><a href="#cb71-725" aria-hidden="true" tabindex="-1"></a><span class="in">            Pd.Bottleneck()(pds[i][3], pds[j][3])</span></span>
-<span id="cb71-726"><a href="#cb71-726" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-727"><a href="#cb71-727" aria-hidden="true" tabindex="-1"></a><span class="in">        DB[j, i] = DB[i, j]</span></span>
-<span id="cb71-728"><a href="#cb71-728" aria-hidden="true" tabindex="-1"></a><span class="in">    end</span></span>
-<span id="cb71-729"><a href="#cb71-729" aria-hidden="true" tabindex="-1"></a><span class="in">end</span></span>
-<span id="cb71-730"><a href="#cb71-730" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-731"><a href="#cb71-731" aria-hidden="true" tabindex="-1"></a><span class="in">CSV.write("meshes/bottleneck_distance.csv", DataFrame(DB, :auto))</span></span>
-<span id="cb71-732"><a href="#cb71-732" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb71-733"><a href="#cb71-733" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-734"><a href="#cb71-734" aria-hidden="true" tabindex="-1"></a>Notice that we defined the distance $DB_{i, j}$ between two shapes $X_i$ and $X_j$ as </span>
-<span id="cb71-735"><a href="#cb71-735" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-736"><a href="#cb71-736" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb71-737"><a href="#cb71-737" aria-hidden="true" tabindex="-1"></a>DB_{i, j} = d_b(\text{dgm}_1(X_i), \text{dgm}_1(X_j)) + d_b(\text{dgm}_2(X_i), \text{dgm}_2(X_j))</span>
-<span id="cb71-738"><a href="#cb71-738" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb71-739"><a href="#cb71-739" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-740"><a href="#cb71-740" aria-hidden="true" tabindex="-1"></a>where $d_b$ is the bottleneck distance, and $dgm_i$ is the $i$-dimensional persistence diagram. Notice that **we did not use the 0-dimensional persistent homology, because all shapes are connected**.</span>
-<span id="cb71-741"><a href="#cb71-741" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-742"><a href="#cb71-742" aria-hidden="true" tabindex="-1"></a><span class="fu">## Facing the truth</span></span>
-<span id="cb71-743"><a href="#cb71-743" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-744"><a href="#cb71-744" aria-hidden="true" tabindex="-1"></a>We read $DB$ from disk, in case you did not calculate it previously</span>
-<span id="cb71-745"><a href="#cb71-745" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-748"><a href="#cb71-748" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-749"><a href="#cb71-749" aria-hidden="true" tabindex="-1"></a><span class="in">DB = CSV.read("meshes/bottleneck_distance.csv", DataFrame) |&gt; Matrix</span></span>
-<span id="cb71-750"><a href="#cb71-750" aria-hidden="true" tabindex="-1"></a><span class="in">DB</span></span>
-<span id="cb71-751"><a href="#cb71-751" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb71-752"><a href="#cb71-752" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-753"><a href="#cb71-753" aria-hidden="true" tabindex="-1"></a>How can we visualize $DB$?</span>
-<span id="cb71-754"><a href="#cb71-754" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-755"><a href="#cb71-755" aria-hidden="true" tabindex="-1"></a><span class="fu">### Heatmap</span></span>
-<span id="cb71-756"><a href="#cb71-756" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-757"><a href="#cb71-757" aria-hidden="true" tabindex="-1"></a>Heatmaps are matrices (2d arrays) where each element is colored by some value. In the ideal world, our matrix $DB$ will have a square of low values for each comparison between the same class, and a higher value when comparing elements of different classes.</span>
-<span id="cb71-758"><a href="#cb71-758" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-761"><a href="#cb71-761" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-762"><a href="#cb71-762" aria-hidden="true" tabindex="-1"></a><span class="in">labels = pds_df.Class |&gt; copy</span></span>
-<span id="cb71-763"><a href="#cb71-763" aria-hidden="true" tabindex="-1"></a><span class="in">for i ∈ 2:length(pds_df.Class)</span></span>
-<span id="cb71-764"><a href="#cb71-764" aria-hidden="true" tabindex="-1"></a><span class="in">    if labels[i] == pds_df.Class[i-1]</span></span>
-<span id="cb71-765"><a href="#cb71-765" aria-hidden="true" tabindex="-1"></a><span class="in">        labels[i] = ""</span></span>
-<span id="cb71-766"><a href="#cb71-766" aria-hidden="true" tabindex="-1"></a><span class="in">    end</span></span>
-<span id="cb71-767"><a href="#cb71-767" aria-hidden="true" tabindex="-1"></a><span class="in">end</span></span>
-<span id="cb71-768"><a href="#cb71-768" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-769"><a href="#cb71-769" aria-hidden="true" tabindex="-1"></a><span class="in">labels = (1:nrow(pds_df), labels)</span></span>
-<span id="cb71-770"><a href="#cb71-770" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-771"><a href="#cb71-771" aria-hidden="true" tabindex="-1"></a><span class="in">plot(DB, st = :heatmap, xticks = labels, yticks = labels)</span></span>
-<span id="cb71-772"><a href="#cb71-772" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb71-773"><a href="#cb71-773" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-774"><a href="#cb71-774" aria-hidden="true" tabindex="-1"></a>We can see that the diagonals (intra-class comparisons) are good enough: they are dark-coloured squares, indicating small distances. But there are also black squares outside the diagonal, which means that some different classes are close to each other. </span>
-<span id="cb71-775"><a href="#cb71-775" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-776"><a href="#cb71-776" aria-hidden="true" tabindex="-1"></a><span class="fu">### Dendrograms</span></span>
-<span id="cb71-777"><a href="#cb71-777" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-778"><a href="#cb71-778" aria-hidden="true" tabindex="-1"></a>Dendrograms are a nice way to visualize a distance matrix. They represent the evolution of the connected components as some parameter (usually the radius of circles centered on each point) grows.</span>
-<span id="cb71-779"><a href="#cb71-779" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-782"><a href="#cb71-782" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-783"><a href="#cb71-783" aria-hidden="true" tabindex="-1"></a><span class="in">#| code-fold: true</span></span>
-<span id="cb71-784"><a href="#cb71-784" aria-hidden="true" tabindex="-1"></a><span class="in">function plot_hc(hc)</span></span>
-<span id="cb71-785"><a href="#cb71-785" aria-hidden="true" tabindex="-1"></a><span class="in">    plot(</span></span>
-<span id="cb71-786"><a href="#cb71-786" aria-hidden="true" tabindex="-1"></a><span class="in">        hc, xticks = (1:nrow(pds_df), pds_df.File[hc.order])</span></span>
-<span id="cb71-787"><a href="#cb71-787" aria-hidden="true" tabindex="-1"></a><span class="in">        , xflip = true, xrotation = 270</span></span>
-<span id="cb71-788"><a href="#cb71-788" aria-hidden="true" tabindex="-1"></a><span class="in">        , xtickfont = font(5, "Roboto")</span></span>
-<span id="cb71-789"><a href="#cb71-789" aria-hidden="true" tabindex="-1"></a><span class="in">        )</span></span>
-<span id="cb71-790"><a href="#cb71-790" aria-hidden="true" tabindex="-1"></a><span class="in">end;</span></span>
-<span id="cb71-791"><a href="#cb71-791" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb71-792"><a href="#cb71-792" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-793"><a href="#cb71-793" aria-hidden="true" tabindex="-1"></a>The <span class="co">[</span><span class="ot">single linkage dendrogram</span><span class="co">](https://en.wikipedia.org/wiki/Single-linkage_clustering)</span> is a mess:</span>
-<span id="cb71-794"><a href="#cb71-794" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-797"><a href="#cb71-797" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-798"><a href="#cb71-798" aria-hidden="true" tabindex="-1"></a><span class="in">hclust(DB, linkage=:single, branchorder = :optimal) |&gt; plot_hc</span></span>
-<span id="cb71-799"><a href="#cb71-799" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb71-800"><a href="#cb71-800" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-801"><a href="#cb71-801" aria-hidden="true" tabindex="-1"></a>But the <span class="co">[</span><span class="ot">complete linkage dendrogram</span><span class="co">](https://en.wikipedia.org/wiki/Complete-linkage_clustering)</span> shows more hope:</span>
-<span id="cb71-802"><a href="#cb71-802" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-805"><a href="#cb71-805" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-806"><a href="#cb71-806" aria-hidden="true" tabindex="-1"></a><span class="in">hclust(DB, linkage = :complete, branchorder = :optimal) |&gt; plot_hc</span></span>
-<span id="cb71-807"><a href="#cb71-807" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb71-808"><a href="#cb71-808" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-809"><a href="#cb71-809" aria-hidden="true" tabindex="-1"></a>Here is also the Ward algorithm:</span>
-<span id="cb71-810"><a href="#cb71-810" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-813"><a href="#cb71-813" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-814"><a href="#cb71-814" aria-hidden="true" tabindex="-1"></a><span class="in">hclust(DB, linkage = :ward, branchorder = :optimal) |&gt; plot_hc</span></span>
-<span id="cb71-815"><a href="#cb71-815" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb71-816"><a href="#cb71-816" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-817"><a href="#cb71-817" aria-hidden="true" tabindex="-1"></a><span class="fu">### Accuracy</span></span>
-<span id="cb71-818"><a href="#cb71-818" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-819"><a href="#cb71-819" aria-hidden="true" tabindex="-1"></a>Now let's calculate for each shape which reference class is closer to it:</span>
-<span id="cb71-820"><a href="#cb71-820" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-823"><a href="#cb71-823" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-824"><a href="#cb71-824" aria-hidden="true" tabindex="-1"></a><span class="in">#| code-fold: true</span></span>
-<span id="cb71-825"><a href="#cb71-825" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-826"><a href="#cb71-826" aria-hidden="true" tabindex="-1"></a><span class="in">function get_score_dataframe(pds_df, DB) </span></span>
-<span id="cb71-827"><a href="#cb71-827" aria-hidden="true" tabindex="-1"></a><span class="in">  score = @select(pds_df, :Path, :File, :Class)</span></span>
-<span id="cb71-828"><a href="#cb71-828" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-829"><a href="#cb71-829" aria-hidden="true" tabindex="-1"></a><span class="in">  score.Nearest_class .= ""</span></span>
-<span id="cb71-830"><a href="#cb71-830" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-831"><a href="#cb71-831" aria-hidden="true" tabindex="-1"></a><span class="in">  ids_reference = findall(x -&gt; occursin("-reference", x), score.Path)</span></span>
-<span id="cb71-832"><a href="#cb71-832" aria-hidden="true" tabindex="-1"></a><span class="in">  names_reference = score.File[ids_reference]</span></span>
-<span id="cb71-833"><a href="#cb71-833" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-834"><a href="#cb71-834" aria-hidden="true" tabindex="-1"></a><span class="in">  for i ∈ 1:nrow(pds_df)</span></span>
-<span id="cb71-835"><a href="#cb71-835" aria-hidden="true" tabindex="-1"></a><span class="in">      id = sortperm(DB[i, ids_reference])[1]</span></span>
-<span id="cb71-836"><a href="#cb71-836" aria-hidden="true" tabindex="-1"></a><span class="in">      score.Nearest_class[i] = names_reference[id]</span></span>
-<span id="cb71-837"><a href="#cb71-837" aria-hidden="true" tabindex="-1"></a><span class="in">  end</span></span>
-<span id="cb71-838"><a href="#cb71-838" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-839"><a href="#cb71-839" aria-hidden="true" tabindex="-1"></a><span class="in">  score.Right_class =</span></span>
-<span id="cb71-840"><a href="#cb71-840" aria-hidden="true" tabindex="-1"></a><span class="in">      get_class_from_file.(score.Class) .== </span></span>
-<span id="cb71-841"><a href="#cb71-841" aria-hidden="true" tabindex="-1"></a><span class="in">      get_class_from_file.(score.Nearest_class)</span></span>
-<span id="cb71-842"><a href="#cb71-842" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-843"><a href="#cb71-843" aria-hidden="true" tabindex="-1"></a><span class="in">  score</span></span>
-<span id="cb71-844"><a href="#cb71-844" aria-hidden="true" tabindex="-1"></a><span class="in">end;</span></span>
-<span id="cb71-845"><a href="#cb71-845" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb71-846"><a href="#cb71-846" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-849"><a href="#cb71-849" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-850"><a href="#cb71-850" aria-hidden="true" tabindex="-1"></a><span class="in">score = get_score_dataframe(pds_df, DB)</span></span>
-<span id="cb71-851"><a href="#cb71-851" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb71-852"><a href="#cb71-852" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-853"><a href="#cb71-853" aria-hidden="true" tabindex="-1"></a>Our accuracy was</span>
-<span id="cb71-854"><a href="#cb71-854" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-857"><a href="#cb71-857" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-858"><a href="#cb71-858" aria-hidden="true" tabindex="-1"></a><span class="in">score.Right_class |&gt; mean</span></span>
-<span id="cb71-859"><a href="#cb71-859" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb71-860"><a href="#cb71-860" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-861"><a href="#cb71-861" aria-hidden="true" tabindex="-1"></a>that is: 82%. Not bad, but not excellent either!</span>
-<span id="cb71-862"><a href="#cb71-862" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-863"><a href="#cb71-863" aria-hidden="true" tabindex="-1"></a>Here is the <span class="co">[</span><span class="ot">confusion matrix</span><span class="co">](https://en.wikipedia.org/wiki/Confusion_matrix)</span>:</span>
-<span id="cb71-864"><a href="#cb71-864" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-867"><a href="#cb71-867" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-868"><a href="#cb71-868" aria-hidden="true" tabindex="-1"></a><span class="in">score_new = @rsubset score !occursin("ref", :File)</span></span>
-<span id="cb71-869"><a href="#cb71-869" aria-hidden="true" tabindex="-1"></a><span class="in">x = CM.confmat(get_class_from_file.(score_new.Nearest_class), score_new.Class)</span></span>
-<span id="cb71-870"><a href="#cb71-870" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb71-871"><a href="#cb71-871" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-872"><a href="#cb71-872" aria-hidden="true" tabindex="-1"></a><span class="al">![Confusion matrix for DB.](images/3d-shapes/confusion%20matrix.png)</span></span>
-<span id="cb71-873"><a href="#cb71-873" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-874"><a href="#cb71-874" aria-hidden="true" tabindex="-1"></a>Some conclusions we can take from the above analysis:</span>
-<span id="cb71-875"><a href="#cb71-875" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-876"><a href="#cb71-876" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Camels, elephants and faces are all correct;</span>
-<span id="cb71-877"><a href="#cb71-877" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>There is one head mistaken as a face;</span>
-<span id="cb71-878"><a href="#cb71-878" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>There are two mistaken horses;</span>
-<span id="cb71-879"><a href="#cb71-879" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Cats are confused with lions.</span>
-<span id="cb71-880"><a href="#cb71-880" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-881"><a href="#cb71-881" aria-hidden="true" tabindex="-1"></a>Why did this happen? Look back at the rotating plots in section <span class="co">[</span><span class="ot">@sec-3d-plotting</span><span class="co">]</span>: a cat and a lion are almost isometric in the geodesic sense! Thus, **no tool that uses only the metric will be able to split these classes**.</span>
-<span id="cb71-882"><a href="#cb71-882" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-883"><a href="#cb71-883" aria-hidden="true" tabindex="-1"></a><span class="fu">### MDS plot</span></span>
-<span id="cb71-884"><a href="#cb71-884" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-885"><a href="#cb71-885" aria-hidden="true" tabindex="-1"></a>Another last visualization technique is the <span class="co">[</span><span class="ot">multidimensional scaling</span><span class="co">](https://en.wikipedia.org/wiki/Multidimensional_scaling)</span> plot. This method takes a distance matrix and tries to project it down to $\mathbb{R}^2) (or $\mathbb{R}^3) while distorting the distances as little as possible.</span>
-<span id="cb71-886"><a href="#cb71-886" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-889"><a href="#cb71-889" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-890"><a href="#cb71-890" aria-hidden="true" tabindex="-1"></a><span class="in">#| code-fold: true</span></span>
-<span id="cb71-891"><a href="#cb71-891" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-892"><a href="#cb71-892" aria-hidden="true" tabindex="-1"></a><span class="in">function mds_plot(D, score)</span></span>
-<span id="cb71-893"><a href="#cb71-893" aria-hidden="true" tabindex="-1"></a><span class="in">    M = fit(MDS, D; distances = true, maxoutdim = 2)</span></span>
-<span id="cb71-894"><a href="#cb71-894" aria-hidden="true" tabindex="-1"></a><span class="in">    Y = predict(M)</span></span>
-<span id="cb71-895"><a href="#cb71-895" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-896"><a href="#cb71-896" aria-hidden="true" tabindex="-1"></a><span class="in">    score.Row = 1:length(score.Class)</span></span>
-<span id="cb71-897"><a href="#cb71-897" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-898"><a href="#cb71-898" aria-hidden="true" tabindex="-1"></a><span class="in">    dfs = @chain score begin</span></span>
-<span id="cb71-899"><a href="#cb71-899" aria-hidden="true" tabindex="-1"></a><span class="in">        groupby(:Class)</span></span>
-<span id="cb71-900"><a href="#cb71-900" aria-hidden="true" tabindex="-1"></a><span class="in">        collect</span></span>
-<span id="cb71-901"><a href="#cb71-901" aria-hidden="true" tabindex="-1"></a><span class="in">    end</span></span>
-<span id="cb71-902"><a href="#cb71-902" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-903"><a href="#cb71-903" aria-hidden="true" tabindex="-1"></a><span class="in">    fig = gl.Figure();</span></span>
-<span id="cb71-904"><a href="#cb71-904" aria-hidden="true" tabindex="-1"></a><span class="in">    ax = gl.Axis(fig[1,1])</span></span>
-<span id="cb71-905"><a href="#cb71-905" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-906"><a href="#cb71-906" aria-hidden="true" tabindex="-1"></a><span class="in">    colors = cgrad(:tableau_10, 8, categorical = true)</span></span>
-<span id="cb71-907"><a href="#cb71-907" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-908"><a href="#cb71-908" aria-hidden="true" tabindex="-1"></a><span class="in">    for (i, df) ∈ enumerate(dfs)    </span></span>
-<span id="cb71-909"><a href="#cb71-909" aria-hidden="true" tabindex="-1"></a><span class="in">        gl.scatter!(</span></span>
-<span id="cb71-910"><a href="#cb71-910" aria-hidden="true" tabindex="-1"></a><span class="in">            ax, Y[:, df.Row]</span></span>
-<span id="cb71-911"><a href="#cb71-911" aria-hidden="true" tabindex="-1"></a><span class="in">            , label = df.Class[1], markersize = 15</span></span>
-<span id="cb71-912"><a href="#cb71-912" aria-hidden="true" tabindex="-1"></a><span class="in">            , color = colors[i]</span></span>
-<span id="cb71-913"><a href="#cb71-913" aria-hidden="true" tabindex="-1"></a><span class="in">            )</span></span>
-<span id="cb71-914"><a href="#cb71-914" aria-hidden="true" tabindex="-1"></a><span class="in">    end</span></span>
-<span id="cb71-915"><a href="#cb71-915" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-916"><a href="#cb71-916" aria-hidden="true" tabindex="-1"></a><span class="in">    gl.axislegend();</span></span>
-<span id="cb71-917"><a href="#cb71-917" aria-hidden="true" tabindex="-1"></a><span class="in">    fig</span></span>
-<span id="cb71-918"><a href="#cb71-918" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-919"><a href="#cb71-919" aria-hidden="true" tabindex="-1"></a><span class="in">    fig</span></span>
-<span id="cb71-920"><a href="#cb71-920" aria-hidden="true" tabindex="-1"></a><span class="in">end</span></span>
-<span id="cb71-921"><a href="#cb71-921" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb71-922"><a href="#cb71-922" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-925"><a href="#cb71-925" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-926"><a href="#cb71-926" aria-hidden="true" tabindex="-1"></a><span class="in">mds_plot(DB, score)</span></span>
-<span id="cb71-927"><a href="#cb71-927" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb71-928"><a href="#cb71-928" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-929"><a href="#cb71-929" aria-hidden="true" tabindex="-1"></a>Can we do better?</span>
-<span id="cb71-930"><a href="#cb71-930" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-931"><a href="#cb71-931" aria-hidden="true" tabindex="-1"></a>With only the distance matrix $DB$, as we could see above, the answer is **NO**. We need to find more tools to compare these shapes.</span>
-<span id="cb71-932"><a href="#cb71-932" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-933"><a href="#cb71-933" aria-hidden="true" tabindex="-1"></a><span class="fu">## Volumes</span></span>
-<span id="cb71-934"><a href="#cb71-934" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-935"><a href="#cb71-935" aria-hidden="true" tabindex="-1"></a>Each mesh has a notion of volume that can be calculated with the function <span class="in">`measure`</span>.</span>
-<span id="cb71-936"><a href="#cb71-936" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-937"><a href="#cb71-937" aria-hidden="true" tabindex="-1"></a>We can see below the mean volume for each class:</span>
-<span id="cb71-938"><a href="#cb71-938" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-941"><a href="#cb71-941" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-942"><a href="#cb71-942" aria-hidden="true" tabindex="-1"></a><span class="in">volumes = @showprogress map(score.Path) do f</span></span>
-<span id="cb71-943"><a href="#cb71-943" aria-hidden="true" tabindex="-1"></a><span class="in">    ms = read_mesh(f * ".obj")</span></span>
-<span id="cb71-944"><a href="#cb71-944" aria-hidden="true" tabindex="-1"></a><span class="in">    measure(ms)</span></span>
-<span id="cb71-945"><a href="#cb71-945" aria-hidden="true" tabindex="-1"></a><span class="in">end</span></span>
-<span id="cb71-946"><a href="#cb71-946" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-947"><a href="#cb71-947" aria-hidden="true" tabindex="-1"></a><span class="in">df_volumes = DataFrame(</span></span>
-<span id="cb71-948"><a href="#cb71-948" aria-hidden="true" tabindex="-1"></a><span class="in">    Path = score.Path, Class = score.Class, Volume = volumes</span></span>
-<span id="cb71-949"><a href="#cb71-949" aria-hidden="true" tabindex="-1"></a><span class="in">    )</span></span>
-<span id="cb71-950"><a href="#cb71-950" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-951"><a href="#cb71-951" aria-hidden="true" tabindex="-1"></a><span class="in">@chain df_volumes begin</span></span>
-<span id="cb71-952"><a href="#cb71-952" aria-hidden="true" tabindex="-1"></a><span class="in">    @groupby :Class</span></span>
-<span id="cb71-953"><a href="#cb71-953" aria-hidden="true" tabindex="-1"></a><span class="in">    @combine :Mean_volume = mean(:Volume)</span></span>
-<span id="cb71-954"><a href="#cb71-954" aria-hidden="true" tabindex="-1"></a><span class="in">end</span></span>
-<span id="cb71-955"><a href="#cb71-955" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-555"><a href="#cb71-555" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb71-556"><a href="#cb71-556" aria-hidden="true" tabindex="-1"></a><span class="in">#| code-fold: true</span></span>
+<span id="cb71-557"><a href="#cb71-557" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-558"><a href="#cb71-558" aria-hidden="true" tabindex="-1"></a><span class="in">function file_to_barcode(filepath; n_points = 1000, dim_max = 1)</span></span>
+<span id="cb71-559"><a href="#cb71-559" aria-hidden="true" tabindex="-1"></a><span class="in">    ms = read_mesh(filepath)</span></span>
+<span id="cb71-560"><a href="#cb71-560" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-561"><a href="#cb71-561" aria-hidden="true" tabindex="-1"></a><span class="in">    X = mesh_to_metric_space(ms)</span></span>
+<span id="cb71-562"><a href="#cb71-562" aria-hidden="true" tabindex="-1"></a><span class="in">    g = graph_from_mesh(ms)</span></span>
+<span id="cb71-563"><a href="#cb71-563" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-564"><a href="#cb71-564" aria-hidden="true" tabindex="-1"></a><span class="in">    g, ids_biggest_component = extract_biggest_connected_component(g)</span></span>
+<span id="cb71-565"><a href="#cb71-565" aria-hidden="true" tabindex="-1"></a><span class="in">    X = X[ids_biggest_component]</span></span>
+<span id="cb71-566"><a href="#cb71-566" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-567"><a href="#cb71-567" aria-hidden="true" tabindex="-1"></a><span class="in">    ids_fps = farthest_points_sample(X, n_points);</span></span>
+<span id="cb71-568"><a href="#cb71-568" aria-hidden="true" tabindex="-1"></a><span class="in">    X_fps = X[ids_fps]</span></span>
+<span id="cb71-569"><a href="#cb71-569" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-570"><a href="#cb71-570" aria-hidden="true" tabindex="-1"></a><span class="in">    D = geodesic_distance_from_graph(g, ids_fps)</span></span>
+<span id="cb71-571"><a href="#cb71-571" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-572"><a href="#cb71-572" aria-hidden="true" tabindex="-1"></a><span class="in">    pd = Ripserer.ripserer(D, dim_max = dim_max, verbose=true, sparse = true, threshold = 0.8)</span></span>
+<span id="cb71-573"><a href="#cb71-573" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-574"><a href="#cb71-574" aria-hidden="true" tabindex="-1"></a><span class="in">    return X_fps, D, pd</span></span>
+<span id="cb71-575"><a href="#cb71-575" aria-hidden="true" tabindex="-1"></a><span class="in">end;</span></span>
+<span id="cb71-576"><a href="#cb71-576" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-577"><a href="#cb71-577" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-578"><a href="#cb71-578" aria-hidden="true" tabindex="-1"></a>We also define some functions to save the barcodes and metric spaces to disk, so we don't have to calculate all of them in a single session. Calculating the 2-dimensional barcode can take some time depending on your hardware!</span>
+<span id="cb71-579"><a href="#cb71-579" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-582"><a href="#cb71-582" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb71-583"><a href="#cb71-583" aria-hidden="true" tabindex="-1"></a><span class="in">#| code-fold: true</span></span>
+<span id="cb71-584"><a href="#cb71-584" aria-hidden="true" tabindex="-1"></a><span class="in">function pd_to_dataframe(pd)</span></span>
+<span id="cb71-585"><a href="#cb71-585" aria-hidden="true" tabindex="-1"></a><span class="in">    df = @chain begin</span></span>
+<span id="cb71-586"><a href="#cb71-586" aria-hidden="true" tabindex="-1"></a><span class="in">        map(pd) do p</span></span>
+<span id="cb71-587"><a href="#cb71-587" aria-hidden="true" tabindex="-1"></a><span class="in">            DataFrame(</span></span>
+<span id="cb71-588"><a href="#cb71-588" aria-hidden="true" tabindex="-1"></a><span class="in">                birth=p .|&gt; first, death=p .|&gt; last, dim=p.dim</span></span>
+<span id="cb71-589"><a href="#cb71-589" aria-hidden="true" tabindex="-1"></a><span class="in">            )</span></span>
+<span id="cb71-590"><a href="#cb71-590" aria-hidden="true" tabindex="-1"></a><span class="in">        end</span></span>
+<span id="cb71-591"><a href="#cb71-591" aria-hidden="true" tabindex="-1"></a><span class="in">        vcat(_...)</span></span>
+<span id="cb71-592"><a href="#cb71-592" aria-hidden="true" tabindex="-1"></a><span class="in">    end</span></span>
+<span id="cb71-593"><a href="#cb71-593" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-594"><a href="#cb71-594" aria-hidden="true" tabindex="-1"></a><span class="in">    df</span></span>
+<span id="cb71-595"><a href="#cb71-595" aria-hidden="true" tabindex="-1"></a><span class="in">end;</span></span>
+<span id="cb71-596"><a href="#cb71-596" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-597"><a href="#cb71-597" aria-hidden="true" tabindex="-1"></a><span class="in">function dataframe_to_pd(df)</span></span>
+<span id="cb71-598"><a href="#cb71-598" aria-hidden="true" tabindex="-1"></a><span class="in">    df.threshold .= 1</span></span>
+<span id="cb71-599"><a href="#cb71-599" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-600"><a href="#cb71-600" aria-hidden="true" tabindex="-1"></a><span class="in">    @chain df begin</span></span>
+<span id="cb71-601"><a href="#cb71-601" aria-hidden="true" tabindex="-1"></a><span class="in">        groupby(:dim)</span></span>
+<span id="cb71-602"><a href="#cb71-602" aria-hidden="true" tabindex="-1"></a><span class="in">        collect</span></span>
+<span id="cb71-603"><a href="#cb71-603" aria-hidden="true" tabindex="-1"></a><span class="in">        map(Pd.PersistenceDiagram, _)</span></span>
+<span id="cb71-604"><a href="#cb71-604" aria-hidden="true" tabindex="-1"></a><span class="in">    end</span></span>
+<span id="cb71-605"><a href="#cb71-605" aria-hidden="true" tabindex="-1"></a><span class="in">end;</span></span>
+<span id="cb71-606"><a href="#cb71-606" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-607"><a href="#cb71-607" aria-hidden="true" tabindex="-1"></a><span class="in">function metric_space_to_df(X) </span></span>
+<span id="cb71-608"><a href="#cb71-608" aria-hidden="true" tabindex="-1"></a><span class="in">    @chain X_fps begin</span></span>
+<span id="cb71-609"><a href="#cb71-609" aria-hidden="true" tabindex="-1"></a><span class="in">        stack</span></span>
+<span id="cb71-610"><a href="#cb71-610" aria-hidden="true" tabindex="-1"></a><span class="in">        transpose</span></span>
+<span id="cb71-611"><a href="#cb71-611" aria-hidden="true" tabindex="-1"></a><span class="in">        DataFrame(_, :auto)</span></span>
+<span id="cb71-612"><a href="#cb71-612" aria-hidden="true" tabindex="-1"></a><span class="in">    end</span></span>
+<span id="cb71-613"><a href="#cb71-613" aria-hidden="true" tabindex="-1"></a><span class="in">end;</span></span>
+<span id="cb71-614"><a href="#cb71-614" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-615"><a href="#cb71-615" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-616"><a href="#cb71-616" aria-hidden="true" tabindex="-1"></a>Now we loop over all meshes, calculate its persistence diagram and save it to disk, together with the $X_{fps}$ metric space as above.</span>
+<span id="cb71-617"><a href="#cb71-617" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-618"><a href="#cb71-618" aria-hidden="true" tabindex="-1"></a>**Important**: This can take some time! If you cloned my github repository, these files are already there, so you can skip the following piece of code:</span>
+<span id="cb71-619"><a href="#cb71-619" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-622"><a href="#cb71-622" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb71-623"><a href="#cb71-623" aria-hidden="true" tabindex="-1"></a><span class="in">#| eval: false</span></span>
+<span id="cb71-624"><a href="#cb71-624" aria-hidden="true" tabindex="-1"></a><span class="in">overwrite_old_files = true</span></span>
+<span id="cb71-625"><a href="#cb71-625" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-626"><a href="#cb71-626" aria-hidden="true" tabindex="-1"></a><span class="in">@showprogress "Calculating barcode..." for file ∈ list_files("meshes/", ".obj") </span></span>
+<span id="cb71-627"><a href="#cb71-627" aria-hidden="true" tabindex="-1"></a><span class="in">    println("Calculating barcode from file $file ...")</span></span>
+<span id="cb71-628"><a href="#cb71-628" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-629"><a href="#cb71-629" aria-hidden="true" tabindex="-1"></a><span class="in">    file_pd = replace(file, ".obj" =&gt; "-pd.csv")</span></span>
+<span id="cb71-630"><a href="#cb71-630" aria-hidden="true" tabindex="-1"></a><span class="in">    # skip if there is a file already</span></span>
+<span id="cb71-631"><a href="#cb71-631" aria-hidden="true" tabindex="-1"></a><span class="in">    if isfile(file_pd) &amp; !overwrite_old_files continue end</span></span>
+<span id="cb71-632"><a href="#cb71-632" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-633"><a href="#cb71-633" aria-hidden="true" tabindex="-1"></a><span class="in">    X_fps, D, pd = file_to_barcode(file, n_points = 350, dim_max = 2)</span></span>
+<span id="cb71-634"><a href="#cb71-634" aria-hidden="true" tabindex="-1"></a><span class="in">    df = pd_to_dataframe(pd)</span></span>
+<span id="cb71-635"><a href="#cb71-635" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-636"><a href="#cb71-636" aria-hidden="true" tabindex="-1"></a><span class="in">    CSV.write(file_pd, df)</span></span>
+<span id="cb71-637"><a href="#cb71-637" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-638"><a href="#cb71-638" aria-hidden="true" tabindex="-1"></a><span class="in">    file_X = replace(file, ".obj" =&gt; "-points.csv")</span></span>
+<span id="cb71-639"><a href="#cb71-639" aria-hidden="true" tabindex="-1"></a><span class="in">    CSV.write(file_X, metric_space_to_df(X_fps))</span></span>
+<span id="cb71-640"><a href="#cb71-640" aria-hidden="true" tabindex="-1"></a><span class="in">end</span></span>
+<span id="cb71-641"><a href="#cb71-641" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-642"><a href="#cb71-642" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-643"><a href="#cb71-643" aria-hidden="true" tabindex="-1"></a>We read the persistence diagrams saved on disk and pass them to table (a DataFrame object), but first we throw away small intervals.</span>
+<span id="cb71-644"><a href="#cb71-644" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-647"><a href="#cb71-647" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb71-648"><a href="#cb71-648" aria-hidden="true" tabindex="-1"></a><span class="in">#| code-fold: true</span></span>
+<span id="cb71-649"><a href="#cb71-649" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-650"><a href="#cb71-650" aria-hidden="true" tabindex="-1"></a><span class="in">function throw_away_small_intervals(pd, min_pers = 0.01)</span></span>
+<span id="cb71-651"><a href="#cb71-651" aria-hidden="true" tabindex="-1"></a><span class="in">    map(pd) do p</span></span>
+<span id="cb71-652"><a href="#cb71-652" aria-hidden="true" tabindex="-1"></a><span class="in">        filter(x -&gt; Pd.persistence(x) &gt; min_pers, p)</span></span>
+<span id="cb71-653"><a href="#cb71-653" aria-hidden="true" tabindex="-1"></a><span class="in">    end</span></span>
+<span id="cb71-654"><a href="#cb71-654" aria-hidden="true" tabindex="-1"></a><span class="in">end;</span></span>
+<span id="cb71-655"><a href="#cb71-655" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-656"><a href="#cb71-656" aria-hidden="true" tabindex="-1"></a><span class="in">function read_pds_from_files(directory, min_interval_size = 0.05)</span></span>
+<span id="cb71-657"><a href="#cb71-657" aria-hidden="true" tabindex="-1"></a><span class="in">  pds_df = DataFrame()</span></span>
+<span id="cb71-658"><a href="#cb71-658" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-659"><a href="#cb71-659" aria-hidden="true" tabindex="-1"></a><span class="in">#   file = list_files("meshes/", "-pd.csv")[1]</span></span>
+<span id="cb71-660"><a href="#cb71-660" aria-hidden="true" tabindex="-1"></a><span class="in">  for file ∈ list_files(directory, "-pd.csv")</span></span>
+<span id="cb71-661"><a href="#cb71-661" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-662"><a href="#cb71-662" aria-hidden="true" tabindex="-1"></a><span class="in">      pd = @chain begin</span></span>
+<span id="cb71-663"><a href="#cb71-663" aria-hidden="true" tabindex="-1"></a><span class="in">          CSV.read(file, DataFrame)</span></span>
+<span id="cb71-664"><a href="#cb71-664" aria-hidden="true" tabindex="-1"></a><span class="in">          dataframe_to_pd(_)</span></span>
+<span id="cb71-665"><a href="#cb71-665" aria-hidden="true" tabindex="-1"></a><span class="in">          throw_away_small_intervals(min_interval_size)</span></span>
+<span id="cb71-666"><a href="#cb71-666" aria-hidden="true" tabindex="-1"></a><span class="in">      end</span></span>
+<span id="cb71-667"><a href="#cb71-667" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-668"><a href="#cb71-668" aria-hidden="true" tabindex="-1"></a><span class="in">      name = replace(file, "-pd.csv" =&gt; "")</span></span>
+<span id="cb71-669"><a href="#cb71-669" aria-hidden="true" tabindex="-1"></a><span class="in">      push!(pds_df, (Path = name, Persistence_diagram = pd))</span></span>
+<span id="cb71-670"><a href="#cb71-670" aria-hidden="true" tabindex="-1"></a><span class="in">  end</span></span>
+<span id="cb71-671"><a href="#cb71-671" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-672"><a href="#cb71-672" aria-hidden="true" tabindex="-1"></a><span class="in">  pds_df</span></span>
+<span id="cb71-673"><a href="#cb71-673" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-674"><a href="#cb71-674" aria-hidden="true" tabindex="-1"></a><span class="in">  sort!(pds_df, :Path)</span></span>
+<span id="cb71-675"><a href="#cb71-675" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-676"><a href="#cb71-676" aria-hidden="true" tabindex="-1"></a><span class="in">  pds_df.File = [split(s, "/")[3] for s ∈ pds_df.Path]</span></span>
+<span id="cb71-677"><a href="#cb71-677" aria-hidden="true" tabindex="-1"></a><span class="in">  pds_df.Class = [split(s, "-")[1] for s ∈ pds_df.File]</span></span>
+<span id="cb71-678"><a href="#cb71-678" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-679"><a href="#cb71-679" aria-hidden="true" tabindex="-1"></a><span class="in">  pds_df</span></span>
+<span id="cb71-680"><a href="#cb71-680" aria-hidden="true" tabindex="-1"></a><span class="in">end;</span></span>
+<span id="cb71-681"><a href="#cb71-681" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-682"><a href="#cb71-682" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-683"><a href="#cb71-683" aria-hidden="true" tabindex="-1"></a><span class="fu">## A metric problem</span></span>
+<span id="cb71-684"><a href="#cb71-684" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-685"><a href="#cb71-685" aria-hidden="true" tabindex="-1"></a>Now we proceed to create a dataframe that contains all we need to classify our shapes.</span>
+<span id="cb71-686"><a href="#cb71-686" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-689"><a href="#cb71-689" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb71-690"><a href="#cb71-690" aria-hidden="true" tabindex="-1"></a><span class="in">pds_df = read_pds_from_files("meshes/", 0.01);</span></span>
+<span id="cb71-691"><a href="#cb71-691" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-692"><a href="#cb71-692" aria-hidden="true" tabindex="-1"></a><span class="in">first(pds_df, 20)</span></span>
+<span id="cb71-693"><a href="#cb71-693" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-694"><a href="#cb71-694" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-695"><a href="#cb71-695" aria-hidden="true" tabindex="-1"></a>The dataframe looks ok! You can plot the barcodes as follows:</span>
+<span id="cb71-696"><a href="#cb71-696" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-699"><a href="#cb71-699" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb71-700"><a href="#cb71-700" aria-hidden="true" tabindex="-1"></a><span class="in">pd2 = pds_df.Persistence_diagram[1]</span></span>
+<span id="cb71-701"><a href="#cb71-701" aria-hidden="true" tabindex="-1"></a><span class="in">plot_barcode(pd2[2:3])</span></span>
+<span id="cb71-702"><a href="#cb71-702" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-703"><a href="#cb71-703" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-704"><a href="#cb71-704" aria-hidden="true" tabindex="-1"></a>Now we calculate the bootleneck distance between each pair of persistence diagrams. This can take some time! If you cloned the repository, you don't need to run this piece of code.</span>
+<span id="cb71-705"><a href="#cb71-705" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-708"><a href="#cb71-708" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb71-709"><a href="#cb71-709" aria-hidden="true" tabindex="-1"></a><span class="in">#| eval: false</span></span>
+<span id="cb71-710"><a href="#cb71-710" aria-hidden="true" tabindex="-1"></a><span class="in">pds = pds_df.Persistence_diagram</span></span>
+<span id="cb71-711"><a href="#cb71-711" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-712"><a href="#cb71-712" aria-hidden="true" tabindex="-1"></a><span class="in">n = nrow(pds_df)</span></span>
+<span id="cb71-713"><a href="#cb71-713" aria-hidden="true" tabindex="-1"></a><span class="in">DB = zeros(n, n)</span></span>
+<span id="cb71-714"><a href="#cb71-714" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-715"><a href="#cb71-715" aria-hidden="true" tabindex="-1"></a><span class="in">@showprogress for i ∈ 1:n</span></span>
+<span id="cb71-716"><a href="#cb71-716" aria-hidden="true" tabindex="-1"></a><span class="in">    for j ∈ i:n</span></span>
+<span id="cb71-717"><a href="#cb71-717" aria-hidden="true" tabindex="-1"></a><span class="in">        if i == j</span></span>
+<span id="cb71-718"><a href="#cb71-718" aria-hidden="true" tabindex="-1"></a><span class="in">            DB[i, j] = 0 </span></span>
+<span id="cb71-719"><a href="#cb71-719" aria-hidden="true" tabindex="-1"></a><span class="in">            continue </span></span>
+<span id="cb71-720"><a href="#cb71-720" aria-hidden="true" tabindex="-1"></a><span class="in">        end</span></span>
+<span id="cb71-721"><a href="#cb71-721" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-722"><a href="#cb71-722" aria-hidden="true" tabindex="-1"></a><span class="in">        DB[i, j] = </span></span>
+<span id="cb71-723"><a href="#cb71-723" aria-hidden="true" tabindex="-1"></a><span class="in">            Pd.Bottleneck()(pds[i][2], pds[j][2]) + </span></span>
+<span id="cb71-724"><a href="#cb71-724" aria-hidden="true" tabindex="-1"></a><span class="in">            Pd.Bottleneck()(pds[i][3], pds[j][3])</span></span>
+<span id="cb71-725"><a href="#cb71-725" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-726"><a href="#cb71-726" aria-hidden="true" tabindex="-1"></a><span class="in">        DB[j, i] = DB[i, j]</span></span>
+<span id="cb71-727"><a href="#cb71-727" aria-hidden="true" tabindex="-1"></a><span class="in">    end</span></span>
+<span id="cb71-728"><a href="#cb71-728" aria-hidden="true" tabindex="-1"></a><span class="in">end</span></span>
+<span id="cb71-729"><a href="#cb71-729" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-730"><a href="#cb71-730" aria-hidden="true" tabindex="-1"></a><span class="in">CSV.write("meshes/bottleneck_distance.csv", DataFrame(DB, :auto))</span></span>
+<span id="cb71-731"><a href="#cb71-731" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-732"><a href="#cb71-732" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-733"><a href="#cb71-733" aria-hidden="true" tabindex="-1"></a>Notice that we defined the distance $DB_{i, j}$ between two shapes $X_i$ and $X_j$ as </span>
+<span id="cb71-734"><a href="#cb71-734" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-735"><a href="#cb71-735" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb71-736"><a href="#cb71-736" aria-hidden="true" tabindex="-1"></a>DB_{i, j} = d_b(\text{dgm}_1(X_i), \text{dgm}_1(X_j)) + d_b(\text{dgm}_2(X_i), \text{dgm}_2(X_j))</span>
+<span id="cb71-737"><a href="#cb71-737" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb71-738"><a href="#cb71-738" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-739"><a href="#cb71-739" aria-hidden="true" tabindex="-1"></a>where $d_b$ is the bottleneck distance, and $dgm_i$ is the $i$-dimensional persistence diagram. Notice that **we did not use the 0-dimensional persistent homology, because all shapes are connected**.</span>
+<span id="cb71-740"><a href="#cb71-740" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-741"><a href="#cb71-741" aria-hidden="true" tabindex="-1"></a><span class="fu">## Facing the truth</span></span>
+<span id="cb71-742"><a href="#cb71-742" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-743"><a href="#cb71-743" aria-hidden="true" tabindex="-1"></a>We read $DB$ from disk, in case you did not calculate it previously</span>
+<span id="cb71-744"><a href="#cb71-744" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-747"><a href="#cb71-747" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb71-748"><a href="#cb71-748" aria-hidden="true" tabindex="-1"></a><span class="in">DB = CSV.read("meshes/bottleneck_distance.csv", DataFrame) |&gt; Matrix</span></span>
+<span id="cb71-749"><a href="#cb71-749" aria-hidden="true" tabindex="-1"></a><span class="in">DB</span></span>
+<span id="cb71-750"><a href="#cb71-750" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-751"><a href="#cb71-751" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-752"><a href="#cb71-752" aria-hidden="true" tabindex="-1"></a>How can we visualize $DB$?</span>
+<span id="cb71-753"><a href="#cb71-753" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-754"><a href="#cb71-754" aria-hidden="true" tabindex="-1"></a><span class="fu">### Heatmap</span></span>
+<span id="cb71-755"><a href="#cb71-755" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-756"><a href="#cb71-756" aria-hidden="true" tabindex="-1"></a>Heatmaps are matrices (2d arrays) where each element is colored by some value. In the ideal world, our matrix $DB$ will have a square of low values for each comparison between the same class, and a higher value when comparing elements of different classes.</span>
+<span id="cb71-757"><a href="#cb71-757" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-760"><a href="#cb71-760" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb71-761"><a href="#cb71-761" aria-hidden="true" tabindex="-1"></a><span class="in">labels = pds_df.Class |&gt; copy</span></span>
+<span id="cb71-762"><a href="#cb71-762" aria-hidden="true" tabindex="-1"></a><span class="in">for i ∈ 2:length(pds_df.Class)</span></span>
+<span id="cb71-763"><a href="#cb71-763" aria-hidden="true" tabindex="-1"></a><span class="in">    if labels[i] == pds_df.Class[i-1]</span></span>
+<span id="cb71-764"><a href="#cb71-764" aria-hidden="true" tabindex="-1"></a><span class="in">        labels[i] = ""</span></span>
+<span id="cb71-765"><a href="#cb71-765" aria-hidden="true" tabindex="-1"></a><span class="in">    end</span></span>
+<span id="cb71-766"><a href="#cb71-766" aria-hidden="true" tabindex="-1"></a><span class="in">end</span></span>
+<span id="cb71-767"><a href="#cb71-767" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-768"><a href="#cb71-768" aria-hidden="true" tabindex="-1"></a><span class="in">labels = (1:nrow(pds_df), labels)</span></span>
+<span id="cb71-769"><a href="#cb71-769" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-770"><a href="#cb71-770" aria-hidden="true" tabindex="-1"></a><span class="in">plot(DB, st = :heatmap, xticks = labels, yticks = labels)</span></span>
+<span id="cb71-771"><a href="#cb71-771" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-772"><a href="#cb71-772" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-773"><a href="#cb71-773" aria-hidden="true" tabindex="-1"></a>We can see that the diagonals (intra-class comparisons) are good enough: they are dark-coloured squares, indicating small distances. But there are also black squares outside the diagonal, which means that some different classes are close to each other. </span>
+<span id="cb71-774"><a href="#cb71-774" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-775"><a href="#cb71-775" aria-hidden="true" tabindex="-1"></a><span class="fu">### Dendrograms</span></span>
+<span id="cb71-776"><a href="#cb71-776" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-777"><a href="#cb71-777" aria-hidden="true" tabindex="-1"></a>Dendrograms are a nice way to visualize a distance matrix. They represent the evolution of the connected components as some parameter (usually the radius of circles centered on each point) grows.</span>
+<span id="cb71-778"><a href="#cb71-778" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-781"><a href="#cb71-781" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb71-782"><a href="#cb71-782" aria-hidden="true" tabindex="-1"></a><span class="in">#| code-fold: true</span></span>
+<span id="cb71-783"><a href="#cb71-783" aria-hidden="true" tabindex="-1"></a><span class="in">function plot_hc(hc)</span></span>
+<span id="cb71-784"><a href="#cb71-784" aria-hidden="true" tabindex="-1"></a><span class="in">    plot(</span></span>
+<span id="cb71-785"><a href="#cb71-785" aria-hidden="true" tabindex="-1"></a><span class="in">        hc, xticks = (1:nrow(pds_df), pds_df.File[hc.order])</span></span>
+<span id="cb71-786"><a href="#cb71-786" aria-hidden="true" tabindex="-1"></a><span class="in">        , xflip = true, xrotation = 270</span></span>
+<span id="cb71-787"><a href="#cb71-787" aria-hidden="true" tabindex="-1"></a><span class="in">        , xtickfont = font(5, "Roboto")</span></span>
+<span id="cb71-788"><a href="#cb71-788" aria-hidden="true" tabindex="-1"></a><span class="in">        )</span></span>
+<span id="cb71-789"><a href="#cb71-789" aria-hidden="true" tabindex="-1"></a><span class="in">end;</span></span>
+<span id="cb71-790"><a href="#cb71-790" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-791"><a href="#cb71-791" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-792"><a href="#cb71-792" aria-hidden="true" tabindex="-1"></a>The <span class="co">[</span><span class="ot">single linkage dendrogram</span><span class="co">](https://en.wikipedia.org/wiki/Single-linkage_clustering)</span> is a mess:</span>
+<span id="cb71-793"><a href="#cb71-793" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-796"><a href="#cb71-796" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb71-797"><a href="#cb71-797" aria-hidden="true" tabindex="-1"></a><span class="in">hclust(DB, linkage=:single, branchorder = :optimal) |&gt; plot_hc</span></span>
+<span id="cb71-798"><a href="#cb71-798" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-799"><a href="#cb71-799" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-800"><a href="#cb71-800" aria-hidden="true" tabindex="-1"></a>But the <span class="co">[</span><span class="ot">complete linkage dendrogram</span><span class="co">](https://en.wikipedia.org/wiki/Complete-linkage_clustering)</span> shows more hope:</span>
+<span id="cb71-801"><a href="#cb71-801" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-804"><a href="#cb71-804" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb71-805"><a href="#cb71-805" aria-hidden="true" tabindex="-1"></a><span class="in">hclust(DB, linkage = :complete, branchorder = :optimal) |&gt; plot_hc</span></span>
+<span id="cb71-806"><a href="#cb71-806" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-807"><a href="#cb71-807" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-808"><a href="#cb71-808" aria-hidden="true" tabindex="-1"></a>Here is also the Ward algorithm:</span>
+<span id="cb71-809"><a href="#cb71-809" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-812"><a href="#cb71-812" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb71-813"><a href="#cb71-813" aria-hidden="true" tabindex="-1"></a><span class="in">hclust(DB, linkage = :ward, branchorder = :optimal) |&gt; plot_hc</span></span>
+<span id="cb71-814"><a href="#cb71-814" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-815"><a href="#cb71-815" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-816"><a href="#cb71-816" aria-hidden="true" tabindex="-1"></a><span class="fu">### Accuracy</span></span>
+<span id="cb71-817"><a href="#cb71-817" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-818"><a href="#cb71-818" aria-hidden="true" tabindex="-1"></a>Now let's calculate for each shape which reference class is closer to it:</span>
+<span id="cb71-819"><a href="#cb71-819" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-822"><a href="#cb71-822" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb71-823"><a href="#cb71-823" aria-hidden="true" tabindex="-1"></a><span class="in">#| code-fold: true</span></span>
+<span id="cb71-824"><a href="#cb71-824" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-825"><a href="#cb71-825" aria-hidden="true" tabindex="-1"></a><span class="in">function get_score_dataframe(pds_df, DB) </span></span>
+<span id="cb71-826"><a href="#cb71-826" aria-hidden="true" tabindex="-1"></a><span class="in">  score = @select(pds_df, :Path, :File, :Class)</span></span>
+<span id="cb71-827"><a href="#cb71-827" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-828"><a href="#cb71-828" aria-hidden="true" tabindex="-1"></a><span class="in">  score.Nearest_class .= ""</span></span>
+<span id="cb71-829"><a href="#cb71-829" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-830"><a href="#cb71-830" aria-hidden="true" tabindex="-1"></a><span class="in">  ids_reference = findall(x -&gt; occursin("-reference", x), score.Path)</span></span>
+<span id="cb71-831"><a href="#cb71-831" aria-hidden="true" tabindex="-1"></a><span class="in">  names_reference = score.File[ids_reference]</span></span>
+<span id="cb71-832"><a href="#cb71-832" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-833"><a href="#cb71-833" aria-hidden="true" tabindex="-1"></a><span class="in">  for i ∈ 1:nrow(pds_df)</span></span>
+<span id="cb71-834"><a href="#cb71-834" aria-hidden="true" tabindex="-1"></a><span class="in">      id = sortperm(DB[i, ids_reference])[1]</span></span>
+<span id="cb71-835"><a href="#cb71-835" aria-hidden="true" tabindex="-1"></a><span class="in">      score.Nearest_class[i] = names_reference[id]</span></span>
+<span id="cb71-836"><a href="#cb71-836" aria-hidden="true" tabindex="-1"></a><span class="in">  end</span></span>
+<span id="cb71-837"><a href="#cb71-837" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-838"><a href="#cb71-838" aria-hidden="true" tabindex="-1"></a><span class="in">  score.Right_class =</span></span>
+<span id="cb71-839"><a href="#cb71-839" aria-hidden="true" tabindex="-1"></a><span class="in">      get_class_from_file.(score.Class) .== </span></span>
+<span id="cb71-840"><a href="#cb71-840" aria-hidden="true" tabindex="-1"></a><span class="in">      get_class_from_file.(score.Nearest_class)</span></span>
+<span id="cb71-841"><a href="#cb71-841" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-842"><a href="#cb71-842" aria-hidden="true" tabindex="-1"></a><span class="in">  score</span></span>
+<span id="cb71-843"><a href="#cb71-843" aria-hidden="true" tabindex="-1"></a><span class="in">end;</span></span>
+<span id="cb71-844"><a href="#cb71-844" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-845"><a href="#cb71-845" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-848"><a href="#cb71-848" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb71-849"><a href="#cb71-849" aria-hidden="true" tabindex="-1"></a><span class="in">score = get_score_dataframe(pds_df, DB)</span></span>
+<span id="cb71-850"><a href="#cb71-850" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-851"><a href="#cb71-851" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-852"><a href="#cb71-852" aria-hidden="true" tabindex="-1"></a>Our accuracy was</span>
+<span id="cb71-853"><a href="#cb71-853" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-856"><a href="#cb71-856" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb71-857"><a href="#cb71-857" aria-hidden="true" tabindex="-1"></a><span class="in">score.Right_class |&gt; mean</span></span>
+<span id="cb71-858"><a href="#cb71-858" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-859"><a href="#cb71-859" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-860"><a href="#cb71-860" aria-hidden="true" tabindex="-1"></a>that is: 82%. Not bad, but not excellent either!</span>
+<span id="cb71-861"><a href="#cb71-861" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-862"><a href="#cb71-862" aria-hidden="true" tabindex="-1"></a>Here is the <span class="co">[</span><span class="ot">confusion matrix</span><span class="co">](https://en.wikipedia.org/wiki/Confusion_matrix)</span>:</span>
+<span id="cb71-863"><a href="#cb71-863" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-866"><a href="#cb71-866" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb71-867"><a href="#cb71-867" aria-hidden="true" tabindex="-1"></a><span class="in">score_new = @rsubset score !occursin("ref", :File)</span></span>
+<span id="cb71-868"><a href="#cb71-868" aria-hidden="true" tabindex="-1"></a><span class="in">x = CM.confmat(get_class_from_file.(score_new.Nearest_class), score_new.Class)</span></span>
+<span id="cb71-869"><a href="#cb71-869" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-870"><a href="#cb71-870" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-871"><a href="#cb71-871" aria-hidden="true" tabindex="-1"></a><span class="al">![Confusion matrix for DB.](images/3d-shapes/confusion%20matrix.png)</span></span>
+<span id="cb71-872"><a href="#cb71-872" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-873"><a href="#cb71-873" aria-hidden="true" tabindex="-1"></a>Some conclusions we can take from the above analysis:</span>
+<span id="cb71-874"><a href="#cb71-874" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-875"><a href="#cb71-875" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Camels, elephants and faces are all correct;</span>
+<span id="cb71-876"><a href="#cb71-876" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>There is one head mistaken as a face;</span>
+<span id="cb71-877"><a href="#cb71-877" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>There are two mistaken horses;</span>
+<span id="cb71-878"><a href="#cb71-878" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Cats are confused with lions.</span>
+<span id="cb71-879"><a href="#cb71-879" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-880"><a href="#cb71-880" aria-hidden="true" tabindex="-1"></a>Why did this happen? Look back at the rotating plots in section <span class="co">[</span><span class="ot">@sec-3d-plotting</span><span class="co">]</span>: a cat and a lion are almost isometric in the geodesic sense! Thus, **no tool that uses only the metric will be able to split these classes**.</span>
+<span id="cb71-881"><a href="#cb71-881" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-882"><a href="#cb71-882" aria-hidden="true" tabindex="-1"></a><span class="fu">### MDS plot</span></span>
+<span id="cb71-883"><a href="#cb71-883" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-884"><a href="#cb71-884" aria-hidden="true" tabindex="-1"></a>Another last visualization technique is the <span class="co">[</span><span class="ot">multidimensional scaling</span><span class="co">](https://en.wikipedia.org/wiki/Multidimensional_scaling)</span> plot. This method takes a distance matrix and tries to project it down to $\mathbb{R}^2$) (or $\mathbb{R}^3$) while distorting the distances as little as possible.</span>
+<span id="cb71-885"><a href="#cb71-885" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-888"><a href="#cb71-888" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb71-889"><a href="#cb71-889" aria-hidden="true" tabindex="-1"></a><span class="in">#| code-fold: true</span></span>
+<span id="cb71-890"><a href="#cb71-890" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-891"><a href="#cb71-891" aria-hidden="true" tabindex="-1"></a><span class="in">function mds_plot(D, score)</span></span>
+<span id="cb71-892"><a href="#cb71-892" aria-hidden="true" tabindex="-1"></a><span class="in">    M = fit(MDS, D; distances = true, maxoutdim = 2)</span></span>
+<span id="cb71-893"><a href="#cb71-893" aria-hidden="true" tabindex="-1"></a><span class="in">    Y = predict(M)</span></span>
+<span id="cb71-894"><a href="#cb71-894" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-895"><a href="#cb71-895" aria-hidden="true" tabindex="-1"></a><span class="in">    score.Row = 1:length(score.Class)</span></span>
+<span id="cb71-896"><a href="#cb71-896" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-897"><a href="#cb71-897" aria-hidden="true" tabindex="-1"></a><span class="in">    dfs = @chain score begin</span></span>
+<span id="cb71-898"><a href="#cb71-898" aria-hidden="true" tabindex="-1"></a><span class="in">        groupby(:Class)</span></span>
+<span id="cb71-899"><a href="#cb71-899" aria-hidden="true" tabindex="-1"></a><span class="in">        collect</span></span>
+<span id="cb71-900"><a href="#cb71-900" aria-hidden="true" tabindex="-1"></a><span class="in">    end</span></span>
+<span id="cb71-901"><a href="#cb71-901" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-902"><a href="#cb71-902" aria-hidden="true" tabindex="-1"></a><span class="in">    fig = gl.Figure();</span></span>
+<span id="cb71-903"><a href="#cb71-903" aria-hidden="true" tabindex="-1"></a><span class="in">    ax = gl.Axis(fig[1,1])</span></span>
+<span id="cb71-904"><a href="#cb71-904" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-905"><a href="#cb71-905" aria-hidden="true" tabindex="-1"></a><span class="in">    colors = cgrad(:tableau_10, 8, categorical = true)</span></span>
+<span id="cb71-906"><a href="#cb71-906" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-907"><a href="#cb71-907" aria-hidden="true" tabindex="-1"></a><span class="in">    for (i, df) ∈ enumerate(dfs)    </span></span>
+<span id="cb71-908"><a href="#cb71-908" aria-hidden="true" tabindex="-1"></a><span class="in">        gl.scatter!(</span></span>
+<span id="cb71-909"><a href="#cb71-909" aria-hidden="true" tabindex="-1"></a><span class="in">            ax, Y[:, df.Row]</span></span>
+<span id="cb71-910"><a href="#cb71-910" aria-hidden="true" tabindex="-1"></a><span class="in">            , label = df.Class[1], markersize = 15</span></span>
+<span id="cb71-911"><a href="#cb71-911" aria-hidden="true" tabindex="-1"></a><span class="in">            , color = colors[i]</span></span>
+<span id="cb71-912"><a href="#cb71-912" aria-hidden="true" tabindex="-1"></a><span class="in">            )</span></span>
+<span id="cb71-913"><a href="#cb71-913" aria-hidden="true" tabindex="-1"></a><span class="in">    end</span></span>
+<span id="cb71-914"><a href="#cb71-914" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-915"><a href="#cb71-915" aria-hidden="true" tabindex="-1"></a><span class="in">    gl.axislegend();</span></span>
+<span id="cb71-916"><a href="#cb71-916" aria-hidden="true" tabindex="-1"></a><span class="in">    fig</span></span>
+<span id="cb71-917"><a href="#cb71-917" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-918"><a href="#cb71-918" aria-hidden="true" tabindex="-1"></a><span class="in">    fig</span></span>
+<span id="cb71-919"><a href="#cb71-919" aria-hidden="true" tabindex="-1"></a><span class="in">end</span></span>
+<span id="cb71-920"><a href="#cb71-920" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-921"><a href="#cb71-921" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-924"><a href="#cb71-924" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb71-925"><a href="#cb71-925" aria-hidden="true" tabindex="-1"></a><span class="in">mds_plot(DB, score)</span></span>
+<span id="cb71-926"><a href="#cb71-926" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-927"><a href="#cb71-927" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-928"><a href="#cb71-928" aria-hidden="true" tabindex="-1"></a>Can we do better?</span>
+<span id="cb71-929"><a href="#cb71-929" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-930"><a href="#cb71-930" aria-hidden="true" tabindex="-1"></a>With only the distance matrix $DB$, as we could see above, the answer is **NO**. We need to find more tools to compare these shapes.</span>
+<span id="cb71-931"><a href="#cb71-931" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-932"><a href="#cb71-932" aria-hidden="true" tabindex="-1"></a><span class="fu">## Using volumes</span></span>
+<span id="cb71-933"><a href="#cb71-933" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-934"><a href="#cb71-934" aria-hidden="true" tabindex="-1"></a>::: {.callout-caution title="Warning"}</span>
+<span id="cb71-935"><a href="#cb71-935" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-936"><a href="#cb71-936" aria-hidden="true" tabindex="-1"></a>Don't try the following scenes at home! Read the text and explain why this approach is wrong.</span>
+<span id="cb71-937"><a href="#cb71-937" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-938"><a href="#cb71-938" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb71-939"><a href="#cb71-939" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-940"><a href="#cb71-940" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-941"><a href="#cb71-941" aria-hidden="true" tabindex="-1"></a>Each mesh has a notion of volume that can be calculated with the function <span class="in">`measure`</span>.</span>
+<span id="cb71-942"><a href="#cb71-942" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-943"><a href="#cb71-943" aria-hidden="true" tabindex="-1"></a>We can see below the mean volume for each class:</span>
+<span id="cb71-944"><a href="#cb71-944" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-947"><a href="#cb71-947" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb71-948"><a href="#cb71-948" aria-hidden="true" tabindex="-1"></a><span class="in">volumes = @showprogress map(score.Path) do f</span></span>
+<span id="cb71-949"><a href="#cb71-949" aria-hidden="true" tabindex="-1"></a><span class="in">    ms = read_mesh(f * ".obj")</span></span>
+<span id="cb71-950"><a href="#cb71-950" aria-hidden="true" tabindex="-1"></a><span class="in">    measure(ms)</span></span>
+<span id="cb71-951"><a href="#cb71-951" aria-hidden="true" tabindex="-1"></a><span class="in">end</span></span>
+<span id="cb71-952"><a href="#cb71-952" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-953"><a href="#cb71-953" aria-hidden="true" tabindex="-1"></a><span class="in">df_volumes = DataFrame(</span></span>
+<span id="cb71-954"><a href="#cb71-954" aria-hidden="true" tabindex="-1"></a><span class="in">    Path = score.Path, Class = score.Class, Volume = volumes</span></span>
+<span id="cb71-955"><a href="#cb71-955" aria-hidden="true" tabindex="-1"></a><span class="in">    )</span></span>
 <span id="cb71-956"><a href="#cb71-956" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-957"><a href="#cb71-957" aria-hidden="true" tabindex="-1"></a>The volume is enough to separate all the classes except lions and flamingos (which have volumes close to 0.54).</span>
-<span id="cb71-958"><a href="#cb71-958" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-959"><a href="#cb71-959" aria-hidden="true" tabindex="-1"></a>So let's add this difference in volume to our original matrix $DB$, and call it $DB2$:</span>
-<span id="cb71-960"><a href="#cb71-960" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-963"><a href="#cb71-963" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-964"><a href="#cb71-964" aria-hidden="true" tabindex="-1"></a><span class="in">n = nrow(pds_df)</span></span>
-<span id="cb71-965"><a href="#cb71-965" aria-hidden="true" tabindex="-1"></a><span class="in">volume_difs = zeros(n, n)</span></span>
+<span id="cb71-957"><a href="#cb71-957" aria-hidden="true" tabindex="-1"></a><span class="in">@chain df_volumes begin</span></span>
+<span id="cb71-958"><a href="#cb71-958" aria-hidden="true" tabindex="-1"></a><span class="in">    @groupby :Class</span></span>
+<span id="cb71-959"><a href="#cb71-959" aria-hidden="true" tabindex="-1"></a><span class="in">    @combine :Mean_volume = mean(:Volume)</span></span>
+<span id="cb71-960"><a href="#cb71-960" aria-hidden="true" tabindex="-1"></a><span class="in">end</span></span>
+<span id="cb71-961"><a href="#cb71-961" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-962"><a href="#cb71-962" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-963"><a href="#cb71-963" aria-hidden="true" tabindex="-1"></a>The volume is enough to separate all the classes except lions and flamingos (which have volumes close to 0.54).</span>
+<span id="cb71-964"><a href="#cb71-964" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-965"><a href="#cb71-965" aria-hidden="true" tabindex="-1"></a>So let's add this difference in volume to our original matrix $DB$, and call it $DB2$:</span>
 <span id="cb71-966"><a href="#cb71-966" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-967"><a href="#cb71-967" aria-hidden="true" tabindex="-1"></a><span class="in">for i ∈ 1:n</span></span>
-<span id="cb71-968"><a href="#cb71-968" aria-hidden="true" tabindex="-1"></a><span class="in">    for j ∈ i:n</span></span>
-<span id="cb71-969"><a href="#cb71-969" aria-hidden="true" tabindex="-1"></a><span class="in">        volume_difs[i, j] = abs(df_volumes.Volume[i] - df_volumes.Volume[j])</span></span>
-<span id="cb71-970"><a href="#cb71-970" aria-hidden="true" tabindex="-1"></a><span class="in">        volume_difs[j, i] = volume_difs[i, j]</span></span>
-<span id="cb71-971"><a href="#cb71-971" aria-hidden="true" tabindex="-1"></a><span class="in">    end</span></span>
-<span id="cb71-972"><a href="#cb71-972" aria-hidden="true" tabindex="-1"></a><span class="in">end</span></span>
-<span id="cb71-973"><a href="#cb71-973" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-974"><a href="#cb71-974" aria-hidden="true" tabindex="-1"></a><span class="in"># ignore differences in volume greater than maximum(DB)</span></span>
-<span id="cb71-975"><a href="#cb71-975" aria-hidden="true" tabindex="-1"></a><span class="in">replace!(x -&gt; x &gt; maximum(DB) ? maximum(DB) : x, volume_difs)</span></span>
-<span id="cb71-976"><a href="#cb71-976" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-977"><a href="#cb71-977" aria-hidden="true" tabindex="-1"></a><span class="in">DB2 = DB .+ volume_difs</span></span>
-<span id="cb71-978"><a href="#cb71-978" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-969"><a href="#cb71-969" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb71-970"><a href="#cb71-970" aria-hidden="true" tabindex="-1"></a><span class="in">n = nrow(pds_df)</span></span>
+<span id="cb71-971"><a href="#cb71-971" aria-hidden="true" tabindex="-1"></a><span class="in">volume_difs = zeros(n, n)</span></span>
+<span id="cb71-972"><a href="#cb71-972" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-973"><a href="#cb71-973" aria-hidden="true" tabindex="-1"></a><span class="in">for i ∈ 1:n</span></span>
+<span id="cb71-974"><a href="#cb71-974" aria-hidden="true" tabindex="-1"></a><span class="in">    for j ∈ i:n</span></span>
+<span id="cb71-975"><a href="#cb71-975" aria-hidden="true" tabindex="-1"></a><span class="in">        volume_difs[i, j] = abs(df_volumes.Volume[i] - df_volumes.Volume[j])</span></span>
+<span id="cb71-976"><a href="#cb71-976" aria-hidden="true" tabindex="-1"></a><span class="in">        volume_difs[j, i] = volume_difs[i, j]</span></span>
+<span id="cb71-977"><a href="#cb71-977" aria-hidden="true" tabindex="-1"></a><span class="in">    end</span></span>
+<span id="cb71-978"><a href="#cb71-978" aria-hidden="true" tabindex="-1"></a><span class="in">end</span></span>
 <span id="cb71-979"><a href="#cb71-979" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-980"><a href="#cb71-980" aria-hidden="true" tabindex="-1"></a>Its dendrogram is the following:</span>
-<span id="cb71-981"><a href="#cb71-981" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-984"><a href="#cb71-984" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-985"><a href="#cb71-985" aria-hidden="true" tabindex="-1"></a><span class="in">hclust(DB2, linkage = :complete, branchorder = :optimal) |&gt; plot_hc</span></span>
-<span id="cb71-986"><a href="#cb71-986" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-980"><a href="#cb71-980" aria-hidden="true" tabindex="-1"></a><span class="in"># ignore differences in volume greater than maximum(DB)</span></span>
+<span id="cb71-981"><a href="#cb71-981" aria-hidden="true" tabindex="-1"></a><span class="in">replace!(x -&gt; x &gt; maximum(DB) ? maximum(DB) : x, volume_difs)</span></span>
+<span id="cb71-982"><a href="#cb71-982" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-983"><a href="#cb71-983" aria-hidden="true" tabindex="-1"></a><span class="in">DB2 = DB .+ volume_difs</span></span>
+<span id="cb71-984"><a href="#cb71-984" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-985"><a href="#cb71-985" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-986"><a href="#cb71-986" aria-hidden="true" tabindex="-1"></a>Its dendrogram is the following:</span>
 <span id="cb71-987"><a href="#cb71-987" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-988"><a href="#cb71-988" aria-hidden="true" tabindex="-1"></a>which is much better than before!</span>
-<span id="cb71-989"><a href="#cb71-989" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-990"><a href="#cb71-990" aria-hidden="true" tabindex="-1"></a>If again we calculate the closest reference pose to each given shape, we now get</span>
-<span id="cb71-991"><a href="#cb71-991" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-994"><a href="#cb71-994" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-995"><a href="#cb71-995" aria-hidden="true" tabindex="-1"></a><span class="in">score2 = get_score_dataframe(pds_df, DB2)</span></span>
-<span id="cb71-996"><a href="#cb71-996" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-990"><a href="#cb71-990" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb71-991"><a href="#cb71-991" aria-hidden="true" tabindex="-1"></a><span class="in">hclust(DB2, linkage = :complete, branchorder = :optimal) |&gt; plot_hc</span></span>
+<span id="cb71-992"><a href="#cb71-992" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-993"><a href="#cb71-993" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-994"><a href="#cb71-994" aria-hidden="true" tabindex="-1"></a>which is much better than before!</span>
+<span id="cb71-995"><a href="#cb71-995" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-996"><a href="#cb71-996" aria-hidden="true" tabindex="-1"></a>If again we calculate the closest reference pose to each given shape, we now get</span>
 <span id="cb71-997"><a href="#cb71-997" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb71-1000"><a href="#cb71-1000" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-1001"><a href="#cb71-1001" aria-hidden="true" tabindex="-1"></a><span class="in">score2.Right_class |&gt; mean</span></span>
+<span id="cb71-1001"><a href="#cb71-1001" aria-hidden="true" tabindex="-1"></a><span class="in">score2 = get_score_dataframe(pds_df, DB2)</span></span>
 <span id="cb71-1002"><a href="#cb71-1002" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb71-1003"><a href="#cb71-1003" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-1004"><a href="#cb71-1004" aria-hidden="true" tabindex="-1"></a>nearly 100%!</span>
-<span id="cb71-1005"><a href="#cb71-1005" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-1006"><a href="#cb71-1006" aria-hidden="true" tabindex="-1"></a>The only misclassification can be seen with</span>
-<span id="cb71-1007"><a href="#cb71-1007" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-1010"><a href="#cb71-1010" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
-<span id="cb71-1011"><a href="#cb71-1011" aria-hidden="true" tabindex="-1"></a><span class="in">@rsubset score2 !:Right_class </span></span>
-<span id="cb71-1012"><a href="#cb71-1012" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-1006"><a href="#cb71-1006" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb71-1007"><a href="#cb71-1007" aria-hidden="true" tabindex="-1"></a><span class="in">score2.Right_class |&gt; mean</span></span>
+<span id="cb71-1008"><a href="#cb71-1008" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-1009"><a href="#cb71-1009" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-1010"><a href="#cb71-1010" aria-hidden="true" tabindex="-1"></a>nearly 100%!</span>
+<span id="cb71-1011"><a href="#cb71-1011" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-1012"><a href="#cb71-1012" aria-hidden="true" tabindex="-1"></a>The only misclassification can be seen with</span>
 <span id="cb71-1013"><a href="#cb71-1013" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-1014"><a href="#cb71-1014" aria-hidden="true" tabindex="-1"></a>where a head was mistaken for a face.</span>
+<span id="cb71-1016"><a href="#cb71-1016" aria-hidden="true" tabindex="-1"></a><span class="in">```{julia}</span></span>
+<span id="cb71-1017"><a href="#cb71-1017" aria-hidden="true" tabindex="-1"></a><span class="in">@rsubset score2 !:Right_class </span></span>
+<span id="cb71-1018"><a href="#cb71-1018" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb71-1019"><a href="#cb71-1019" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-1020"><a href="#cb71-1020" aria-hidden="true" tabindex="-1"></a>where a head was mistaken for a face.</span>
 </code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

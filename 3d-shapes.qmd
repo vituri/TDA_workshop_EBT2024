@@ -359,15 +359,14 @@ We now have 26394 points, which is a small reduction.
 
 We could just select a random sample of points from our space, but points in high-density areas would be selected a lot more. There is another way to select points in a "well spaced manner", called the *farthest point sampling algorithm*. This algorithm was shown to me by Facundo Mémoli on a dirty blackboard in 2018 and the simplicity of it astonished me. For the curious ones, the algorithm is detailed below.
 
+![An example of farthest point sample. The blue dots are the space $X$; the red dots are chosen each time far away from all the other red dots.](images/3d-shapes/farthest%20points.gif)
+
 ::: {.callout-important}
 <!-- ## Algorithm -->
 
 Let $(X, d)$ be a metric space. Fix an integer $n$. Let $C = \emptyset$ be the "set of chosen points". Select $x_1 \in X$ randomly and add it to $C$. Repeat the following procedure until you have $n$ points in $C$:
 
-- Calculate the point $x \in X$ that is the most distant from all elements of $C$, ie, 
-$$
-\max \{ d(x, c), c \in C \} = \max \{d(x', c), x' \in X, c \in C \}.
-$$
+- Calculate the point $x \in X$ that is the most distant from all elements of $C$.
 
 - Add $x$ to $C$.
 
@@ -396,9 +395,9 @@ We are now interested in calculating the geodesic distance between these 400 poi
 
 ### Geodesic distances
 
-Given a shape $S$, we can think of the geodesic distance between two points as "the least distance an and would need to walk from one point to another". We will approximate this "walkable" paths using the edges of the triangles of the shape $S$. Remember: a mesh is a set of points and triangles!
+Given a shape $S$, we can think of the geodesic distance between two points as "the least distance an ant would need to walk from one point to another". We will approximate this "walkable" paths using the edges of the triangles of the shape $S$. Remember: a mesh is a set of points and triangles!
 
-The Dijkstra algorithm is perfect for our needs: it calculates the shortest path from one point to another in a weighted graph. So all we need is to:
+The [Dijkstra algorithm](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm) is perfect for our needs: it calculates the shortest path from one point to another in a weighted graph. So all we need is to:
 
 - Transform $S$ into a graph where the edges have weights (the euclidean distance between these points);
 - Calculate the shortest path between each two points.
@@ -450,7 +449,7 @@ Looks good! The extremities of the flamingo are in a lighter color, indicating t
 
 ## Persistent homology
 
-We can now calculate the persistence diagram of $X_fps$ with the geodesic distance and use it! Let's load some packages and calculate it
+We can now calculate the persistence diagram of $X_{fps}$ with the geodesic distance and use it! Let's load some packages and calculate it
 
 ```{julia}
 pd = Ripserer.ripserer(D, dim_max = 2, verbose=true, sparse = true, threshold = 0.4)
@@ -790,7 +789,7 @@ Why did this happen? Look back at the rotating plots in section [@sec-3d-plottin
 
 ### MDS plot
 
-Another last visualization technique is the [multidimensional scaling](https://en.wikipedia.org/wiki/Multidimensional_scaling) plot. This method takes a distance matrix and tries to project it down to $\mathbb{R}^2) (or $\mathbb{R}^3) while distorting the distances as little as possible.
+Another last visualization technique is the [multidimensional scaling](https://en.wikipedia.org/wiki/Multidimensional_scaling) plot. This method takes a distance matrix and tries to project it down to $\mathbb{R}^2$) (or $\mathbb{R}^3$) while distorting the distances as little as possible.
 
 ```{julia}
 #| code-fold: true
@@ -834,7 +833,14 @@ Can we do better?
 
 With only the distance matrix $DB$, as we could see above, the answer is **NO**. We need to find more tools to compare these shapes.
 
-## Volumes
+## Using volumes
+
+::: {.callout-caution title="Warning"}
+
+Don't try the following scenes at home! Read the text and explain why this approach is wrong.
+
+:::
+
 
 Each mesh has a notion of volume that can be calculated with the function `measure`.
 
