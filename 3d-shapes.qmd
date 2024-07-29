@@ -189,18 +189,48 @@ Each shape $s \in S$ has a class of the type camel, cat, elephant, etc. We can t
 
 We will try to solve the following problem: can we correctly calculate $c(s)$ when we only know $c$ for $s \in S_{rp}$? That is: **knowing only the class of each reference pose, can we deduce the class of the remaining shapes using only the mesh file**?
 
+In other words:
+
+::: {.callout-note title="Problem"}
+
+If I give you a 3d shape, can you say its class _if all you know is the reference pose of each class_?
+
+:::
+
+```{julia}
+#| include: false
+
+# function plot_reference_classes()
+#     files = list_files("meshes/", "reference.obj")
+#     fig = gl.Figure(size = (800, 1200));
+
+#     for (i, file) ∈ enumerate(files)
+#         p, q = divrem(i - 1, 3) .+ 1    
+#         ms = read_mesh(file)
+#         viz(fig[p, q], ms, title = "a")    
+#     end
+
+#     gl.record(fig, "images/3d-shapes/reference" * ".gif", 0:31) do i
+#         gl.rotate!(fig.scene, Vec3f(0, 0, 1), i * pi/16)
+#     end
+# end
+```
+
+![The reference pose of each class.](images/3d-shapes/reference.gif)
+
 This kind of problem is common in data science and is known as a "classification problem": we are trying to *atribute classes to objects, knowing the class of fewer other objects*.
 
 ## From meshes to metric spaces
 
-As this is a minicourse on topological data analysis, we know that in somewhere we have to use persistent homology.
+::: {.callout-note title="An ingenuous attempt"}
 
 An ingenuous attempt to solve the classification problem can be summarised as follows:
 
-- For each shape $S_i$, extract the points $X_i \subset \mathbb{R}^3$ and consider $d$ as the Euclidean distance;
-- Calculate the persistence diagram $D_i = dgm(X_i)$;
-- For each $D_i$, calculate the bottleneck distance from $D_i$ to all $D_j$ where $S_j$ is a reference pose;
-- The closest reference pose to $D_i$ will be the class of $S_i$.
+1. For each shape $S_i$, extract the points $X_i \subset \mathbb{R}^3$ and consider $d$ as the Euclidean distance;
+1. Calculate the persistence diagram $D_i = dgm(X_i)$;
+1. For each $D_i$, calculate the bottleneck distance from $D_i$ to all $D_j$ where $S_j$ is a reference pose;
+1. The closest reference pose to $D_i$ will be the class of $S_i$.
+:::
 
 **This approach won't work** because of the two first steps:
 
