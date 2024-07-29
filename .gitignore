@@ -2,3 +2,5 @@
 *.obj
 /files
 .Rproj.user
+/_freeze
+.jupyter_cache/

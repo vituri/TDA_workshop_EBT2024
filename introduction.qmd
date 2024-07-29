@@ -157,7 +157,7 @@ norm("Hello!")
 
 ## Why TDA?
 
-Topological Data Analysis is a very curious field of mathematics that apply tools from topology and algebraic topology in the study of datasets. By "datasets", we almost always mean "finite metric space".
+Topological Data Analysis is a eccentric field of mathematics that applies tools from topology and algebraic topology on the study of datasets. By "datasets", we almost always mean "finite metric space".
 
 These tools can be divided in some broad categories:
 
@@ -169,16 +169,12 @@ Persistence homology calculates the "shape" (homology groups) of a object on dif
 
 ### Graph reduction methods
 
-The Mapper algorithm is the discrete version of the [Reeb graph](https://en.wikipedia.org/wiki/Reeb_graph). It captures the geometry of a dataset with respect to a given function (called "filter") and produce a graph of its pre-images clustered. There is also the Ball Mapper variant, which does not need a filter function and resembles the Vietoris-Rips filtration. These methods are useful to get a glimpse of the geometry (flares, holes) and areas of interest. For example: if your metric space is a dataset of measurements of patients with diabets, the Mapper graph can represent the patients and the shape of this graph can give insights about the type of diabetes one has.
+The Mapper algorithm [see @singh2007topological] is the discrete version of the [Reeb graph](https://en.wikipedia.org/wiki/Reeb_graph). It captures the geometry of a dataset with respect to a given function (called "filter") and produce a graph of its pre-images clustered. There is also the Ball Mapper variant [see @dlotko2019ball], which does not need a filter function and resembles the Vietoris-Rips filtration. These methods are useful to get a glimpse of the geometry (flares, holes) and areas of interest. For example: if your metric space is a dataset of measurements of patients with diabets, the Mapper graph can represent the patients and the shape of this graph can give insights about the type of diabetes one has.
 
 ![The Mapper graph of some 3d-shapes retain some of the original geometry.](images/intro/mapper.png)
 
 ### Clustering methods
 
-Algorithms like ToMATo are clustering algorithms: we have a metric space as input, and return a partition of this dataset. Clustering is useful whenever we need to "group a set of objects in such a way that objects in the same group (called a cluster) are more similar to each other than to those in other groups (clusters)"^[https://en.wikipedia.org/wiki/Cluster_analysis].
+Algorithms like ToMATo [see @chazal2013persistence] are _clustering algorithms_: we have a metric space as input, and return a (disjoint) partition of this dataset. Clustering is useful whenever we need to "group a set of objects in such a way that objects in the same group (called a cluster) are more similar to each other than to those in other groups (clusters)"^[[https://en.wikipedia.org/wiki/Cluster_analysis](https://en.wikipedia.org/wiki/Cluster_analysis)].
 
 ![ToMATo is a persistence-based clustering algorithm.](images/intro/tomato.png)
-
-## Why this minicourse?
-
-This minicourse is a good opportunity for pure topologists to see how we can use TDA *in practice*. It will be even better for the applied mathematicians who can promptly recognize the tools and algorithms I am using.

@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>2&nbsp; Introduction – TDA Workshop - EBT 2024</title>
+<title>1&nbsp; Introduction – TDA Workshop - EBT 2024</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -54,7 +54,27 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="site_libs/quarto-nav/quarto-nav.js"></script>
@@ -147,7 +167,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./introduction.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Introduction</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./introduction.html"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -182,25 +202,42 @@ window.Quarto = {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">TDA workshop - 2024</span></span></a>
+ <span class="menu-text">Welcome!</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./introduction.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Introduction</span></span></a>
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></span></a>
   </div>
 </li>
-        <li class="sidebar-item">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part 1: Persistence homology</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./getting started.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Getting started</span></span></a>
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Getting started</span></span></a>
   </div>
 </li>
-        <li class="sidebar-item">
+          <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./3d-shapes.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">3d shape classification using persistent homology</span></span></a>
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">3d shape classification using persistent homology</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
   </div>
 </li>
     </ul>
@@ -213,11 +250,11 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#why-julia" id="toc-why-julia" class="nav-link active" data-scroll-target="#why-julia"><span class="header-section-number">2.1</span> Why Julia?</a>
+  <li><a href="#why-julia" id="toc-why-julia" class="nav-link active" data-scroll-target="#why-julia"><span class="header-section-number">1.1</span> Why Julia?</a>
   <ul>
-  <li><a href="#speed" id="toc-speed" class="nav-link" data-scroll-target="#speed"><span class="header-section-number">2.1.1</span> Speed</a></li>
-  <li><a href="#use-other-languages" id="toc-use-other-languages" class="nav-link" data-scroll-target="#use-other-languages"><span class="header-section-number">2.1.2</span> Use other languages</a></li>
-  <li><a href="#mathematical-syntax" id="toc-mathematical-syntax" class="nav-link" data-scroll-target="#mathematical-syntax"><span class="header-section-number">2.1.3</span> Mathematical syntax</a>
+  <li><a href="#speed" id="toc-speed" class="nav-link" data-scroll-target="#speed"><span class="header-section-number">1.1.1</span> Speed</a></li>
+  <li><a href="#use-other-languages" id="toc-use-other-languages" class="nav-link" data-scroll-target="#use-other-languages"><span class="header-section-number">1.1.2</span> Use other languages</a></li>
+  <li><a href="#mathematical-syntax" id="toc-mathematical-syntax" class="nav-link" data-scroll-target="#mathematical-syntax"><span class="header-section-number">1.1.3</span> Mathematical syntax</a>
   <ul class="collapse">
   <li><a href="#latex-symbols" id="toc-latex-symbols" class="nav-link" data-scroll-target="#latex-symbols">LaTeX symbols</a></li>
   <li><a href="#broadcasting" id="toc-broadcasting" class="nav-link" data-scroll-target="#broadcasting">Broadcasting</a></li>
@@ -225,13 +262,13 @@ window.Quarto = {
   <li><a href="#functional-programming" id="toc-functional-programming" class="nav-link" data-scroll-target="#functional-programming">Functional programming</a></li>
   </ul></li>
   </ul></li>
-  <li><a href="#why-tda" id="toc-why-tda" class="nav-link" data-scroll-target="#why-tda"><span class="header-section-number">2.2</span> Why TDA?</a>
+  <li><a href="#why-tda" id="toc-why-tda" class="nav-link" data-scroll-target="#why-tda"><span class="header-section-number">1.2</span> Why TDA?</a>
   <ul>
-  <li><a href="#homological-methods" id="toc-homological-methods" class="nav-link" data-scroll-target="#homological-methods"><span class="header-section-number">2.2.1</span> Homological methods</a></li>
-  <li><a href="#graph-reduction-methods" id="toc-graph-reduction-methods" class="nav-link" data-scroll-target="#graph-reduction-methods"><span class="header-section-number">2.2.2</span> Graph reduction methods</a></li>
-  <li><a href="#clustering-methods" id="toc-clustering-methods" class="nav-link" data-scroll-target="#clustering-methods"><span class="header-section-number">2.2.3</span> Clustering methods</a></li>
+  <li><a href="#homological-methods" id="toc-homological-methods" class="nav-link" data-scroll-target="#homological-methods"><span class="header-section-number">1.2.1</span> Homological methods</a></li>
+  <li><a href="#graph-reduction-methods" id="toc-graph-reduction-methods" class="nav-link" data-scroll-target="#graph-reduction-methods"><span class="header-section-number">1.2.2</span> Graph reduction methods</a></li>
+  <li><a href="#clustering-methods" id="toc-clustering-methods" class="nav-link" data-scroll-target="#clustering-methods"><span class="header-section-number">1.2.3</span> Clustering methods</a></li>
   </ul></li>
-  <li><a href="#why-this-minicourse" id="toc-why-this-minicourse" class="nav-link" data-scroll-target="#why-this-minicourse"><span class="header-section-number">2.3</span> Why this minicourse?</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 </nav>
     </div>
@@ -240,7 +277,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Introduction</span></h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+<div class="quarto-title-block"><div><h1 class="title"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
 </div>
 
 
@@ -257,11 +294,11 @@ window.Quarto = {
 </header>
 
 
-<section id="why-julia" class="level2" data-number="2.1">
-<h2 data-number="2.1" class="anchored" data-anchor-id="why-julia"><span class="header-section-number">2.1</span> Why Julia?</h2>
+<section id="why-julia" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="why-julia"><span class="header-section-number">1.1</span> Why Julia?</h2>
 <p>In a world ruled by Python (and, in some areas, R), why use an exquisite and new language like <a href="https://julialang.org/">Julia</a> in this workshop? You can find some good reasons in the book <a href="https://juliadatascience.io/programmers">Julia Data Science</a>, but I will give some in the context of topology:</p>
-<section id="speed" class="level3" data-number="2.1.1">
-<h3 data-number="2.1.1" class="anchored" data-anchor-id="speed"><span class="header-section-number">2.1.1</span> Speed</h3>
+<section id="speed" class="level3" data-number="1.1.1">
+<h3 data-number="1.1.1" class="anchored" data-anchor-id="speed"><span class="header-section-number">1.1.1</span> Speed</h3>
 <div class="callout callout-style-simple callout-tip" title="">
 <div class="callout-body d-flex">
 <div class="callout-icon-container">
@@ -286,8 +323,8 @@ window.Quarto = {
 </figure>
 </div>
 </section>
-<section id="use-other-languages" class="level3" data-number="2.1.2">
-<h3 data-number="2.1.2" class="anchored" data-anchor-id="use-other-languages"><span class="header-section-number">2.1.2</span> Use other languages</h3>
+<section id="use-other-languages" class="level3" data-number="1.1.2">
+<h3 data-number="1.1.2" class="anchored" data-anchor-id="use-other-languages"><span class="header-section-number">1.1.2</span> Use other languages</h3>
 <div class="callout callout-style-simple callout-tip" title="">
 <div class="callout-body d-flex">
 <div class="callout-icon-container">
@@ -300,8 +337,8 @@ window.Quarto = {
 </div>
 <p>Even though Julia is fast and has a robust ecosystem, Python and R have many more packages already good-to-go. You can use them easily with tools like <a href="https://github.com/JuliaPy/PythonCall.jl">PythonCall</a> or <a href="https://github.com/JuliaInterop/RCall.jl">RCall</a>.</p>
 </section>
-<section id="mathematical-syntax" class="level3" data-number="2.1.3">
-<h3 data-number="2.1.3" class="anchored" data-anchor-id="mathematical-syntax"><span class="header-section-number">2.1.3</span> Mathematical syntax</h3>
+<section id="mathematical-syntax" class="level3" data-number="1.1.3">
+<h3 data-number="1.1.3" class="anchored" data-anchor-id="mathematical-syntax"><span class="header-section-number">1.1.3</span> Mathematical syntax</h3>
 <div class="callout callout-style-simple callout-tip" title="">
 <div class="callout-body d-flex">
 <div class="callout-icon-container">
@@ -510,12 +547,12 @@ window.Quarto = {
 </section>
 </section>
 </section>
-<section id="why-tda" class="level2" data-number="2.2">
-<h2 data-number="2.2" class="anchored" data-anchor-id="why-tda"><span class="header-section-number">2.2</span> Why TDA?</h2>
-<p>Topological Data Analysis is a very curious field of mathematics that apply tools from topology and algebraic topology in the study of datasets. By “datasets”, we almost always mean “finite metric space”.</p>
+<section id="why-tda" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="why-tda"><span class="header-section-number">1.2</span> Why TDA?</h2>
+<p>Topological Data Analysis is a eccentric field of mathematics that applies tools from topology and algebraic topology on the study of datasets. By “datasets”, we almost always mean “finite metric space”.</p>
 <p>These tools can be divided in some broad categories:</p>
-<section id="homological-methods" class="level3" data-number="2.2.1">
-<h3 data-number="2.2.1" class="anchored" data-anchor-id="homological-methods"><span class="header-section-number">2.2.1</span> Homological methods</h3>
+<section id="homological-methods" class="level3" data-number="1.2.1">
+<h3 data-number="1.2.1" class="anchored" data-anchor-id="homological-methods"><span class="header-section-number">1.2.1</span> Homological methods</h3>
 <p>Persistence homology calculates the “shape” (homology groups) of a object on different scales, and compact this information into objects called “barcodes”. This barcode can be vectorized and then inserted into machine learning models.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -524,9 +561,9 @@ window.Quarto = {
 </figure>
 </div>
 </section>
-<section id="graph-reduction-methods" class="level3" data-number="2.2.2">
-<h3 data-number="2.2.2" class="anchored" data-anchor-id="graph-reduction-methods"><span class="header-section-number">2.2.2</span> Graph reduction methods</h3>
-<p>The Mapper algorithm is the discrete version of the <a href="https://en.wikipedia.org/wiki/Reeb_graph">Reeb graph</a>. It captures the geometry of a dataset with respect to a given function (called “filter”) and produce a graph of its pre-images clustered. There is also the Ball Mapper variant, which does not need a filter function and resembles the Vietoris-Rips filtration. These methods are useful to get a glimpse of the geometry (flares, holes) and areas of interest. For example: if your metric space is a dataset of measurements of patients with diabets, the Mapper graph can represent the patients and the shape of this graph can give insights about the type of diabetes one has.</p>
+<section id="graph-reduction-methods" class="level3" data-number="1.2.2">
+<h3 data-number="1.2.2" class="anchored" data-anchor-id="graph-reduction-methods"><span class="header-section-number">1.2.2</span> Graph reduction methods</h3>
+<p>The Mapper algorithm <span class="citation" data-cites="singh2007topological">(see <a href="references.html#ref-singh2007topological" role="doc-biblioref">Singh et al. 2007</a>)</span> is the discrete version of the <a href="https://en.wikipedia.org/wiki/Reeb_graph">Reeb graph</a>. It captures the geometry of a dataset with respect to a given function (called “filter”) and produce a graph of its pre-images clustered. There is also the Ball Mapper variant <span class="citation" data-cites="dlotko2019ball">(see <a href="references.html#ref-dlotko2019ball" role="doc-biblioref">Dłotko 2019</a>)</span>, which does not need a filter function and resembles the Vietoris-Rips filtration. These methods are useful to get a glimpse of the geometry (flares, holes) and areas of interest. For example: if your metric space is a dataset of measurements of patients with diabets, the Mapper graph can represent the patients and the shape of this graph can give insights about the type of diabetes one has.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="images/intro/mapper.png" class="img-fluid figure-img"></p>
@@ -534,9 +571,9 @@ window.Quarto = {
 </figure>
 </div>
 </section>
-<section id="clustering-methods" class="level3" data-number="2.2.3">
-<h3 data-number="2.2.3" class="anchored" data-anchor-id="clustering-methods"><span class="header-section-number">2.2.3</span> Clustering methods</h3>
-<p>Algorithms like ToMATo are clustering algorithms: we have a metric space as input, and return a partition of this dataset. Clustering is useful whenever we need to “group a set of objects in such a way that objects in the same group (called a cluster) are more similar to each other than to those in other groups (clusters)”<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p>
+<section id="clustering-methods" class="level3" data-number="1.2.3">
+<h3 data-number="1.2.3" class="anchored" data-anchor-id="clustering-methods"><span class="header-section-number">1.2.3</span> Clustering methods</h3>
+<p>Algorithms like ToMATo <span class="citation" data-cites="chazal2013persistence">(see <a href="references.html#ref-chazal2013persistence" role="doc-biblioref">Chazal et al. 2013</a>)</span> are <em>clustering algorithms</em>: we have a metric space as input, and return a (disjoint) partition of this dataset. Clustering is useful whenever we need to “group a set of objects in such a way that objects in the same group (called a cluster) are more similar to each other than to those in other groups (clusters)”<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="images/intro/tomato.png" class="img-fluid figure-img"></p>
@@ -545,9 +582,19 @@ window.Quarto = {
 </div>
 </section>
 </section>
-<section id="why-this-minicourse" class="level2" data-number="2.3">
-<h2 data-number="2.3" class="anchored" data-anchor-id="why-this-minicourse"><span class="header-section-number">2.3</span> Why this minicourse?</h2>
-<p>This minicourse is a good opportunity for pure topologists to see how we can use TDA <em>in practice</em>. It will be even better for the applied mathematicians who can promptly recognize the tools and algorithms I am using.</p>
+<section id="references" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="references">References</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-chazal2013persistence" class="csl-entry" role="listitem">
+Chazal, Frédéric, Leonidas J Guibas, Steve Y Oudot, and Primoz Skraba. 2013. <span>“Persistence-Based Clustering in Riemannian Manifolds.”</span> <em>Journal of the ACM (JACM)</em> 60 (6): 1–38.
+</div>
+<div id="ref-dlotko2019ball" class="csl-entry" role="listitem">
+Dłotko, Paweł. 2019. <span>“Ball Mapper: A Shape Summary for Topological Data Analysis.”</span> <em>arXiv Preprint arXiv:1901.07410</em>.
+</div>
+<div id="ref-singh2007topological" class="csl-entry" role="listitem">
+Singh, Gurjeet, Facundo Mémoli, Gunnar E Carlsson, et al. 2007. <span>“Topological Methods for the Analysis of High Dimensional Data Sets and 3d Object Recognition.”</span> <em>PBG@ Eurographics</em> 2: 091–100.
+</div>
+</div>
 
 
 <!-- -->
@@ -556,7 +603,7 @@ window.Quarto = {
 <section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
 <hr>
 <ol>
-<li id="fn1"><p>https://en.wikipedia.org/wiki/Cluster_analysis<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p><a href="https://en.wikipedia.org/wiki/Cluster_analysis">https://en.wikipedia.org/wiki/Cluster_analysis</a><a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
 
@@ -1034,13 +1081,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation column-body">
   <div class="nav-page nav-page-previous">
-      <a href="./index.html" class="pagination-link" aria-label="TDA workshop - 2024">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">TDA workshop - 2024</span></span>
+      <a href="./index.html" class="pagination-link" aria-label="Welcome!">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Welcome!</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="./getting started.html" class="pagination-link" aria-label="Getting started">
-        <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Getting started</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Getting started</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
@@ -1203,7 +1250,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb28-185"><a href="#cb28-185" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb28-186"><a href="#cb28-186" aria-hidden="true" tabindex="-1"></a><span class="fu">## Why TDA?</span></span>
 <span id="cb28-187"><a href="#cb28-187" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-188"><a href="#cb28-188" aria-hidden="true" tabindex="-1"></a>Topological Data Analysis is a very curious field of mathematics that apply tools from topology and algebraic topology in the study of datasets. By "datasets", we almost always mean "finite metric space".</span>
+<span id="cb28-188"><a href="#cb28-188" aria-hidden="true" tabindex="-1"></a>Topological Data Analysis is a eccentric field of mathematics that applies tools from topology and algebraic topology on the study of datasets. By "datasets", we almost always mean "finite metric space".</span>
 <span id="cb28-189"><a href="#cb28-189" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb28-190"><a href="#cb28-190" aria-hidden="true" tabindex="-1"></a>These tools can be divided in some broad categories:</span>
 <span id="cb28-191"><a href="#cb28-191" aria-hidden="true" tabindex="-1"></a></span>
@@ -1215,19 +1262,15 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb28-197"><a href="#cb28-197" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb28-198"><a href="#cb28-198" aria-hidden="true" tabindex="-1"></a><span class="fu">### Graph reduction methods</span></span>
 <span id="cb28-199"><a href="#cb28-199" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-200"><a href="#cb28-200" aria-hidden="true" tabindex="-1"></a>The Mapper algorithm is the discrete version of the <span class="co">[</span><span class="ot">Reeb graph</span><span class="co">](https://en.wikipedia.org/wiki/Reeb_graph)</span>. It captures the geometry of a dataset with respect to a given function (called "filter") and produce a graph of its pre-images clustered. There is also the Ball Mapper variant, which does not need a filter function and resembles the Vietoris-Rips filtration. These methods are useful to get a glimpse of the geometry (flares, holes) and areas of interest. For example: if your metric space is a dataset of measurements of patients with diabets, the Mapper graph can represent the patients and the shape of this graph can give insights about the type of diabetes one has.</span>
+<span id="cb28-200"><a href="#cb28-200" aria-hidden="true" tabindex="-1"></a>The Mapper algorithm <span class="co">[</span><span class="ot">see @singh2007topological</span><span class="co">]</span> is the discrete version of the <span class="co">[</span><span class="ot">Reeb graph</span><span class="co">](https://en.wikipedia.org/wiki/Reeb_graph)</span>. It captures the geometry of a dataset with respect to a given function (called "filter") and produce a graph of its pre-images clustered. There is also the Ball Mapper variant <span class="co">[</span><span class="ot">see @dlotko2019ball</span><span class="co">]</span>, which does not need a filter function and resembles the Vietoris-Rips filtration. These methods are useful to get a glimpse of the geometry (flares, holes) and areas of interest. For example: if your metric space is a dataset of measurements of patients with diabets, the Mapper graph can represent the patients and the shape of this graph can give insights about the type of diabetes one has.</span>
 <span id="cb28-201"><a href="#cb28-201" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb28-202"><a href="#cb28-202" aria-hidden="true" tabindex="-1"></a><span class="al">![The Mapper graph of some 3d-shapes retain some of the original geometry.](images/intro/mapper.png)</span></span>
 <span id="cb28-203"><a href="#cb28-203" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb28-204"><a href="#cb28-204" aria-hidden="true" tabindex="-1"></a><span class="fu">### Clustering methods</span></span>
 <span id="cb28-205"><a href="#cb28-205" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-206"><a href="#cb28-206" aria-hidden="true" tabindex="-1"></a>Algorithms like ToMATo are clustering algorithms: we have a metric space as input, and return a partition of this dataset. Clustering is useful whenever we need to "group a set of objects in such a way that objects in the same group (called a cluster) are more similar to each other than to those in other groups (clusters)"^<span class="co">[</span><span class="ot">https://en.wikipedia.org/wiki/Cluster_analysis</span><span class="co">]</span>.</span>
+<span id="cb28-206"><a href="#cb28-206" aria-hidden="true" tabindex="-1"></a>Algorithms like ToMATo <span class="co">[</span><span class="ot">see @chazal2013persistence</span><span class="co">]</span> are _clustering algorithms_: we have a metric space as input, and return a (disjoint) partition of this dataset. Clustering is useful whenever we need to "group a set of objects in such a way that objects in the same group (called a cluster) are more similar to each other than to those in other groups (clusters)"^[<span class="co">[</span><span class="ot">https://en.wikipedia.org/wiki/Cluster_analysis</span><span class="co">](https://en.wikipedia.org/wiki/Cluster_analysis)</span>].</span>
 <span id="cb28-207"><a href="#cb28-207" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb28-208"><a href="#cb28-208" aria-hidden="true" tabindex="-1"></a><span class="al">![ToMATo is a persistence-based clustering algorithm.](images/intro/tomato.png)</span></span>
-<span id="cb28-209"><a href="#cb28-209" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-210"><a href="#cb28-210" aria-hidden="true" tabindex="-1"></a><span class="fu">## Why this minicourse?</span></span>
-<span id="cb28-211"><a href="#cb28-211" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-212"><a href="#cb28-212" aria-hidden="true" tabindex="-1"></a>This minicourse is a good opportunity for pure topologists to see how we can use TDA *in practice*. It will be even better for the applied mathematicians who can promptly recognize the tools and algorithms I am using.</span>
 </code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

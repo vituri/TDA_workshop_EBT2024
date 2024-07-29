@@ -2,13 +2,20 @@
 jupyter: julia-1.10
 ---
 
-# TDA workshop - 2024
+# Welcome! {.unnumbered}
 
 ![](images/ebt.png)
 
-This repository will hold all materials necessary to the Topological Data Analysis workshop, which will be presented at the [Encontro Brasileiro de Topologia](https://xxiiiebt.ime.ufba.br/) in July 2024.
+This digital book and the corresponding repository will hold all materials necessary to the Topological Data Analysis workshop, presented at the [Encontro Brasileiro de Topologia](https://xxiiiebt.ime.ufba.br/) (Brazilian Topology Meeting) in July 2024.
 
 ## Goals
+
+The main goal of this minicourse is to get more people in Brazil (and elsewhere) applying TDA. There are several ways to do that: 
+
+- Write a book about applied TDA. I [have one in progress](https://vituri.github.io/TDA_with_julia/digits.html) and need more authors!
+- Write more articles about applications, even if basic. Spread the word!
+- Contribute to the [JuliaTDA](https://github.com/JuliaTDA) organization on github.^[Coincidentally, I am the creator of this org. Que mundo pequeno!]
+- Start analyzing real world datasets with the help of data scientists and publish some cool papers!
 
 At the end of this minicourse, you (hopefully) will be able to:
 
@@ -63,10 +70,4 @@ In this minicourse, we will explore the practical aspects of Topological Data An
 - Machine learning basics: why "pure TDA" is not enough? Classifiers and regression problems.
 - TDA like a pro: Try to reproduce some results found in famous TDA papers.
 
-The minicourse will be more useful if the attendee is able to run code in its own computer along with the explanations (although this is not a prerequisite). The complete instructions and code used are available at https://github.com/vituri/TDA_workshop_EBT2024. The material presented is available as a Quarto book at https://vituri.github.io/TDA_workshop_EBT2024/.
-
-# To-do: 
-
-- explain how to source a project with its dependencies;
-- create the .qmd files
-- export the files also as plain code
+The minicourse will be more useful if the attendee is able to run code in its own computer along with the explanations (although this is not a prerequisite). The complete instructions and code used are available at [https://github.com/vituri/TDA_workshop_EBT2024](https://github.com/vituri/TDA_workshop_EBT2024). The material presented is available as a Quarto book at [https://vituri.github.io/TDA_workshop_EBT2024/](https://vituri.github.io/TDA_workshop_EBT2024/).

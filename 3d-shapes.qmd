@@ -7,7 +7,7 @@ execute:
   warning: false
 ---
 
-# 3d shape classification using persistent homology
+# 3d shape classification
 
 In this lesson, we will explore a 3d-shape classification problem using some experimental approaches.
 

@@ -41,7 +41,7 @@ $$
 
 
 
-![The Vietoris-Rips filtration of a metric space (on the left of each panel). As $\epsilon$ increases, so do the amount of simplexes we have. Source: @vr.](images/getting-started/vr.png)
+![The Vietoris-Rips filtration of a metric space (on the left of each panel). As $\epsilon$ increases, so do the amount of simplexes we have. [@vr].](images/getting-started/vr.png)
 
 There are some other simplicial complex constructions like the Alpha complex or the Cech complex, but the Vietoris-Rips has a good algorithm to calculate its homology.
 
@@ -69,7 +69,7 @@ called a _persistent vector space_.
 
 ### Simplifying 
 
-Some very nice theorems (see @oudot2017persistence for a complete exposition) prove that a persistent vector space can be decomposed as a sum of _interval modules_, which are the fundamental blocks of persistent vector spaces. Each one of these blocks represent the birth and death of a generator. Thus, $\mathbb{V}(M)$ can summarised in two equivalent ways:
+Some very nice theorems [see @oudot2017persistence for a really complete material] prove that a persistent vector space can be decomposed as a sum of _interval modules_, which are the fundamental blocks of persistent vector spaces. Each one of these blocks represent the birth and death of a generator. Thus, $\mathbb{V}(M)$ can summarised in two equivalent ways:
 
 - as a _barcode_: a (multi)set of real intervals $\{ [a_i, b_i) \subset \mathbb{R}, \; i \in I \}$.
 
@@ -79,7 +79,7 @@ Each pair $(a_i, b_i)$ can be interpreted as follows: $a_i$ is the value of $\ep
 
 We will use both these representations many times.
 
-![A Vietoris-Rips filtration and its respective barcode. Vertical lines represent "slices" at some values of $\epsilon$. Source: @ghrist2008barcodes.](images/getting-started/ph.png)
+![A Vietoris-Rips filtration and its respective barcode. Vertical lines represent "slices" at some values of $\epsilon$. [Source: @ghrist2008barcodes].](images/getting-started/ph.png)
 
 ### Distances on persistence diagrams and stability
 
@@ -168,7 +168,7 @@ gl.scatter(X)
 
 ```{julia}
 #| eval: true
-bv = Ripserer.ripserer(X, dim_max = 1)
+bc = Ripserer.ripserer(X, dim_max = 1)
 plot_barcode(bc)
 ```
 
@@ -233,7 +233,7 @@ There are several ways to do that!
 
 ### Persistence images 
 
-Persistence images is a technique that transform a set of barcodes into nxn matrices with values from 0 to 1. See @adams2017persistence for more detailes.
+Persistence images is a technique that transform a set of barcodes into nxn matrices with values from 0 to 1 [see @adams2017persistence for more details].
 
 The idea is the following:
 

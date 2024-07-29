@@ -24,8 +24,12 @@ book:
   chapters:
     - index.qmd
     - introduction.qmd
-    - "getting started.qmd"
-    - 3d-shapes.qmd
+    - part: "Part 1: Persistence homology"
+      chapters:
+      - "getting started.qmd"
+      - 3d-shapes.qmd
+      - digits.qmd
+    - references.qmd
 
 format:
   html:
