@@ -13,7 +13,11 @@ In this lesson, we will explore a 3d-shape classification problem using some exp
 
 ## The dataset
 
-The dataset we are using can be found at [http://people.csail.mit.edu/sumner/research/deftransfer/data.html](http://people.csail.mit.edu/sumner/research/deftransfer/data.html). It consists of some reference pose of animals and human faces. The files used in this lesson can be found [in this Google drive](https://drive.google.com/drive/folders/1YCx80qTvyDvunPJ8f6Ae8w6tdRz0QLy2?usp=sharing). After downloading it, unzip the file and put then inside a directory called "meshes".
+To get in touch with the classics, we are going to use the 3d shape dataset seen in [@singh2007topological].
+
+![In [@singh2007topological] the authors used two different methods to cluster the different 3d shapes: an approximation to the Gromov Hausdorff distance, and a distance on the Mapper graph of each shape. Here in this chapter, we are going to use persistent homology.](images/3d-shapes/mapper.png)
+
+The dataset can be found at [http://people.csail.mit.edu/sumner/research/deftransfer/data.html](http://people.csail.mit.edu/sumner/research/deftransfer/data.html). It consists of some reference pose of animals and human faces. The files used in this lesson can be found [in this Google drive](https://drive.google.com/drive/folders/1YCx80qTvyDvunPJ8f6Ae8w6tdRz0QLy2?usp=sharing). After downloading it, unzip the file and put then inside a directory called "meshes".
 
 The files are written in the ".obj" format. They are *meshes*: sets of points and triangles that form a 3d image like the ones we can see in videogames.
 
@@ -22,7 +26,7 @@ Let's start with a flamingo shape. We load some libraries
 ```{julia}
 # read meshes and plot
 using Meshes, GeoIO
-import GLMakie as gl
+import CairoMakie as gl
 
 # see progress
 using ProgressMeter
@@ -101,39 +105,6 @@ and see its details:
 
 ![](images/3d-shapes/flamingo-details.png)
 
-We can see some variations of the initial pose:
-
-```{julia}
-ms2 = read_mesh("meshes/flamingo-poses/flam-01.obj")
-
-plot_mesh(ms2)
-```
-
-```{julia}
-ms2 = read_mesh("meshes/flamingo-poses/flam-02.obj")
-
-plot_mesh(ms2)
-```
-
-```{julia}
-ms2 = read_mesh("meshes/flamingo-poses/flam-03.obj")
-
-plot_mesh(ms2)
-```
-
-And also some other animals:
-
-```{julia}
-ms2 = read_mesh("meshes/lion-poses/lion-reference.obj")
-
-plot_mesh(ms2)
-```
-
-```{julia}
-ms2 = read_mesh("meshes/cat-poses/cat-reference.obj")
-
-plot_mesh(ms2)
-```
 
 ## Plotting {#sec-3d-plotting}
 
