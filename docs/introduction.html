@@ -182,7 +182,7 @@ window.Quarto = {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Topological Data Analysis workshop - 2024</span></span></a>
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">TDA workshop - 2024</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -213,7 +213,7 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#why-julia-for-topological-data-analysis" id="toc-why-julia-for-topological-data-analysis" class="nav-link active" data-scroll-target="#why-julia-for-topological-data-analysis"><span class="header-section-number">2.1</span> Why Julia for topological data analysis?</a>
+  <li><a href="#why-julia" id="toc-why-julia" class="nav-link active" data-scroll-target="#why-julia"><span class="header-section-number">2.1</span> Why Julia?</a>
   <ul>
   <li><a href="#speed" id="toc-speed" class="nav-link" data-scroll-target="#speed"><span class="header-section-number">2.1.1</span> Speed</a></li>
   <li><a href="#use-other-languages" id="toc-use-other-languages" class="nav-link" data-scroll-target="#use-other-languages"><span class="header-section-number">2.1.2</span> Use other languages</a></li>
@@ -257,8 +257,8 @@ window.Quarto = {
 </header>
 
 
-<section id="why-julia-for-topological-data-analysis" class="level2" data-number="2.1">
-<h2 data-number="2.1" class="anchored" data-anchor-id="why-julia-for-topological-data-analysis"><span class="header-section-number">2.1</span> Why Julia for topological data analysis?</h2>
+<section id="why-julia" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="why-julia"><span class="header-section-number">2.1</span> Why Julia?</h2>
 <p>In a world ruled by Python (and, in some areas, R), why use an exquisite and new language like <a href="https://julialang.org/">Julia</a> in this workshop? You can find some good reasons in the book <a href="https://juliadatascience.io/programmers">Julia Data Science</a>, but I will give some in the context of topology:</p>
 <section id="speed" class="level3" data-number="2.1.1">
 <h3 data-number="2.1.1" class="anchored" data-anchor-id="speed"><span class="header-section-number">2.1.1</span> Speed</h3>
@@ -272,7 +272,7 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<p>Let’s say you read about a new algorithm to calculate the Vietoris-Rips. If you are a R/Python user, <em>your algorithm won’t be written in R/Python</em> simply because R/Python is slow. Fast code in R/Python is written in C, C++, Fortran or Rust; this is called the <a href="https://juliadatascience.io/julia_accomplish#sec:two_language">two language problem</a>. Julia solves this because with enought knowledge about the compiler and the language, you will get performance nearly as good as if it was written in C. Optimize Julia code is not a trivial task, but is way easier than learning another language just to get good performance in some functions.</p>
+<p>Let’s say you read about a new algorithm to calculate the Vietoris-Rips. If you are a R/Python user, <em>your algorithm won’t be written in R/Python</em> simply because R/Python is slow. Fast code in R/Python is written in C, C++, Fortran or Rust; this is called the <a href="https://juliadatascience.io/julia_accomplish#sec:two_language">two language problem</a>. Julia solves this because with enought knowledge about the compiler and the language, you will get performance nearly as good as if it was written in C. Optimizing Julia code is not a trivial task, but is way easier than learning another language just to get good performance in some functions.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="images/intro/torch.png" class="img-fluid figure-img"></p>
@@ -517,14 +517,32 @@ window.Quarto = {
 <section id="homological-methods" class="level3" data-number="2.2.1">
 <h3 data-number="2.2.1" class="anchored" data-anchor-id="homological-methods"><span class="header-section-number">2.2.1</span> Homological methods</h3>
 <p>Persistence homology calculates the “shape” (homology groups) of a object on different scales, and compact this information into objects called “barcodes”. This barcode can be vectorized and then inserted into machine learning models.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/getting-started/ph.png" class="img-fluid figure-img"></p>
+<figcaption>The shape of data can be summarised as a barcode.</figcaption>
+</figure>
+</div>
 </section>
 <section id="graph-reduction-methods" class="level3" data-number="2.2.2">
 <h3 data-number="2.2.2" class="anchored" data-anchor-id="graph-reduction-methods"><span class="header-section-number">2.2.2</span> Graph reduction methods</h3>
 <p>The Mapper algorithm is the discrete version of the <a href="https://en.wikipedia.org/wiki/Reeb_graph">Reeb graph</a>. It captures the geometry of a dataset with respect to a given function (called “filter”) and produce a graph of its pre-images clustered. There is also the Ball Mapper variant, which does not need a filter function and resembles the Vietoris-Rips filtration. These methods are useful to get a glimpse of the geometry (flares, holes) and areas of interest. For example: if your metric space is a dataset of measurements of patients with diabets, the Mapper graph can represent the patients and the shape of this graph can give insights about the type of diabetes one has.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/intro/mapper.png" class="img-fluid figure-img"></p>
+<figcaption>The Mapper graph of some 3d-shapes retain some of the original geometry.</figcaption>
+</figure>
+</div>
 </section>
 <section id="clustering-methods" class="level3" data-number="2.2.3">
 <h3 data-number="2.2.3" class="anchored" data-anchor-id="clustering-methods"><span class="header-section-number">2.2.3</span> Clustering methods</h3>
 <p>Algorithms like ToMATo are clustering algorithms: we have a metric space as input, and return a partition of this dataset. Clustering is useful whenever we need to “group a set of objects in such a way that objects in the same group (called a cluster) are more similar to each other than to those in other groups (clusters)”<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/intro/tomato.png" class="img-fluid figure-img"></p>
+<figcaption>ToMATo is a persistence-based clustering algorithm.</figcaption>
+</figure>
+</div>
 </section>
 </section>
 <section id="why-this-minicourse" class="level2" data-number="2.3">
@@ -1016,8 +1034,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation column-body">
   <div class="nav-page nav-page-previous">
-      <a href="./index.html" class="pagination-link" aria-label="Topological Data Analysis workshop - 2024">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Topological Data Analysis workshop - 2024</span></span>
+      <a href="./index.html" class="pagination-link" aria-label="TDA workshop - 2024">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">TDA workshop - 2024</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
@@ -1032,7 +1050,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="fu"># Introduction</span></span>
 <span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="fu">## Why Julia for topological data analysis?</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="fu">## Why Julia?</span></span>
 <span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>In a world ruled by Python (and, in some areas, R), why use an exquisite and new language like <span class="co">[</span><span class="ot">Julia</span><span class="co">](https://julialang.org/)</span> in this workshop? You can find some good reasons in the book <span class="co">[</span><span class="ot">Julia Data Science</span><span class="co">](https://juliadatascience.io/programmers)</span>, but I will give some in the context of topology:</span>
 <span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a></span>
@@ -1044,7 +1062,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>Let's say you read about a new algorithm to calculate the Vietoris-Rips. If you are a R/Python user, *your algorithm won't be written in R/Python* simply because R/Python is slow. Fast code in R/Python is written in C, C++, Fortran or Rust; this is called the <span class="co">[</span><span class="ot">two language problem</span><span class="co">](https://juliadatascience.io/julia_accomplish#sec:two_language)</span>. Julia solves this because with enought knowledge about the compiler and the language, you will get performance nearly as good as if it was written in C. Optimize Julia code is not a trivial task, but is way easier than learning another language just to get good performance in some functions.</span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>Let's say you read about a new algorithm to calculate the Vietoris-Rips. If you are a R/Python user, *your algorithm won't be written in R/Python* simply because R/Python is slow. Fast code in R/Python is written in C, C++, Fortran or Rust; this is called the <span class="co">[</span><span class="ot">two language problem</span><span class="co">](https://juliadatascience.io/julia_accomplish#sec:two_language)</span>. Julia solves this because with enought knowledge about the compiler and the language, you will get performance nearly as good as if it was written in C. Optimizing Julia code is not a trivial task, but is way easier than learning another language just to get good performance in some functions.</span>
 <span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a>!<span class="co">[</span><span class="ot">The famous deep learning package [`torch`](https://github.com/pytorch/pytorch) in Python has its core written mostly in C++. Python is just a "glue" interface.</span><span class="co">](images/intro/torch.png)</span></span>
 <span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a></span>
@@ -1193,17 +1211,23 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb28-193"><a href="#cb28-193" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb28-194"><a href="#cb28-194" aria-hidden="true" tabindex="-1"></a>Persistence homology calculates the "shape" (homology groups) of a object on different scales, and compact this information into objects called "barcodes". This barcode can be vectorized and then inserted into machine learning models.</span>
 <span id="cb28-195"><a href="#cb28-195" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-196"><a href="#cb28-196" aria-hidden="true" tabindex="-1"></a><span class="fu">### Graph reduction methods</span></span>
+<span id="cb28-196"><a href="#cb28-196" aria-hidden="true" tabindex="-1"></a><span class="al">![The shape of data can be summarised as a barcode.](images/getting-started/ph.png)</span></span>
 <span id="cb28-197"><a href="#cb28-197" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-198"><a href="#cb28-198" aria-hidden="true" tabindex="-1"></a>The Mapper algorithm is the discrete version of the <span class="co">[</span><span class="ot">Reeb graph</span><span class="co">](https://en.wikipedia.org/wiki/Reeb_graph)</span>. It captures the geometry of a dataset with respect to a given function (called "filter") and produce a graph of its pre-images clustered. There is also the Ball Mapper variant, which does not need a filter function and resembles the Vietoris-Rips filtration. These methods are useful to get a glimpse of the geometry (flares, holes) and areas of interest. For example: if your metric space is a dataset of measurements of patients with diabets, the Mapper graph can represent the patients and the shape of this graph can give insights about the type of diabetes one has.</span>
+<span id="cb28-198"><a href="#cb28-198" aria-hidden="true" tabindex="-1"></a><span class="fu">### Graph reduction methods</span></span>
 <span id="cb28-199"><a href="#cb28-199" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-200"><a href="#cb28-200" aria-hidden="true" tabindex="-1"></a><span class="fu">### Clustering methods</span></span>
+<span id="cb28-200"><a href="#cb28-200" aria-hidden="true" tabindex="-1"></a>The Mapper algorithm is the discrete version of the <span class="co">[</span><span class="ot">Reeb graph</span><span class="co">](https://en.wikipedia.org/wiki/Reeb_graph)</span>. It captures the geometry of a dataset with respect to a given function (called "filter") and produce a graph of its pre-images clustered. There is also the Ball Mapper variant, which does not need a filter function and resembles the Vietoris-Rips filtration. These methods are useful to get a glimpse of the geometry (flares, holes) and areas of interest. For example: if your metric space is a dataset of measurements of patients with diabets, the Mapper graph can represent the patients and the shape of this graph can give insights about the type of diabetes one has.</span>
 <span id="cb28-201"><a href="#cb28-201" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-202"><a href="#cb28-202" aria-hidden="true" tabindex="-1"></a>Algorithms like ToMATo are clustering algorithms: we have a metric space as input, and return a partition of this dataset. Clustering is useful whenever we need to "group a set of objects in such a way that objects in the same group (called a cluster) are more similar to each other than to those in other groups (clusters)"^<span class="co">[</span><span class="ot">https://en.wikipedia.org/wiki/Cluster_analysis</span><span class="co">]</span>.</span>
+<span id="cb28-202"><a href="#cb28-202" aria-hidden="true" tabindex="-1"></a><span class="al">![The Mapper graph of some 3d-shapes retain some of the original geometry.](images/intro/mapper.png)</span></span>
 <span id="cb28-203"><a href="#cb28-203" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-204"><a href="#cb28-204" aria-hidden="true" tabindex="-1"></a><span class="fu">## Why this minicourse?</span></span>
+<span id="cb28-204"><a href="#cb28-204" aria-hidden="true" tabindex="-1"></a><span class="fu">### Clustering methods</span></span>
 <span id="cb28-205"><a href="#cb28-205" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-206"><a href="#cb28-206" aria-hidden="true" tabindex="-1"></a>This minicourse is a good opportunity for pure topologists to see how we can use TDA *in practice*. It will be even better for the applied mathematicians who can promptly recognize the tools and algorithms I am using.</span>
+<span id="cb28-206"><a href="#cb28-206" aria-hidden="true" tabindex="-1"></a>Algorithms like ToMATo are clustering algorithms: we have a metric space as input, and return a partition of this dataset. Clustering is useful whenever we need to "group a set of objects in such a way that objects in the same group (called a cluster) are more similar to each other than to those in other groups (clusters)"^<span class="co">[</span><span class="ot">https://en.wikipedia.org/wiki/Cluster_analysis</span><span class="co">]</span>.</span>
+<span id="cb28-207"><a href="#cb28-207" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-208"><a href="#cb28-208" aria-hidden="true" tabindex="-1"></a><span class="al">![ToMATo is a persistence-based clustering algorithm.](images/intro/tomato.png)</span></span>
+<span id="cb28-209"><a href="#cb28-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-210"><a href="#cb28-210" aria-hidden="true" tabindex="-1"></a><span class="fu">## Why this minicourse?</span></span>
+<span id="cb28-211"><a href="#cb28-211" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-212"><a href="#cb28-212" aria-hidden="true" tabindex="-1"></a>This minicourse is a good opportunity for pure topologists to see how we can use TDA *in practice*. It will be even better for the applied mathematicians who can promptly recognize the tools and algorithms I am using.</span>
 </code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

@@ -15,11 +15,15 @@ Now you are convinced that Julia is really nice and fast, and that Topological d
 
 Let's quickly review what is persistent homology and why it is useful.
 
-Given a finite metric space $M$, for each $\epsilon > 0$ we create a simplicial complex $K_\epsilon$ in such a way that $\epsilon_1 < \epsilon_2$ implies $K_{\epsilon} \subset K_{\epsilon'}$.
+Let $M$ be a finite metric space. 
 
 ### Creating simplicial complexes
 
+For each $\epsilon > 0$ we create a simplicial complex $K_\epsilon$ in such a way that $\epsilon_1 < \epsilon_2$ implies $K_{\epsilon} \subseteq K_{\epsilon'}$.
+
 As you can guess, there are several ways to "undiscretize" a finite metric space into a simplicial complex.
+
+:::{.callout title="" appearance="simple"}
 
 One famous construction is the Vietoris-Rips complex:
 
@@ -33,12 +37,13 @@ $$
 [x_1, \cdots, x_n] \in VR_\epsilon(M) \Leftrightarrow \cap B_i \neq \emptyset.
 $$
 
+:::
+
+
+
 ![The Vietoris-Rips filtration of a metric space (on the left of each panel). As $\epsilon$ increases, so do the amount of simplexes we have. Source: @vr.](images/getting-started/vr.png)
 
-Other very useful construction is a sublevel filtration:
-
-!! colocar aqui cubical complex
-
+There are some other simplicial complex constructions like the Alpha complex or the Cech complex, but the Vietoris-Rips has a good algorithm to calculate its homology.
 
 ### Creating sequences of vector spaces
 
@@ -64,7 +69,7 @@ called a _persistent vector space_.
 
 ### Simplifying 
 
-Some very nice theorems^[citar aqui!!] prove that a persistent vector space can be decomposed as a sum of _interval modules_, which are the fundamental blocks of persistent vector spaces. Each one of these blocks represent the birth and death of a generator. Thus, $\mathbb{V}(M)$ can summarised in two equivalent ways:
+Some very nice theorems (see @oudot2017persistence for a complete exposition) prove that a persistent vector space can be decomposed as a sum of _interval modules_, which are the fundamental blocks of persistent vector spaces. Each one of these blocks represent the birth and death of a generator. Thus, $\mathbb{V}(M)$ can summarised in two equivalent ways:
 
 - as a _barcode_: a (multi)set of real intervals $\{ [a_i, b_i) \subset \mathbb{R}, \; i \in I \}$.
 
@@ -148,7 +153,7 @@ gl.scatter(X)
 
 ```{julia}
 #| eval: true
-bc = Ripserer.ripserer(X, dim_max = 1, verbose = true, threshold = 4)
+bc = Ripserer.ripserer(X, dim_max = 1, threshold = 4)
 plot_barcode(bc)
 ```
 
@@ -156,14 +161,14 @@ plot_barcode(bc)
 
 ```{julia}
 #| eval: true
-X = sphere(200, dim = 2)
+X = sphere(300, dim = 2)
 gl.scatter(X)
 ```
 
 
 ```{julia}
 #| eval: true
-bv = Ripserer.ripserer(X, dim_max = 1, verbose = true)
+bv = Ripserer.ripserer(X, dim_max = 1)
 plot_barcode(bc)
 ```
 
@@ -171,19 +176,18 @@ plot_barcode(bc)
 
 ```{julia}
 #| eval: true
-X = sphere(500, dim = 3)
+X = sphere(300, dim = 3)
 gl.scatter(X)
 ```
 
 
 ```{julia}
 #| eval: true
-bc = Ripserer.ripserer(X, dim_max = 2, verbose = true)
+bc = Ripserer.ripserer(X, dim_max = 2)
 plot_barcode(bc)
 ```
 
 ### A square with a hole
-
 
 ```{julia}
 #| eval: true
@@ -225,5 +229,43 @@ Even though the bottleneck distance is easier to calculate than the Gromov-Hausd
 
 Barcodes are nice but wild objects. They have variable length. To be able to use these tools in machine learning algorithms, we need to represent them in a vector or matrix with fixed size.
 
-!!! falar sobre persistence landscape
+There are several ways to do that!
 
+### Persistence images 
+
+Persistence images is a technique that transform a set of barcodes into nxn matrices with values from 0 to 1. See @adams2017persistence for more detailes.
+
+The idea is the following:
+
+- Plot the persistence diagram;
+
+- Plot gaussians around each point;
+
+- Pixelate them.
+
+![The idea behind a persistent image. Source: @adams2017persistence.](images/getting-started/image.png)
+
+For example, the two barcodes below
+
+```{julia}
+using PersistenceDiagrams, Plots
+
+diag_1 = PersistenceDiagram([(0, 1), (0, 1.5), (1, 2)]);
+diag_2 = PersistenceDiagram([(1, 2), (1, 1.5)]);
+
+image = PersistenceImage([diag_1, diag_2])
+
+Plots.plot(
+  Plots.plot(diag_1)
+  ,Plots.plot(diag_2)
+)
+```
+
+are transformed into these matrices (plotted as heatmaps):
+
+```{julia}
+Plots.plot(
+  heatmap(image(diag_1))
+  ,heatmap(image(diag_2))
+)
+```

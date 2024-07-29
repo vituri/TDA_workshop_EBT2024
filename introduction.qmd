@@ -4,7 +4,7 @@ jupyter: julia-1.10
 
 # Introduction
 
-## Why Julia for topological data analysis?
+## Why Julia?
 
 In a world ruled by Python (and, in some areas, R), why use an exquisite and new language like [Julia](https://julialang.org/) in this workshop? You can find some good reasons in the book [Julia Data Science](https://juliadatascience.io/programmers), but I will give some in the context of topology:
 
@@ -16,7 +16,7 @@ Julia is fast. You won't need to use another language to make some expensive com
 
 :::
 
-Let's say you read about a new algorithm to calculate the Vietoris-Rips. If you are a R/Python user, *your algorithm won't be written in R/Python* simply because R/Python is slow. Fast code in R/Python is written in C, C++, Fortran or Rust; this is called the [two language problem](https://juliadatascience.io/julia_accomplish#sec:two_language). Julia solves this because with enought knowledge about the compiler and the language, you will get performance nearly as good as if it was written in C. Optimize Julia code is not a trivial task, but is way easier than learning another language just to get good performance in some functions.
+Let's say you read about a new algorithm to calculate the Vietoris-Rips. If you are a R/Python user, *your algorithm won't be written in R/Python* simply because R/Python is slow. Fast code in R/Python is written in C, C++, Fortran or Rust; this is called the [two language problem](https://juliadatascience.io/julia_accomplish#sec:two_language). Julia solves this because with enought knowledge about the compiler and the language, you will get performance nearly as good as if it was written in C. Optimizing Julia code is not a trivial task, but is way easier than learning another language just to get good performance in some functions.
 
 ![The famous deep learning package [`torch`](https://github.com/pytorch/pytorch) in Python has its core written mostly in C++. Python is just a "glue" interface.](images/intro/torch.png)
 
@@ -165,13 +165,19 @@ These tools can be divided in some broad categories:
 
 Persistence homology calculates the "shape" (homology groups) of a object on different scales, and compact this information into objects called "barcodes". This barcode can be vectorized and then inserted into machine learning models.
 
+![The shape of data can be summarised as a barcode.](images/getting-started/ph.png)
+
 ### Graph reduction methods
 
 The Mapper algorithm is the discrete version of the [Reeb graph](https://en.wikipedia.org/wiki/Reeb_graph). It captures the geometry of a dataset with respect to a given function (called "filter") and produce a graph of its pre-images clustered. There is also the Ball Mapper variant, which does not need a filter function and resembles the Vietoris-Rips filtration. These methods are useful to get a glimpse of the geometry (flares, holes) and areas of interest. For example: if your metric space is a dataset of measurements of patients with diabets, the Mapper graph can represent the patients and the shape of this graph can give insights about the type of diabetes one has.
 
+![The Mapper graph of some 3d-shapes retain some of the original geometry.](images/intro/mapper.png)
+
 ### Clustering methods
 
 Algorithms like ToMATo are clustering algorithms: we have a metric space as input, and return a partition of this dataset. Clustering is useful whenever we need to "group a set of objects in such a way that objects in the same group (called a cluster) are more similar to each other than to those in other groups (clusters)"^[https://en.wikipedia.org/wiki/Cluster_analysis].
+
+![ToMATo is a persistence-based clustering algorithm.](images/intro/tomato.png)
 
 ## Why this minicourse?
 

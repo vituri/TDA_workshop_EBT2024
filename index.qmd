@@ -2,7 +2,7 @@
 jupyter: julia-1.10
 ---
 
-# Topological Data Analysis workshop - 2024
+# TDA workshop - 2024
 
 ![](images/ebt.png)
 
