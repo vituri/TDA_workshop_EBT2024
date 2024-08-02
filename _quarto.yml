@@ -29,6 +29,10 @@ book:
       - "getting started.qmd"
       - 3d-shapes.qmd
       - digits.qmd
+      - wings.qmd
+    - part: "Part 2: Mapper"
+      chapters:
+      - "mapper.qmd"
     - references.qmd
 
 format:

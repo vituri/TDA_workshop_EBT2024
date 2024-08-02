@@ -512,5 +512,93 @@
       "Part 1: Persistence homology",
       "<span class='chapter-number'>3</span>  <span class='chapter-title'>3d shape classification</span>"
     ]
+  },
+  {
+    "objectID": "mapper.html",
+    "href": "mapper.html",
+    "title": "6  The Mapper algorithm and friends",
+    "section": "",
+    "text": "6.1 Reeb graph\nIn topology, there are many ways by which we try to see what can’t be seen, in particular high-dimensional sets. The Reeb graph is one of those ways: given a topological space \\(X\\) and a map \\(f: X \\to \\mathbb{R}\\), we can collapse the connected components of its pre-images to get a graph that reflects the level-sets of \\(f\\).\nMore formally, we define a relation \\(\\sim\\) on \\(X\\) such that \\(p \\sim q\\) if-and-only-if \\(p\\) and \\(q\\) belong to the same connected component of \\(f^{-1}(c)\\) for some \\(c \\in \\mathbb{R}\\).",
+    "crumbs": [
+      "Part 2: Mapper",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>The Mapper algorithm and friends</span>"
+    ]
+  },
+  {
+    "objectID": "mapper.html#reeb-graph",
+    "href": "mapper.html#reeb-graph",
+    "title": "6  The Mapper algorithm and friends",
+    "section": "",
+    "text": "The Reeb graph of a torus using the projection on the z-axis. Source: Wikipedia1",
+    "crumbs": [
+      "Part 2: Mapper",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>The Mapper algorithm and friends</span>"
+    ]
+  },
+  {
+    "objectID": "mapper.html#an-example-in-julia",
+    "href": "mapper.html#an-example-in-julia",
+    "title": "5  The Mapper algorithm and friends",
+    "section": "5.2 An example in Julia",
+    "text": "5.2 An example in Julia\nLet’s import some packages:\n\nusing TDAmapper;\nusing MetricSpaces;\n\nand define \\(X\\) as a torus with the usual Euclidean distance\n\nX = torus(2000)\n\n2000-element Vector{StaticArraysCore.SVector{3, Float64}}:\n [1.4520444994581432, 1.7438234082980761, 0.6826116223288266]\n [-1.5253112242515614, -1.7578417455155695, -0.7399654641278123]\n [2.1934548323602963, 1.405478298729173, -0.9187296651707002]\n [1.2146448848463725, 2.9926019903240473, 0.9732590408092822]\n [-1.6237512452104998, 3.4850962503098333, -0.53508693387643]\n [0.7926128781087972, 1.9178080350121014, -0.38031759646220065]\n [2.018677580321991, 2.9157686683895974, -0.8375415387460915]\n [0.8098495231716679, -2.5787269863458517, -0.9548475618849052]\n [-3.846654235832284, -0.7975785327232333, 0.3714061988394067]\n [3.8731573019706653, -0.7605140946098826, 0.32088972126205556]\n [-2.0566960992156877, 1.6990345561965587, -0.9431799488477587]\n [2.3794188804272767, -0.6444932713179139, -0.8449523240861657]\n [2.739413603216131, 2.6304096207632264, -0.6028948632404756]\n ⋮\n [1.4716459825953268, 2.265591952464939, 0.9544412650710696]\n [0.3544470688241108, -3.9286115770030863, 0.3283140420646309]\n [-1.264773510455645, 1.6004288227806311, 0.2795158733545307]\n [-1.6213113917904438, -3.6045221473714997, 0.3049441255320435]\n [2.060569789544015, 2.322924174483705, -0.9944569167212749]\n [0.16028630670217345, -2.8042032734090765, -0.9815472934649428]\n [3.6605360160575415, -1.5062830235179954, -0.2856481668924123]\n [1.5350783496386116, 1.3266461643472272, -0.23869340602628508]\n [2.5178046747495206, -1.1002351625074194, 0.967649182209972]\n [-1.6939811412915629, -1.3775609519536487, -0.5772074588777947]\n [-3.9058512067242903, 0.6311619598841652, -0.2916714859667669]\n [-3.882428639872846, 0.22396953543481987, -0.4581333979303572]\n\n\nWe define the function \\(f: X \\to \\mathbb{R}\\) as the projection on the \\(x\\)-axis because our torus is laying down compared to the one in the Reeb graph example.\nLet fv be a vector such that fv[i] is the \\(x\\)-axis projection of the point \\(x_i\\) of \\(X\\):\n\nfv = X .|&gt; first;\n\nYou can plot \\(X\\) colored by \\(f\\) as follows:\n\nusing CairoMakie;\nscatter(X, color = fv)\n\n\n\n\n\n\n\n\nImportant: the plots will be interactive when running in Julia if you change CairoMakie to GLMakie. Give it a try!\nDefine the covering intervals cv as follows:\n\nC = uniform(fv, overlap = 150);\n\nYou can check the first five intervals of this covering:\n\nC[1:5]\n\n5-element Vector{Interval}:\n Interval(-4.7081213f0, -3.710804f0)\n Interval(-4.1382256f0, -3.1409085f0)\n Interval(-3.56833f0, -2.5710127f0)\n Interval(-2.9984345f0, -2.0011172f0)\n Interval(-2.4285388f0, -1.4312216f0)\n\n\nFor the clustering algorithm we choose the DBSCAN with radius 1:\n\nclustering = cluster_dbscan(radius = 1);\n\nThen the mapper graph of \\(X\\) can be calculated by\n\n# the mapper function needs:\n# X\n# fv, the values of f(X)\n# the covering C\n# the clustering function\nmp = mapper(as_matrix(X), fv, C; clustering = clustering)\n\nAnd plotted with\n\n# define the value of each node as the maximum of\n# values of fv \nnode_values = node_colors(mp, fv)\n\nmapper_plot(mp, node_values = node_values)\n\n\n\n\n\n\n\n\nCompare it with the Reeb graph from the start.",
+    "crumbs": [
+      "Part 2: Mapper",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>The Mapper algorithm and friends</span>"
+    ]
+  },
+  {
+    "objectID": "mapper.html#ball-mapper",
+    "href": "mapper.html#ball-mapper",
+    "title": "6  The Mapper algorithm and friends",
+    "section": "6.3 Ball mapper",
+    "text": "6.3 Ball mapper\nAnother way to reduce the complexity of a metric space is to approximate it by a simplicial complex. Simplicial complexes are like small building blocks glued together, each of these blocks a small representative of an \\(n\\)-dimensional space: points, line segments, triangles, tetrahedrons, and so on.\nThe Vietoris-Rips complex is build as follows: given a metric space \\((X, d)\\) and an \\(\\epsilon &gt; 0\\), define the following simplicial complex:\n\\[\nVR(X, \\epsilon) = \\{ [ x_1, \\ldots, x_n ] \\; d(x_i, x_j) &lt; \\epsilon, \\forall i, j \\}\n\\]\nthat is: the points of \\(X\\) are our vertices, and we have an \\(n\\)-simplex \\([x_1, \\ldots, x_n]\\) whenever the pairwise distance between \\(x_1, \\ldots, x_n\\) is less than \\(\\epsilon\\). This condition is equivalent to ask that\n\\[\n\\cap_i B(x_i, \\epsilon) \\neq \\emptyset\n\\]\nwhere \\(B(x, \\epsilon)\\) is the ball of center \\(x\\) and radius \\(\\epsilon\\).\n\n\n\nThe black dots are points in a metric space; the pink circles are \\(\\epsilon\\) balls around the points; in green, we have the Vietoris-Rips complex. Source: https://www.researchgate.net/publication/331739415_Topological_data_analysis_for_the_string_landscape\n\n\nThe ball mapper is clearly inspired by the Vietoris-Rips complex. Given a metric space \\((X, d)\\) with \\(X = \\{x_1, \\ldots, x_n\\}\\), select a subset of indexes \\(L \\subseteq \\{1, \\ldots, n\\}\\) and define the ball mapper graph G as follows: the set of vertices of \\(G\\) is \\(L\\), and set of edges \\(E\\) given by\n\\[\n(i, j) \\in E \\Leftrightarrow B(x_i, \\epsilon) \\cap B(x_j, \\epsilon) \\neq \\emptyset\n\\]\nThe ball mapper then can be seen as the 1-skeleton of the Vietoris-Rips, but create using balls whose center can only be the elements indexed by \\(L\\).\n\n\n\nThe ball mapper construction. (See Dłotko 2019)\n\n\nTo exemplify, consider a circle\n\nX = sphere(1000, dim = 2);\n\nCheck that it is indeed a circle:\n\nscatter(X)\n\n\n\n\n\n\n\n\nNow take \\(L\\) as a hundred random points and let’s create the ball mapper of \\(X\\) with radius \\(\\epsilon = 0.1\\):\n\nL = rand(1:1000, 100)\nmp = ball_mapper(as_matrix(X), L, ϵ = 0.5);\n\n\nmapper_plot(mp)\n\n\n\n\n\n\n\n\nand now for the torus\n\nX = torus(1000)\nL = rand(1:1000, 100)\nmp = ball_mapper(as_matrix(X), L, ϵ = 1);\nmapper_plot(mp)",
+    "crumbs": [
+      "Part 2: Mapper",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>The Mapper algorithm and friends</span>"
+    ]
+  },
+  {
+    "objectID": "mapper.html#the-ball-mapper",
+    "href": "mapper.html#the-ball-mapper",
+    "title": "5  The Mapper algorithm and friends",
+    "section": "5.4 The ball mapper",
+    "text": "5.4 The ball mapper\nThe ball mapper is clearly inspired by the Vietoris-Rips complex. Given a metric space \\((X, d)\\) with \\(X = \\{x_1, \\ldots, x_n\\}\\), select a subset of indexes \\(L \\subseteq \\{1, \\ldots, n\\}\\) and define the ball mapper graph G as follows: the set of vertices of \\(G\\) is \\(L\\), and set of edges \\(E\\) given by\n\\[\n(i, j) \\in E \\Leftrightarrow B(x_i, \\epsilon) \\cap B(x_j, \\epsilon) \\neq \\emptyset\n\\]\nThe ball mapper then can be seen as the 1-skeleton of the Vietoris-Rips, but create using balls whose center can only be the elements indexed by \\(L\\).\nTo exemplify, consider a circle\n\nX = sphere(1000, dim = 2);\n\nCheck that it is indeed a circle:\n\nscatter(X)\n\n\n\n\n\n\n\n\nNow take \\(L\\) as a hundred random points and let’s create the ball mapper of \\(X\\) with radius \\(\\epsilon = 0.1\\):\n\nL = rand(1:1000, 100)\nmp = ball_mapper(as_matrix(X), L, ϵ = 0.5);\n\n\nmapper_plot(mp)\n\n\n\n\n\n\n\n\n\nX = torus(1000)\nL = rand(1:1000, 100)\nmp = ball_mapper(as_matrix(X), L, ϵ = 1);\nmapper_plot(mp)",
+    "crumbs": [
+      "Part 2: Mapper",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>The Mapper algorithm and friends</span>"
+    ]
+  },
+  {
+    "objectID": "mapper.html#what-can-we-do-with-mapper-like-algorithms",
+    "href": "mapper.html#what-can-we-do-with-mapper-like-algorithms",
+    "title": "6  The Mapper algorithm and friends",
+    "section": "6.4 What can we do with mapper-like algorithms?",
+    "text": "6.4 What can we do with mapper-like algorithms?\nMapper and ballmapper are mostly used in exploratory data analysis, in the sense that the resulting graph can be explored to understand relations in the original dataset.\n\n\n\nThe projection of a 6-dimensional data about diabetes patients. (See Singh et al. 2007)\n\n\n\n\n\nThe authors were able to retrieve the 3 “flares” from the above analysis using the Mapper algorithm (see Singh et al. 2007)\n\n\n\n\n\nIn (Nicolau, Levine, and Carlsson 2011), the authors apply the Mapper algorithm to a cancer dataset and identify some subgroups in which the mortality is lower.\n\n\n\n\n\nThe Mapper algorithm was able to identify more than the 5 traditional positions in basketball. (See Lum et al. 2013)\n\n\n\n\n\n\n\n\nDłotko, Paweł. 2019. “Ball Mapper: A Shape Summary for Topological Data Analysis.” arXiv Preprint arXiv:1901.07410.\n\n\nLum, Pek Y, Gurjeet Singh, Alan Lehman, Tigran Ishkanov, Mikael Vejdemo-Johansson, Muthu Alagappan, John Carlsson, and Gunnar Carlsson. 2013. “Extracting Insights from the Shape of Complex Data Using Topology.” Scientific Reports 3 (1): 1236.\n\n\nNicolau, Monica, Arnold J Levine, and Gunnar Carlsson. 2011. “Topology Based Data Analysis Identifies a Subgroup of Breast Cancers with a Unique Mutational Profile and Excellent Survival.” Proceedings of the National Academy of Sciences 108 (17): 7265–70.\n\n\nSingh, Gurjeet, Facundo Mémoli, Gunnar E Carlsson, et al. 2007. “Topological Methods for the Analysis of High Dimensional Data Sets and 3d Object Recognition.” PBG@ Eurographics 2: 091–100.",
+    "crumbs": [
+      "Part 2: Mapper",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>The Mapper algorithm and friends</span>"
+    ]
+  },
+  {
+    "objectID": "mapper.html#footnotes",
+    "href": "mapper.html#footnotes",
+    "title": "6  The Mapper algorithm and friends",
+    "section": "",
+    "text": "https://commons.wikimedia.org/wiki/File:3D-Leveltorus-Reebgraph.png↩︎",
+    "crumbs": [
+      "Part 2: Mapper",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>The Mapper algorithm and friends</span>"
+    ]
+  },
+  {
+    "objectID": "mapper.html#the-classical-mapper",
+    "href": "mapper.html#the-classical-mapper",
+    "title": "6  The Mapper algorithm and friends",
+    "section": "6.2 The (classical) mapper",
+    "text": "6.2 The (classical) mapper\nThe (classical) mapper is an algorithm to create graphs from metric spaces, and can be seen as an “statistical” version of the Reeb graph.\nTo be able to mimick the Reeb graph, we need to change some objects from the continuous setting to the discrete setting:\n\n\\(X = (X, d)\\) is now a finite metric space, also called a point cloud;\n\\(f: X \\to \\mathbb{R}\\) can be any function (since \\(X\\) is discrete, \\(f\\) is always continuous);\ninstead of inverse images of points of \\(\\mathbb{R}\\), we calculate inverse images of subsets of \\(\\mathbb{R}\\) (usually intervals);\ninstead of connected components (which are trivial in the discrete setting), we use some clustering algorithm (DBSCAN, single linkage, etc.) and consider these clusterings as “connected pieces of \\(X\\)”.\n\n\nThe mapper graph can shed light to the geometry of \\(X\\):\n\nnodes are clusters of points of \\(X\\);\nthe color of the nodes can summarise some information about the points of \\(X\\) that represent this node;\nedges denote some proximity (in the metric of \\(d\\) of \\(X\\)) between the nodes.\n\nTo be more precise, to calculate the mapper of a metric space \\(X\\), we need the following ingredients:\n\na function \\(f: X \\to \\mathbb{R}\\) that measures something interesting in \\(X\\), as, for example, the excentricity, the first coordinate of PCA, and so on;\na covering \\(C\\) of the image \\(f(X) \\subset \\mathbb{R}\\);\na method \\(l\\) to cluster each \\(f^{-1}(c)\\) for \\(c \\in C\\).\n\nWhen all of this is chosen, we have a covering of \\(X\\) by clustering each pre-image of the elements of \\(C\\), that is:\n\\[\nV = \\{ l(p); \\; p = f^{-1}(c) \\; \\text{for} \\; c \\in C\\}\n\\]\nWe then calculate the 1-dimensional nerve of \\(V\\): we define the set of edges \\(E \\subset V \\times V\\) by\n\\[\n(v_1, v_2) \\in E \\leftrightarrow v_1 \\cap v_2 \\neq \\emptyset\n\\]\nIn words, we have an edge between \\(v_1\\) and \\(v_2\\) if there is some point in both \\(v_1\\) and \\(v_2\\) at the same time.\n\n6.2.1 Example\nLet’s import some packages:\n\nusing TDAmapper;\nusing MetricSpaces;\n\nand define \\(X\\) as a torus with the usual Euclidean distance\n\nX = torus(2000);\n\nWe define the function \\(f: X \\to \\mathbb{R}\\) as the projection on the \\(x\\)-axis because our torus is laying down compared to the one in the Reeb graph example.\nLet fv be a vector such that fv[i] is the \\(x\\)-axis projection of the point \\(x_i\\) of \\(X\\):\n\nfv = X .|&gt; first;\n\nYou can plot \\(X\\) colored by \\(f\\) as follows:\n\nusing CairoMakie;\nscatter(X, color = fv)\n\n\n\n\n\n\n\n\nImportant: the plots will be interactive when running in Julia if you change CairoMakie to GLMakie. Give it a try!\nDefine the covering intervals cv as follows:\n\nC = uniform(fv, overlap = 150);\n\nYou can check the first five intervals of this covering:\n\nC[1:5]\n\n5-element Vector{Interval}:\n Interval(-4.709972f0, -3.7120821f0)\n Interval(-4.139749f0, -3.1418595f0)\n Interval(-3.5695267f0, -2.571637f0)\n Interval(-2.999304f0, -2.0014143f0)\n Interval(-2.4290814f0, -1.4311918f0)\n\n\nFor the clustering algorithm we choose the DBSCAN with radius 1:\n\nclustering = cluster_dbscan(radius = 1);\n\nThen the mapper graph of \\(X\\) can be calculated by\n\n# the mapper function needs:\n# X\n# fv, the values of f(X)\n# the covering C\n# the clustering function\nmp = mapper(as_matrix(X), fv, C; clustering = clustering)\n\nAnd plotted with\n\n# define the value of each node as the maximum of\n# values of fv \nnode_values = node_colors(mp, fv)\n\nmapper_plot(mp, node_values = node_values)\n\n\n\n\n\n\n\n\nCompare it with the Reeb graph from the start.",
+    "crumbs": [
+      "Part 2: Mapper",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>The Mapper algorithm and friends</span>"
+    ]
   }
 ]

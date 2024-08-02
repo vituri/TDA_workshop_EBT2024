@@ -1,0 +1,730 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "---\n",
+        "jupyter: julia-1.10\n",
+        "---\n",
+        "\n",
+        "\n",
+        "\n",
+        "\n",
+        "\n",
+        "\n",
+        "# Classifying wings\n",
+        "\n",
+        "![](wings/Asilidae/Asilidae%2011.png)\n",
+        "\n",
+        "In this quick lesson, we try to classify wings using the tools seen in the last lessons.\n"
+      ],
+      "id": "6d366209"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "using MetricSpaces\n",
+        "using Images\n",
+        "using DataFrames\n",
+        "using CairoMakie\n",
+        "using Ripserer, PersistenceDiagrams\n",
+        "import Plots\n",
+        "using ProgressMeter\n",
+        "\n",
+        "using Clustering\n",
+        "import StatsPlots\n",
+        "\n",
+        "import StatisticalMeasures.ConfusionMatrices as CM\n",
+        "using MultivariateStats\n",
+        "using Chain\n",
+        "using ImageFiltering"
+      ],
+      "id": "ba0398c1",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "We prepare a dataframe with the files and classes of each image\n"
+      ],
+      "id": "3e21015b"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "ds = DataFrame()\n",
+        "\n",
+        "for (root, dir, files) in walkdir(\"wings/\")\n",
+        "\n",
+        "    for file in files\n",
+        "        dc = Dict(:Classe => root |> basename, :Caminho => file, :Caminho_completo => joinpath(root, file))\n",
+        "        \n",
+        "        push!(ds, dc, cols = :union)\n",
+        "    end\n",
+        "end\n",
+        "\n",
+        "ds;"
+      ],
+      "id": "3bfcad26",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "ds_split = groupby(ds, :Classe) |> collect;"
+      ],
+      "id": "b92ec4d9",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "function plot_mosaic(s)\n",
+        "    mosaicview(\n",
+        "    [imresize(load(f), (150, 300)) for f ∈ s.Caminho_completo[1:min(end, 21)]]\n",
+        "    , ncol = 3\n",
+        "    ,fillvalue = RGB24(1)\n",
+        "    )\n",
+        "end;\n",
+        "\n",
+        "f = ds.Caminho_completo[1]"
+      ],
+      "id": "3c978839",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## The dataset\n",
+        "\n",
+        "The dataset consists of several images of 3 different species of insects:\n",
+        "\n",
+        "\n",
+        "### Asilidae\n"
+      ],
+      "id": "33610c10"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "plot_mosaic(ds_split[1])"
+      ],
+      "id": "f97aa93f",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "### Ceratopogonidae\n"
+      ],
+      "id": "a87e6401"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "plot_mosaic(ds_split[2])"
+      ],
+      "id": "7cb992c4",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "### Tipulidae\n"
+      ],
+      "id": "b0d86921"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "plot_mosaic(ds_split[3])"
+      ],
+      "id": "ae0b5611",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "We load all images as matrices\n"
+      ],
+      "id": "8c24991a"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "images = [load(img) .|> Gray |> channelview for img ∈ ds.Caminho_completo];"
+      ],
+      "id": "96308b42",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "We can see that the image is indeed correct:\n"
+      ],
+      "id": "94f65f4b"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "heatmap(images[1])"
+      ],
+      "id": "35329783",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Matrix to \\mathbb{R}^2\n",
+        "\n",
+        "As before, we need to transform each image in points of the plane.\n"
+      ],
+      "id": "fb0cf25e"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "function img_to_points(img)\n",
+        "    img2 = imfilter(img, Kernel.gaussian(1)) .|> float\n",
+        "    ids = findall(x -> x <= 0.8, img2)\n",
+        "    pts = getindex.(ids, [1 2])\n",
+        "\n",
+        "    [ [ p[1], p[2] ] for p in eachrow(pts)] |> EuclideanSpace\n",
+        "end;"
+      ],
+      "id": "1ed1bf79",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "We convert each image to points \n"
+      ],
+      "id": "8fb2e1e9"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "pts = img_to_points.(images);"
+      ],
+      "id": "043e8129",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "and normalize the coordinates, since each image has a different size:\n"
+      ],
+      "id": "17c0dbe8"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "function normalize!(pts)\n",
+        "    a, b = extrema(pts .|> last)\n",
+        "\n",
+        "    pts ./ (b - a)\n",
+        "end\n",
+        "\n",
+        "wings = normalize!.(pts);"
+      ],
+      "id": "d50c15c0",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "We can plot a scatter to check that it is indeed ok:\n"
+      ],
+      "id": "8d805d3e"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "scatter(wings[1])"
+      ],
+      "id": "3d98bddc",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "In order to apply the Vietoris-Rips filtration, we need to reduce the amount of points in each wing. The farthest point sample come in our rescue again!\n"
+      ],
+      "id": "e43989c1"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "wings_short = @showprogress map(wings) do w\n",
+        "    ids = farthest_points_sample(w, 400)\n",
+        "    w[ids]\n",
+        "end;"
+      ],
+      "id": "def5c87e",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Now we calculate each barcode using the Vietoris-Rips filtration:\n"
+      ],
+      "id": "708e34c4"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "pds = @showprogress map(wings_short) do w\n",
+        "    ripserer(w, cutoff = 0.01)\n",
+        "end"
+      ],
+      "id": "750fc57e",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "We can now see the metric space\n"
+      ],
+      "id": "17ab2b24"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "scatter(wings_short[1])"
+      ],
+      "id": "9fd13c6e",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "and the corresponding 1-dimensional persistente diagram\n"
+      ],
+      "id": "0efe35a1"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "Plots.plot(pds[1][2])"
+      ],
+      "id": "83172234",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Now we calculate the pairwise 1-dimensional bottleneck distance between each wing:\n"
+      ],
+      "id": "297f118f"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "function barcode_to_distance(pds)\n",
+        "    n = length(pds)\n",
+        "    DB = zeros(n, n)\n",
+        "\n",
+        "    @showprogress for i ∈ 1:n\n",
+        "        for j ∈ i:n\n",
+        "            if i == j\n",
+        "                DB[i, j] = 0 \n",
+        "                continue \n",
+        "            end\n",
+        "\n",
+        "            DB[i, j] = Bottleneck()(pds[i][2], pds[j][2])\n",
+        "            DB[j, i] = DB[i, j]\n",
+        "        end\n",
+        "    end\n",
+        "\n",
+        "    DB\n",
+        "end"
+      ],
+      "id": "7814e76c",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "DB = barcode_to_distance(pds)"
+      ],
+      "id": "1cab28b9",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "and see if the classes are well separated:\n"
+      ],
+      "id": "ae6e958c"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "function mds_plot(D)\n",
+        "    M = fit(MDS, D; distances = true, maxoutdim = 2)\n",
+        "    Y = predict(M)\n",
+        "\n",
+        "    ds.Row = 1:nrow(ds)\n",
+        "\n",
+        "    dfs = @chain ds begin\n",
+        "        groupby(:Classe)\n",
+        "        collect\n",
+        "    end\n",
+        "\n",
+        "    fig = Figure();\n",
+        "    ax = Makie.Axis(fig[1,1])\n",
+        "\n",
+        "    colors = cgrad(:tableau_10, 8, categorical = true)\n",
+        "\n",
+        "    for (i, df) ∈ enumerate(dfs)    \n",
+        "        scatter!(\n",
+        "            ax, Y[:, df.Row]\n",
+        "            , label = df.Classe[1], markersize = 15\n",
+        "            , color = colors[i]\n",
+        "            )\n",
+        "    end\n",
+        "\n",
+        "    axislegend();\n",
+        "    fig\n",
+        "\n",
+        "    fig\n",
+        "end"
+      ],
+      "id": "5da6670b",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "mds_plot(DB)"
+      ],
+      "id": "fa73c0e3",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Slicing it sideways\n",
+        "\n",
+        "As we did with the hand-written digits dataset, we can do some sideways slicing on the wings.\n"
+      ],
+      "id": "6a9f0aa6"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "set_value(x, value) = x < 0.99 ? value : x\n",
+        "\n",
+        "function side_filtration(img, axis = 1, invert = false)\n",
+        "\n",
+        "    m = imfilter(img, Kernel.gaussian(1))\n",
+        "    # m = img .|> float\n",
+        "    m = set_value.(m, 0)\n",
+        "    # m |> image\n",
+        "    # m = img .|> float\n",
+        "\n",
+        "    pts = img_to_points(m)\n",
+        "\n",
+        "    a, b = if axis == 1 \n",
+        "        extrema(pts .|> first)\n",
+        "        else\n",
+        "        extrema(pts .|> last)\n",
+        "    end\n",
+        "\n",
+        "    for i ∈ a:b\n",
+        "\n",
+        "        v = (b - i) / (b - a)\n",
+        "\n",
+        "        if invert == true\n",
+        "            v = 1.0 - v\n",
+        "        end\n",
+        "\n",
+        "        if axis == 1\n",
+        "            m[i, :] = set_value.(m[i, :], v)\n",
+        "        else \n",
+        "            m[:, i] = set_value.(m[:, i], v)\n",
+        "        end\n",
+        "\n",
+        "    end\n",
+        "\n",
+        "    m .|> float\n",
+        "end;"
+      ],
+      "id": "58db0deb",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "We can visualize the filtrations as follows:\n"
+      ],
+      "id": "fddcd758"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "img = images[5]\n",
+        "img2 = side_filtration(img, 1)\n",
+        "heatmap(img2)"
+      ],
+      "id": "57a4bbee",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "img2 = side_filtration(img, 2)\n",
+        "heatmap(img2)"
+      ],
+      "id": "4446a11f",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "img2 = side_filtration(img, 1, true)\n",
+        "heatmap(img2)"
+      ],
+      "id": "111e5a83",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "img2 = side_filtration(img, 2, true)\n",
+        "heatmap(img2)"
+      ],
+      "id": "1c1704ef",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "And calculate each barcode:\n"
+      ],
+      "id": "7eb89049"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "pds_x = @showprogress map(images) do img\n",
+        "    img2 = side_filtration(img)\n",
+        "    bc = ripserer(Cubical(img2), cutoff = 0.1)\n",
+        "end\n",
+        "\n",
+        "pds_y = @showprogress map(images) do img\n",
+        "    img2 = side_filtration(img, 2)\n",
+        "    ripserer(Cubical(img2), cutoff = 0.1)\n",
+        "end\n",
+        "\n",
+        "pds_x2 = @showprogress map(images) do img\n",
+        "    img2 = side_filtration(img, 1, true)\n",
+        "    ripserer(Cubical(img2), cutoff = 0.1)\n",
+        "end\n",
+        "\n",
+        "pds_y2 = @showprogress map(images) do img\n",
+        "    img2 = side_filtration(img, 2, true)\n",
+        "    ripserer(Cubical(img2), cutoff = 0.1)\n",
+        "end"
+      ],
+      "id": "03cb8d35",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "The respective distance matrices are obtained with\n"
+      ],
+      "id": "0c0fa7a6"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "DB_x = barcode_to_distance(pds_x)\n",
+        "DB_y = barcode_to_distance(pds_y)\n",
+        "DB_x2 = barcode_to_distance(pds_x2)\n",
+        "DB_y2 = barcode_to_distance(pds_y2)"
+      ],
+      "id": "78cdbfb2",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "And we can see that none of the tools we used before can separate well the classes:\n"
+      ],
+      "id": "bb404a30"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "mds_plot(DB)"
+      ],
+      "id": "47d835b4",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "mds_plot(DB_x)"
+      ],
+      "id": "1a712dd4",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "mds_plot(DB_y)"
+      ],
+      "id": "b332908c",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "mds_plot(DB_x2)"
+      ],
+      "id": "13c4ad06",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "mds_plot(DB_y2)"
+      ],
+      "id": "1a158c38",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Even if we sum all these distances, we still can't cluster correctly any class:\n"
+      ],
+      "id": "65f45b48"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "DB_final = zero(DB)\n",
+        "\n",
+        "for d in [DB, DB_x, DB_y, DB_x2, DB_y2]\n",
+        "    DB_final = DB_final + (d ./ maximum(d))\n",
+        "end"
+      ],
+      "id": "9b8b58b6",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "mds_plot(DB_final)"
+      ],
+      "id": "df8d1837",
+      "execution_count": null,
+      "outputs": []
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "julia-1.10",
+      "language": "julia",
+      "display_name": "Julia 1.10.4",
+      "path": "/home/vituri/.local/share/jupyter/kernels/julia-1.10"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}
