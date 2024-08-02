@@ -4,7 +4,7 @@ jupyter: julia-1.10
 
 # Classifying wings
 
-![](wings/Asilidae/Asilidae%2011.png)
+![](images/Asilidae%202.png)
 
 
 In this quick lesson, we try to classify wings using the tools seen in the last lessons.
