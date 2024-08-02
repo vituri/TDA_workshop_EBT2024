@@ -1,0 +1,398 @@
+---
+jupyter: julia-1.10
+---
+
+# Classifying wings
+
+![](wings/Asilidae/Asilidae%2011.png)
+
+
+In this quick lesson, we try to classify wings using the tools seen in the last lessons.
+
+```{julia}
+using MetricSpaces
+using Images
+using DataFrames
+using GLMakie
+using Ripserer, PersistenceDiagrams
+import Plots
+using ProgressMeter
+
+using Clustering
+import StatsPlots
+
+using MultivariateStats
+using Chain
+using ImageFiltering
+```
+
+We prepare a dataframe with the files and classes of each image
+
+```{julia}
+ds = DataFrame();
+
+for (root, dir, files) in walkdir("wings/")
+
+    for file in files
+        dc = Dict(:Classe => root |> basename, :Caminho => file, :Caminho_completo => joinpath(root, file))
+        
+        push!(ds, dc, cols = :union)
+    end
+end
+
+ds;
+```
+
+```{julia}
+ds_split = groupby(ds, :Classe) |> collect;
+```
+
+```{julia}
+function plot_mosaic(s)
+    mosaicview(
+    [imresize(load(f), (150, 300)) for f ∈ s.Caminho_completo[1:min(end, 21)]]
+    , ncol = 3
+    ,fillvalue = RGB24(1)
+    )
+end;
+
+f = ds.Caminho_completo[1]
+```
+
+
+## The dataset
+
+The dataset consists of several images of 3 different species of insects:
+
+
+### Asilidae
+
+```{julia}
+plot_mosaic(ds_split[1])
+```
+
+### Ceratopogonidae
+
+```{julia}
+plot_mosaic(ds_split[2])
+```
+
+### Tipulidae
+
+```{julia}
+plot_mosaic(ds_split[3])
+```
+
+We load all images as matrices
+
+```{julia}
+images = [load(img) .|> Gray |> channelview for img ∈ ds.Caminho_completo];
+```
+
+We can see that the image is indeed correct:
+
+```{julia}
+images[1] |> image
+```
+
+## Matrix to $\mathbb{R}^2$
+
+As before, we need to transform each image in points of the plane.
+
+
+```{julia}
+function img_to_points(img)
+    img2 = imfilter(img, Kernel.gaussian(1)) .|> float
+    ids = findall(x -> x <= 0.8, img2)
+    pts = getindex.(ids, [1 2])
+
+    [ [ p[1], p[2] ] for p in eachrow(pts)] |> EuclideanSpace
+end;
+```
+
+We convert each image to points 
+
+```{julia}
+pts = img_to_points.(images);
+```
+
+and normalize the coordinates, since each image has a different size:
+
+```{julia}
+function normalize!(pts)
+    a, b = extrema(pts .|> last)
+
+    pts ./ (b - a)
+end
+
+wings = normalize!.(pts);
+```
+
+We can plot a scatter to check that it is indeed ok:
+
+```{julia}
+scatter(wings[1])
+```
+
+In order to apply the Vietoris-Rips filtration, we need to reduce the amount of points in each wing. The farthest point sample come in our rescue again!
+
+```{julia}
+wings_short = @showprogress map(wings) do w
+    ids = farthest_points_sample(w, 400)
+    w[ids]
+end;
+```
+
+Now we calculate each barcode using the Vietoris-Rips filtration:
+
+```{julia}
+pds = @showprogress map(wings_short) do w
+    ripserer(w, cutoff = 0.008)
+end
+```
+
+We can now see the metric space
+
+```{julia}
+scatter(wings_short[1])
+```
+
+and the corresponding 1-dimensional persistente diagram
+
+```{julia}
+Plots.plot(pds[1][2])
+```
+
+Now we calculate the pairwise 1-dimensional bottleneck distance between each wing:
+
+```{julia}
+function barcode_to_distance(pds)
+    n = length(pds)
+    DB = zeros(n, n)
+
+    @showprogress for i ∈ 1:n
+        for j ∈ i:n
+            if i == j
+                DB[i, j] = 0 
+                continue 
+            end
+
+            DB[i, j] = Bottleneck()(pds[i][2], pds[j][2])
+            DB[j, i] = DB[i, j]
+        end
+    end
+
+    DB
+end
+```
+
+
+```{julia}
+DB = barcode_to_distance(pds)
+```
+
+and see if the classes are well separated:
+
+```{julia}
+function mds_plot(D)
+    M = fit(MDS, D; distances = true, maxoutdim = 2)
+    Y = predict(M)
+
+    ds.Row = 1:nrow(ds)
+
+    dfs = @chain ds begin
+        groupby(:Classe)
+        collect
+    end
+
+    fig = Figure();
+    ax = Makie.Axis(fig[1,1])
+
+    colors = cgrad(:tableau_10, 8, categorical = true)
+
+    for (i, df) ∈ enumerate(dfs)    
+        scatter!(
+            ax, Y[:, df.Row]
+            , label = df.Classe[1], markersize = 15
+            , color = colors[i]
+            )
+    end
+
+    axislegend();
+    fig
+
+    fig
+end;
+```
+
+
+```{julia}
+mds_plot(DB)
+```
+
+## Slicing it sideways
+
+As we did with the hand-written digits dataset, we can do some sideways slicing on the wings.
+
+```{julia}
+set_value(x, value) = x < 0.99 ? value : x
+
+function side_filtration(img, axis = 1, invert = false)
+
+    img2 = imresize(img, (100, 200))
+    m = imfilter(img2, Kernel.gaussian(0.4))
+    # m = img .|> float
+    m = set_value.(m, 0)
+    # m |> image
+    # m = img .|> float
+
+    pts = img_to_points(m)
+
+    a, b = if axis == 1 
+        extrema(pts .|> first)
+        else
+        extrema(pts .|> last)
+    end
+
+    for i ∈ a:b
+
+        v = (b - i) / (b - a)
+
+        if invert == true
+            v = 1.0 - v
+        end
+
+        if axis == 1
+            m[i, :] = set_value.(m[i, :], v)
+        else 
+            m[:, i] = set_value.(m[:, i], v)
+        end
+
+    end
+
+    m .|> float
+end;
+```
+
+
+We can visualize the filtrations as follows:
+
+```{julia}
+img = images[5]
+img2 = side_filtration(img, 1)
+heatmap(img2)
+```
+
+
+```{julia}
+img2 = side_filtration(img, 2)
+heatmap(img2)
+```
+
+```{julia}
+img2 = side_filtration(img, 1, true)
+heatmap(img2)
+```
+
+```{julia}
+img2 = side_filtration(img, 2, true)
+heatmap(img2)
+```
+
+And calculate each barcode:
+
+```{julia}
+pds_x = @showprogress map(images) do img
+    img2 = side_filtration(img)
+    bc = ripserer(Cubical(img2), cutoff = 0.1)
+end
+
+pds_y = @showprogress map(images) do img
+    img2 = side_filtration(img, 2)
+    ripserer(Cubical(img2), cutoff = 0.1)
+end
+
+pds_x2 = @showprogress map(images) do img
+    img2 = side_filtration(img, 1, true)
+    ripserer(Cubical(img2), cutoff = 0.1)
+end
+
+pds_y2 = @showprogress map(images) do img
+    img2 = side_filtration(img, 2, true)
+    ripserer(Cubical(img2), cutoff = 0.1)
+end
+```
+
+```{julia}
+barcode(pds_x[5])
+```
+
+```{julia}
+barcode(pds_y[5])
+```
+
+```{julia}
+barcode(pds_x2[5])
+```
+
+```{julia}
+barcode(pds_y2[5])
+```
+
+Let's see way some figures have so many generators in dimension 1:
+
+```{julia}
+img = images[9]
+img2 = side_filtration(img, 2, true)
+heatmap(img2)
+```
+
+```{julia}
+barcode(pds_y2[9])
+```
+
+The respective distance matrices are obtained with
+
+```{julia}
+DB_x = barcode_to_distance(pds_x)
+DB_y = barcode_to_distance(pds_y)
+DB_x2 = barcode_to_distance(pds_x2)
+DB_y2 = barcode_to_distance(pds_y2)
+```
+
+And we can see that none of the tools we used before can separate well the classes:
+
+```{julia}
+mds_plot(DB)
+```
+
+```{julia}
+mds_plot(DB_x)
+```
+
+```{julia}
+mds_plot(DB_y)
+```
+
+```{julia}
+mds_plot(DB_x2)
+```
+
+```{julia}
+mds_plot(DB_y2)
+```
+
+Even if we sum all these distances, we still can't cluster correctly any class:
+
+```{julia}
+DB_final = zero(DB)
+
+for d in [DB, DB_x, DB_y, DB_x2, DB_y2]
+    DB_final = DB_final + (d ./ maximum(d))
+end
+```
+
+
+```{julia}
+mds_plot(DB_final)
+```

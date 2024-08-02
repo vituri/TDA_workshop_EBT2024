@@ -1,10 +1,11 @@
 ---
-jupyter: julia-1.10
+engine: julia
 ---
 
 # Classifying wings
 
 ![](wings/Asilidae/Asilidae%2011.png)
+
 
 In this quick lesson, we try to classify wings using the tools seen in the last lessons.
 
@@ -20,7 +21,6 @@ using ProgressMeter
 using Clustering
 import StatsPlots
 
-import StatisticalMeasures.ConfusionMatrices as CM
 using MultivariateStats
 using Chain
 using ImageFiltering
@@ -59,6 +59,7 @@ end;
 f = ds.Caminho_completo[1]
 ```
 
+
 ## The dataset
 
 The dataset consists of several images of 3 different species of insects:
@@ -91,10 +92,10 @@ images = [load(img) .|> Gray |> channelview for img ∈ ds.Caminho_completo];
 We can see that the image is indeed correct:
 
 ```{julia}
-heatmap(images[1])
+images[1] |> image
 ```
 
-## Matrix to \mathbb{R}^2
+## Matrix to $\mathbb{R}^2$
 
 As before, we need to transform each image in points of the plane.
 
@@ -136,6 +137,8 @@ scatter(wings[1])
 In order to apply the Vietoris-Rips filtration, we need to reduce the amount of points in each wing. The farthest point sample come in our rescue again!
 
 ```{julia}
+#| output: false
+#| echo: false
 wings_short = @showprogress map(wings) do w
     ids = farthest_points_sample(w, 400)
     w[ids]
@@ -146,7 +149,7 @@ Now we calculate each barcode using the Vietoris-Rips filtration:
 
 ```{julia}
 pds = @showprogress map(wings_short) do w
-    ripserer(w, cutoff = 0.01)
+    ripserer(w, cutoff = 0.008)
 end
 ```
 
@@ -221,7 +224,7 @@ function mds_plot(D)
     fig
 
     fig
-end
+end;
 ```
 
 
@@ -238,7 +241,8 @@ set_value(x, value) = x < 0.99 ? value : x
 
 function side_filtration(img, axis = 1, invert = false)
 
-    m = imfilter(img, Kernel.gaussian(1))
+    img2 = imresize(img, (100, 200))
+    m = imfilter(img2, Kernel.gaussian(0.4))
     # m = img .|> float
     m = set_value.(m, 0)
     # m |> image
@@ -319,6 +323,22 @@ pds_y2 = @showprogress map(images) do img
     img2 = side_filtration(img, 2, true)
     ripserer(Cubical(img2), cutoff = 0.1)
 end
+```
+
+```{julia}
+barcode(pds_x[5])
+```
+
+```{julia}
+barcode(pds_y[5])
+```
+
+```{julia}
+barcode(pds_x2[5])
+```
+
+```{julia}
+barcode(pds_y2[5])
 ```
 
 The respective distance matrices are obtained with

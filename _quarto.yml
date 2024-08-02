@@ -29,7 +29,7 @@ book:
       - "getting started.qmd"
       - 3d-shapes.qmd
       - digits.qmd
-      - wings.qmd
+      - wings2.qmd
     - part: "Part 2: Mapper"
       chapters:
       - "mapper.qmd"
