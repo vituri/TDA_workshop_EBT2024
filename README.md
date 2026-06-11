@@ -65,3 +65,36 @@ The minicourse will be more useful if the attendee is able to run code in its ow
 - explain how to source a project with its dependencies;
 - create the .qmd files
 - export the files also as plain code
+
+---
+
+## CI — Scheduled Rebuild (bit-rot detection)
+
+A GitHub Actions workflow at `.github/workflows/rebuild.yml` rebuilds this
+book automatically **every Monday at 03:00 UTC** and on every manual trigger
+(`Actions → Rebuild → Run workflow`).
+
+## What the workflow does
+
+1. Checks out the repository.
+2. Installs Julia (latest stable 1.x) and Quarto.
+3. **Deletes `Manifest.toml`** and then `Pkg.develop`s the six JuliaTDA
+   ecosystem packages directly from their `main` branches on GitHub
+   (`MetricSpaces`, `TDAmapper`, `TDAplots`, `Ripserer`,
+   `PersistenceDiagrams`, `ToMATo`) — overriding any pinned versions.
+4. Installs IJulia and registers the kernel used in the `.qmd` files.
+5. Clears the Quarto `_freeze` cache so every chapter is fully re-executed.
+6. Runs `quarto render` under `xvfb-run` (needed because `wings2.qmd` uses
+   GLMakie, which requires a virtual framebuffer on headless Linux).
+
+## What a red run means
+
+A failed workflow run means **bit-rot**: some change in a JuliaTDA package's
+`main` branch broke the book's rendering.  Check the Actions log for the
+failing step (most likely the `Render book` step) and the Julia error message.
+Common causes: renamed/removed API functions, changed function signatures,
+new breaking releases of transitive dependencies.
+
+The book is **not published** by this workflow — it is render-only.  Fixing
+the book means either updating the book's source to match the new API, or
+filing an issue upstream in the relevant JuliaTDA package.
